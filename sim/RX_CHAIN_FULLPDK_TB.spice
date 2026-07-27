@@ -1,0 +1,226 @@
+** Full RX Chain — FULL IHP SG13G2 PDK (ngspice-46 + OSDI)
+** Signal chain: ANT → LNA → Mixer → IF Amp
+.control
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/r3_cmc.osdi
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/psp103_nqs.osdi
+.endc
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+
+** === MIM Cap ===
+.subckt cap_cmim PLUS MINUS w=10e-6 l=10e-6 m=1
+.param Ctot={1.5e-3*w*l*m}
+C1 PLUS MINUS {Ctot}
+.ends cap_cmim
+
+** === TL Models ===
+.subckt TL_85_97u IN OUT GND
+C1 IN GND 0.77fF
+R1 IN n1 0.554
+L1 n1 n2 11.15pH
+C2 n2 GND 1.54fF
+R2 n2 n3 0.554
+L2 n3 n4 11.15pH
+C3 n4 GND 1.54fF
+R3 n4 n5 0.554
+L3 n5 n6 11.15pH
+C4 n6 GND 1.54fF
+R4 n6 n7 0.554
+L4 n7 OUT 11.15pH
+C5 OUT GND 0.77fF
+.ends
+
+.subckt TL_85_210u IN OUT GND
+C1 IN GND 0.92fF
+R1 IN n1 0.665
+L1 n1 n2 13.38pH
+C2 n2 GND 1.845fF
+R2 n2 n3 0.665
+L2 n3 n4 13.38pH
+C3 n4 GND 1.845fF
+R3 n4 n5 0.665
+L3 n5 n6 13.38pH
+C4 n6 GND 1.845fF
+R4 n6 n7 0.665
+L4 n7 n8 13.38pH
+C5 n8 GND 1.845fF
+R5 n8 n9 0.665
+L5 n9 n10 13.38pH
+C6 n10 GND 1.845fF
+R6 n10 n11 0.665
+L6 n11 n12 13.38pH
+C7 n12 GND 1.845fF
+R7 n12 n13 0.665
+L7 n13 OUT 13.38pH
+C8 OUT GND 0.92fF
+.ends
+
+.subckt TL_85_58u IN OUT GND
+C1 IN GND 0.89fF
+R1 IN n1 0.643
+L1 n1 n2 12.9pH
+C2 n2 GND 1.79fF
+R2 n2 n3 0.643
+L2 n3 OUT 12.9pH
+C3 OUT GND 0.89fF
+.ends
+
+.subckt TL_85_49u IN OUT GND
+C1 IN GND 0.75fF
+R1 IN n1 0.543
+L1 n1 n2 10.92pH
+C2 n2 GND 1.51fF
+R2 n2 n3 0.543
+L2 n3 OUT 10.92pH
+C3 OUT GND 0.75fF
+.ends
+
+.subckt TL_85_66u IN OUT GND
+C1 IN GND 1.02fF
+R1 IN n1 0.732
+L1 n1 n2 14.71pH
+C2 n2 GND 2.03fF
+R2 n2 n3 0.732
+L2 n3 OUT 14.71pH
+C3 OUT GND 1.02fF
+.ends
+
+.subckt TL_85_125u IN OUT GND
+C1 IN GND 0.96fF
+R1 IN n1 0.693
+L1 n1 n2 13.93pH
+C2 n2 GND 1.92fF
+R2 n2 n3 0.693
+L2 n3 n4 13.93pH
+C3 n4 GND 1.92fF
+R3 n4 n5 0.693
+L3 n5 n6 13.93pH
+C4 n6 GND 1.92fF
+R4 n6 n7 0.693
+L4 n7 OUT 13.93pH
+C5 OUT GND 0.96fF
+.ends
+
+** === LNA (Differential Cascode) ===
+.subckt RXAMP_77GD INP INN OUTP OUTN VCC VSS
+XQ1 net_c1 INP net_e1 VSS npn13G2l Nx=4 le=2.5e-6
+XQ2 net_c2 INN net_e2 VSS npn13G2l Nx=4 le=2.5e-6
+XQ3 OUTP VB1 net_c1 VSS npn13G2l Nx=4 le=2.5e-6
+XQ4 OUTN VB1 net_c2 VSS npn13G2l Nx=4 le=2.5e-6
+XTL_IN1 INP net_in1 VSS TL_85_97u
+XTL_IN2 INN net_in2 VSS TL_85_97u
+XTL_LOAD1 VCC OUTP VSS TL_85_210u
+XTL_LOAD2 VCC OUTN VSS TL_85_210u
+XTL_DEG1 net_e1 VSS VSS TL_85_58u
+XTL_DEG2 net_e2 VSS VSS TL_85_58u
+Cin1 net_in1 VSS 30fF
+Cin2 net_in2 VSS 30fF
+RB1 VCC VB1 2k
+CB1 VB1 VSS 1pF
+.ends RXAMP_77GD
+
+** === Mixer (Gilbert Cell) ===
+.subckt MIXER_77GD RFP RFN LOP LON IFP IFN VCC VSS
+XQ1 net_sw1p LOP net_rf1 VSS npn13G2l Nx=2 le=2.5e-6
+XQ2 net_sw1n LON net_rf1 VSS npn13G2l Nx=2 le=2.5e-6
+XQ3 net_sw2n LOP net_rf2 VSS npn13G2l Nx=2 le=2.5e-6
+XQ4 net_sw2p LON net_rf2 VSS npn13G2l Nx=2 le=2.5e-6
+XQ5 net_rf1 RFP net_tail VSS npn13G2l Nx=4 le=2.5e-6
+XQ6 net_rf2 RFN net_tail VSS npn13G2l Nx=4 le=2.5e-6
+XTL_LO1 LOP net_lo1 VSS TL_85_49u
+XTL_LO2 LON net_lo2 VSS TL_85_49u
+XTL_RF1 RFP net_rfm1 VSS TL_85_125u
+XTL_RF2 RFN net_rfm2 VSS TL_85_125u
+Rload1 VCC IFP 500
+Rload2 VCC IFN 500
+Rtail net_tail VSS 200
+Rsw1p net_sw1p IFP 50
+Rsw1n net_sw1n IFN 50
+Rsw2n net_sw2n IFN 50
+Rsw2p net_sw2p IFP 50
+.ends MIXER_77GD
+
+** === IF Amplifier ===
+.subckt IFAMP INP INN OUTP OUTN VCC VSS
+XQ1 net_c1 INP net_tail VSS npn13G2l Nx=4 le=2.5e-6
+XQ2 net_c2 INN net_tail VSS npn13G2l Nx=4 le=2.5e-6
+Rload1 VCC net_c1 200
+Rload2 VCC net_c2 200
+XQ3 OUTP net_c1 net_e3 VSS npn13G2l Nx=4 le=2.5e-6
+XQ4 OUTN net_c2 net_e4 VSS npn13G2l Nx=4 le=2.5e-6
+Ref3 net_e3 VSS 100
+Ref4 net_e4 VSS 100
+Rtail net_tail VSS 100
+.ends IFAMP
+
+** =============================================
+** TESTBENCH
+** =============================================
+VCC VCC 0 2.4
+VB_IN VB_IN 0 0.92
+VB_LO VB_LO 0 0.92
+
+** RF Input (77 GHz, -40 dBm ~ 6.3 mV into 50 Ohm)
+Vrf RF_inp 0 SIN(0 6.3m 76.9G)
+Vrfn RF_inn 0 SIN(0 -6.3m 76.9G)
+Cblock_rfp RF_inp LNA_INP 100fF
+Cblock_rfn RF_inn LNA_INN 100fF
+Rbias_rfp VB_IN LNA_INP 10k
+Rbias_rfn VB_IN LNA_INN 10k
+
+** LO (77 GHz, 0 dBm ~ 316 mV)
+Vlo LO_inp 0 SIN(0 316m 77G)
+Vlon LO_inn 0 SIN(0 -316m 77G)
+Cblock_lop LO_inp MIX_LOP 100fF
+Cblock_lon LO_inn MIX_LON 100fF
+Rbias_lop VB_LO MIX_LOP 10k
+Rbias_lon VB_LO MIX_LON 10k
+
+** LNA
+XLNA LNA_INP LNA_INN LNA_OUTP LNA_OUTN VCC 0 RXAMP_77GD
+
+** Mixer (LNA output → Mixer RF input)
+Ccoup1 LNA_OUTP MIX_RFP 100fF
+Ccoup2 LNA_OUTN MIX_RFN 100fF
+Rbias_mixp VB_IN MIX_RFP 10k
+Rbias_mixn VB_IN MIX_RFN 10k
+XMIX MIX_RFP MIX_RFN MIX_LOP MIX_LON IF_P IF_N VCC 0 MIXER_77GD
+
+** IF Amplifier
+Ccoup_ifp IF_P IFAMP_INP 1pF
+Ccoup_ifn IF_N IFAMP_INN 1pF
+VB_IF VB_IF 0 1.5
+Rbias_ifp VB_IF IFAMP_INP 10k
+Rbias_ifn VB_IF IFAMP_INN 10k
+XIFAMP IFAMP_INP IFAMP_INN OUTP OUTN VCC 0 IFAMP
+
+Rout1 OUTP 0 1k
+Rout2 OUTN 0 1k
+
+.control
+tran 0.5p 30n 5n 0.5p
+
+let vif = v(outp) - v(outn)
+let vrf_in = v(rf_inp) - v(rf_inn)
+meas tran vif_pp pp vif from=20n to=30n
+meas tran vrf_pp pp vrf_in from=20n to=30n
+
+echo ""
+echo "============================================="
+echo "  FULL RX CHAIN — IHP SG13G2 PDK"
+echo "  ANT(76.9G) → LNA → Mixer(LO=77G) → IFAMP"
+echo "  IF = 100 MHz"
+echo "============================================="
+echo "RF input (Vpp diff):"
+print vrf_pp
+echo "IF output (Vpp diff):"
+print vif_pp
+echo "Total chain gain:"
+let chain_gain = vif_pp / vrf_pp
+let chain_gain_db = 20*log(chain_gain)/log(10)
+print chain_gain_db
+echo "============================================="
+.endc
+.end

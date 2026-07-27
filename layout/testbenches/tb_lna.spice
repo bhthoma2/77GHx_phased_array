@@ -1,0 +1,32 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/layout/testbenches/tb_lna.sch
+**.subckt tb_lna
+XQ61 LNA_MIDP INP LNA_TAIL sub! npn13G2l Nx=1 El=1.0
+XQ62 LNA_MIDN INN LNA_TAIL sub! npn13G2l Nx=1 El=1.0
+XQ45 LNA_OUTP LNA_VCB LNA_MIDP sub! npn13G2l Nx=1 El=1.0
+XQ46 LNA_OUTN LNA_VCB LNA_MIDN sub! npn13G2l Nx=1 El=1.0
+RL_P VCC LNA_OUTP 200
+RL_N VCC LNA_OUTN 200
+VCC VCC GND DC 3.3
+ITAIL LNA_TAIL GND DC 6m
+VIN_P INP GND DC 0.9 SIN(0.9 0.001 77e9)
+VIN_N INN GND DC 0.9 SIN(0.9 -0.001 77e9)
+VCASC LNA_VCB GND DC 2.0
+**** begin user architecture code
+
+
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+.options gmin=1e-10 reltol=5e-3 abstol=1e-10 vntol=1e-4
+.options itl1=1000 itl2=200 itl4=500
+.options method=gear maxord=3
+.options noopiter
+.tran 0.2p 2n
+.meas tran vswing_outp pp v(lna_outp) from=1n to=2n
+.meas tran vswing_inp pp v(inp) from=1n to=2n
+
+
+**** end user architecture code
+**.ends
+.end

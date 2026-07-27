@@ -1,0 +1,85 @@
+** 77 GHz LNA Testbench - Real IHP SG13G2 PDK
+** Run with: ngspice -b RXAMP_77GD_PDK_TB.spice
+
+** =====================================================================
+** IHP SG13G2 MODELS (extracted VBIC parameters, no OSDI needed)
+** =====================================================================
+.include sg13g2_models_local.spice
+
+** =====================================================================
+** TRANSMISSION LINE MODELS
+** =====================================================================
+.include RXAMP_77GD.spice
+
+** =====================================================================
+** INCLUDE PDK-COMPATIBLE LNA
+** =====================================================================
+.include RXAMP_77GD_PDK.spice
+
+** =====================================================================
+** TESTBENCH
+** =====================================================================
+
+VCC VCC 0 2.4
+
+.param PIN_DBM=-30
+.param PIN={PWR(10,0.1*PIN_DBM)/1000}
+.param VIN_RMS={SQRT(PIN*85)}
+.param VIN_PP={SQRT(2)*2*VIN_RMS}
+
+VinP INP_src 0 DC 0 AC 1 SIN(0 {VIN_PP/2} 77G)
+VinN INN_src 0 DC 0 AC -1 SIN(0 {-VIN_PP/2} 77G)
+
+RS1 INP_src INP_ac 42.5
+RS2 INN_src INN_ac 42.5
+Cblock1 INP_ac INP 100fF
+Cblock2 INN_ac INN 100fF
+
+XDUT INP INN OUTP OUTN VCC 0 RXAMP_77GD_PDK
+
+RL1 OUTP 0 42.5
+RL2 OUTN 0 42.5
+
+** =====================================================================
+** ANALYSIS
+** =====================================================================
+
+.control
+
+echo "=============================================="
+echo " 77 GHz LNA - REAL IHP SG13G2 PDK MODELS"
+echo "=============================================="
+echo ""
+
+echo "=== DC Operating Point ==="
+op
+print v(vcc)
+print @vcc[i]
+echo ""
+
+echo "=== AC Analysis: 50-110 GHz ==="
+ac lin 201 50G 110G
+let vout_diff = v(outp) - v(outn)
+let gain_dB = db(vout_diff)
+print gain_dB[100]
+meas ac gain_50G find vdb(outp) at=50G
+meas ac gain_77G find vdb(outp) at=77G
+meas ac gain_100G find vdb(outp) at=100G
+echo ""
+
+echo "=== Transient at 77 GHz ==="
+tran 0.5p 2n
+
+let vout_t = v(outp) - v(outn)
+let vin_t = v(inp) - v(inn)
+meas tran vout_pp pp vout_t from=0.5n to=2n
+meas tran vin_pp pp vin_t from=0.5n to=2n
+
+echo ""
+echo "=============================================="
+echo " PDK SIMULATION COMPLETE"
+echo "=============================================="
+
+.endc
+
+.end

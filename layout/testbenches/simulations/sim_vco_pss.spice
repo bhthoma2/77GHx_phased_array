@@ -1,0 +1,63 @@
+* VCO 77GHz — Shooting-method PSS via long transient
+* Extract steady-state oscillation frequency, amplitude, power
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+
+VCC vcc 0 DC 3.3
+VTUNE vtune 0 DC 0.9
+
+* Cross-coupled differential VCO
+* Q1 and Q2 form cross-coupled pair
+XQ1 c1 c2 tail 0 npn13G2l m=2
+XQ2 c2 c1 tail 0 npn13G2l m=2
+
+* LC tank: BJT Ceff varies with swing (nonlinear Cje/Cbc)
+* Empirically tuned: L=32pH gives 76.1GHz with npn13G2l m=2
+* Q=8 → Rs = 2*pi*77e9*32e-12/8 = 1.9Ω
+L1 vcc c1_l 32p
+RL1 c1_l c1 1.9
+L2 vcc c2_l 32p
+RL2 c2_l c2 1.9
+
+* Tail current
+ITAIL tail 0 DC 6m
+
+* Startup kick: inject asymmetric pulse into c1
+Ikick c1 0 PULSE(0 1m 0 1p 1p 5p 1n)
+
+* Convergence — aggressive relaxation for mm-wave oscillator
+.options reltol=10e-3 abstol=1e-9 vntol=1e-3 itl1=500 itl2=200 itl4=500
+.options gmin=1e-10 method=trap gminsteps=50 srcsteps=50
+.ic v(c1)=3.3 v(c2)=3.0 v(tail)=2.4
+
+.control
+set maxdata=100000000
+* First check DC OP
+op
+echo "DC OP:"
+print v(c1) v(c2) v(tail)
+destroy all
+
+* Now transient with UIC
+tran 0.5p 3n uic
+
+echo "=== VCO PSS (Shooting Method) ==="
+* Measure frequency from v(c1) crossings (midpoint ~ 3.29V)
+meas tran t1 when v(c1)=3.29 rise=50
+meas tran t2 when v(c1)=3.29 rise=51
+print t1 t2
+
+* Amplitude
+meas tran vc1max max v(c1) from=1.5n to=2n
+meas tran vc1min min v(c1) from=1.5n to=2n
+meas tran vc2max max v(c2) from=1.5n to=2n
+meas tran vc2min min v(c2) from=1.5n to=2n
+print vc1max vc1min vc2max vc2min
+
+* Power
+meas tran isupply avg i(vcc) from=1.5n to=2n
+print isupply
+quit
+.endc
+.end

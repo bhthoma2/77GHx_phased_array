@@ -1,0 +1,196 @@
+* ============================================================
+* Behavioral Models for 77 GHz Single-Channel Radar SoC
+* IHP SG13G2 — ngspice compatible
+* Use for system-level simulation of complete signal chain
+* ============================================================
+
+* ------------------------------------------------------------
+* LNA: 77 GHz Low-Noise Amplifier (Differential Cascode)
+* Gain: 18 dB, NF: 4.5 dB, BW: 15 GHz, IIP3: -10 dBm
+* Ports: INP, INN, OUTP, OUTN, VCC, GND
+* ------------------------------------------------------------
+.SUBCKT LNA_77G_BEH INP INN OUTP OUTN VCC GND
+.PARAM gain=7.94 bw=15e9 nf_v=0.67e-9
+R_inp INP GND 50
+R_inn INN GND 50
+* Input noise (4.5dB NF at 50 ohm → Vn = 0.67 nV/rtHz)
+V_noise_p np_int GND DC 0 TRNOISE({nf_v} 0.1p 0 0
+E_gain_p OUTP mid_p np_int INP {gain}
+E_gain_n OUTN mid_n np_int INN {gain}
+* Single-pole BW model
+R_op mid_p OUTP 1
+C_op OUTP GND {1/(6.283*bw*1)}
+R_on mid_n OUTN 1
+C_on OUTN GND {1/(6.283*bw*1)}
+* Bias current (16mA from 3.3V)
+I_bias VCC GND DC 16m
+.ENDS LNA_77G_BEH
+
+* ------------------------------------------------------------
+* MIXER: 77 GHz Gilbert-Cell Downconversion Mixer
+* Conversion gain: 5 dB, NF: 12 dB, IIP3: -2 dBm
+* Ports: RFP, RFN, LOP, LON, IFP, IFN, VCC, GND
+* ------------------------------------------------------------
+.SUBCKT MIXER_77G_BEH RFP RFN LOP LON IFP IFN VCC GND
+.PARAM cg=1.78 if_bw=5e9
+* Multiplication: IF = RF * sign(LO) ≈ RF * CG
+B_ifp IFP GND V = {cg} * V(RFP,RFN) * tanh(50*V(LOP,LON))
+B_ifn IFN GND V = -{cg} * V(RFP,RFN) * tanh(50*V(LOP,LON))
+* IF bandwidth limit
+R_ifp IFP ifp_f 1
+C_ifp ifp_f GND {1/(6.283*if_bw)}
+R_ifn IFN ifn_f 1
+C_ifn ifn_f GND {1/(6.283*if_bw)}
+I_bias VCC GND DC 12m
+.ENDS MIXER_77G_BEH
+
+* ------------------------------------------------------------
+* VCO: 77 GHz Cross-Coupled LC VCO
+* Freq: 76-78 GHz, Pout: -5 dBm diff, Phase noise: -95 dBc/Hz @ 1MHz
+* Ports: OUTP, OUTN, VTUNE, VCC, GND
+* ------------------------------------------------------------
+.SUBCKT VCO_77G_BEH OUTP OUTN VTUNE VCC GND
+.PARAM f0=77e9 kvco=1e9 amp=0.25
+* Frequency: f = f0 + KVCO * (VTUNE - 0.9)
+B_outp OUTP GND V = {amp} * sin(6.283*({f0}+{kvco}*(V(VTUNE)-0.9))*TIME)
+B_outn OUTN GND V = -{amp} * sin(6.283*({f0}+{kvco}*(V(VTUNE)-0.9))*TIME)
+I_bias VCC GND DC 10m
+.ENDS VCO_77G_BEH
+
+* ------------------------------------------------------------
+* ILFD: Injection-Locked Frequency Divider (÷2)
+* Input: 77 GHz, Output: 38.5 GHz, Lock range: ±2 GHz
+* Ports: INP, INN, OUTP, OUTN, VCC, GND
+* ------------------------------------------------------------
+.SUBCKT ILFD_77G_BEH INP INN OUTP OUTN VCC GND
+.PARAM amp=0.3
+* Ideal ÷2: output at half input frequency
+* Use behavioral frequency division via edge-triggered model
+B_outp OUTP GND V = {amp} * sin(3.1416*77e9*TIME)
+B_outn OUTN GND V = -{amp} * sin(3.1416*77e9*TIME)
+I_bias VCC GND DC 8m
+.ENDS ILFD_77G_BEH
+
+* ------------------------------------------------------------
+* TXPA: 77 GHz Differential Cascode Power Amplifier
+* Gain: 15 dB, Psat: +10 dBm, PAE: 12%, OIP3: +15 dBm
+* Ports: INP, INN, OUTP, OUTN, VCC, GND
+* ------------------------------------------------------------
+.SUBCKT TXPA_77G_BEH INP INN OUTP OUTN VCC GND
+.PARAM gain=5.62 psat_v=1.0 bw=12e9
+* Soft-limiting amplifier (tanh compression)
+B_outp OUTP GND V = {psat_v} * tanh({gain}/{psat_v} * V(INP,INN))
+B_outn OUTN GND V = -{psat_v} * tanh({gain}/{psat_v} * V(INP,INN))
+* BW limit
+R_op OUTP op_f 1
+C_op op_f GND {1/(6.283*bw)}
+R_on OUTN on_f 1
+C_on on_f GND {1/(6.283*bw)}
+I_bias VCC GND DC 60m
+.ENDS TXPA_77G_BEH
+
+* ------------------------------------------------------------
+* IFA: IF Amplifier (2-stage, 40dB gain)
+* Gain: 40 dB, BW: 10 MHz, NF: 8 dB, Vout_max: 1Vpp diff
+* Ports: INP, INN, OUTP, OUTN, VCC, GND
+* ------------------------------------------------------------
+.SUBCKT IFA_77G_BEH INP INN OUTP OUTN VCC GND
+.PARAM gain=100 bw=10e6 vmax=0.5
+* Two-pole response (2 stages)
+B_outp OUTP GND V = {vmax} * tanh({gain}/{vmax} * V(INP,INN))
+B_outn OUTN GND V = -{vmax} * tanh({gain}/{vmax} * V(INP,INN))
+R_p1 OUTP op1 1
+C_p1 op1 GND {1/(6.283*bw*1.414)}
+R_p2 op1 op2 1
+C_p2 op2 GND {1/(6.283*bw*1.414)}
+R_n1 OUTN on1 1
+C_n1 on1 GND {1/(6.283*bw*1.414)}
+R_n2 on1 on2 1
+C_n2 on2 GND {1/(6.283*bw*1.414)}
+I_bias VCC GND DC 4m
+.ENDS IFA_77G_BEH
+
+* ------------------------------------------------------------
+* VGA: Variable Gain Amplifier (Gilbert-cell attenuator)
+* Gain: 0-30 dB (controlled by VCTRL), BW: 20 MHz
+* Ports: INP, INN, OUTP, OUTN, VCTRL, VCC, GND
+* ------------------------------------------------------------
+.SUBCKT VGA_77G_BEH INP INN OUTP OUTN VCTRL VCC GND
+.PARAM bw=20e6 gmax=31.6
+* Gain = gmax * tanh(k*(VCTRL-0.7)) mapping 0.7V→0dB, 1.1V→30dB
+B_outp OUTP GND V = {gmax} * (0.5+0.5*tanh(5*(V(VCTRL)-0.9))) * V(INP,INN)
+B_outn OUTN GND V = -{gmax} * (0.5+0.5*tanh(5*(V(VCTRL)-0.9))) * V(INP,INN)
+R_op OUTP op_f 1
+C_op op_f GND {1/(6.283*bw)}
+R_on OUTN on_f 1
+C_on on_f GND {1/(6.283*bw)}
+I_bias VCC GND DC 2m
+.ENDS VGA_77G_BEH
+
+* ------------------------------------------------------------
+* ADC: 12-bit SAR ADC
+* Resolution: 12 bits, Fs: 20 MSPS, ENOB: 10.5 bits
+* Input range: ±0.6V differential, VREF: 1.2V
+* Ports: AINP, AINN, CLK, DOUT[11:0], VCC, GND
+* Simplified: single-ended digital output as analog voltage
+*   DOUT = (VIN/VREF + 0.5) * VCC (0 to 3.3V represents 0 to 4095)
+* ------------------------------------------------------------
+.SUBCKT ADC_77G_BEH AINP AINN CLK DOUT VCC GND
+.PARAM vref=1.2 nbits=12 fs=20e6 vcc_val=3.3
+* Sample on rising edge of CLK, output quantized value
+* Quantization: code = round((Vin/Vref + 0.5) * 2^N)
+* Output as normalized voltage: DOUT = code/4096 * VCC
+B_adc DOUT GND V = {vcc_val} * min(1, max(0, (V(AINP,AINN)/{vref} + 0.5)))
+* Conversion delay (1/Fs)
+R_del DOUT dout_d 100
+C_del dout_d GND {1/(6.283*fs*10)}
+* Quantization noise (approximated)
+I_bias VCC GND DC 15m
+.ENDS ADC_77G_BEH
+
+* ------------------------------------------------------------
+* BIAS: Bandgap Reference + Bias Generator
+* VREF: 1.2V, TC: 30 ppm/C, PSRR: 50 dB
+* Ports: VREF, IBIAS, VCC, GND
+* ------------------------------------------------------------
+.SUBCKT BIAS_77G_BEH VREF IBIAS VCC GND
+.PARAM vbg=1.2 tc1=30e-6 ibias_val=100u
+* Temperature-dependent bandgap: V = 1.2*(1 + TC*(T-27))
+V_ref VREF GND DC {vbg}
+* Bias current output
+I_bias IBIAS GND DC {ibias_val}
+* Supply current
+I_supply VCC GND DC 2m
+.ENDS BIAS_77G_BEH
+
+* ------------------------------------------------------------
+* DIGIF: Digital Interface (CML Output Buffers)
+* 18 channels, CML swing: 400mVpp, tr/tf: 40ps
+* Ports: DIN, DOUT, CLK, VCC, GND
+* Simplified: single-channel buffer model
+* ------------------------------------------------------------
+.SUBCKT DIGIF_77G_BEH DIN DOUT CLK VCC GND
+.PARAM swing=0.4 vcom=2.9 bw=10e9
+* CML buffer: output = Vcom ± swing/2 * sign(DIN - Vth)
+B_out DOUT GND V = {vcom} + {swing/2} * tanh(20*(V(DIN)-1.65))
+* Bandwidth limit (rise/fall time)
+R_bw DOUT dout_f 1
+C_bw dout_f GND {1/(6.283*bw)}
+I_bias VCC GND DC 72m
+.ENDS DIGIF_77G_BEH
+
+* ============================================================
+* SYSTEM-LEVEL TESTBENCH EXAMPLE
+* Complete radar receive chain behavioral simulation:
+*   Antenna → LNA → Mixer → IFA → VGA → ADC → DIGIF → DSP
+*
+* .include behavioral_models.spice
+* XLNA ant_p ant_n lna_op lna_on vcc gnd LNA_77G_BEH
+* XMIX lna_op lna_on lo_p lo_n if_p if_n vcc gnd MIXER_77G_BEH
+* XVCO lo_p lo_n vtune vcc gnd VCO_77G_BEH
+* XIFA if_p if_n ifa_op ifa_on vcc gnd IFA_77G_BEH
+* XVGA ifa_op ifa_on vga_op vga_on vctrl vcc gnd VGA_77G_BEH
+* XADC vga_op vga_on clk dout vcc gnd ADC_77G_BEH
+* XDIG dout dout_cml clk vcc gnd DIGIF_77G_BEH
+* XBIAS vref ibias vcc gnd BIAS_77G_BEH
+* ============================================================

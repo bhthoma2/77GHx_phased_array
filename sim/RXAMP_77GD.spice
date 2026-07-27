@@ -1,0 +1,137 @@
+** 77 GHz LNA (RXAMP_77GD) - Standalone SPICE Netlist
+** Modified from mWATTBAT RXAMP_150GD for 77 GHz phased array vibrometer
+** PDK: IHP SG13G2 (130nm SiGe BiCMOS)
+** Simulator: ngspice or Xyce
+**
+** Topology: Two-stage cascode differential amplifier
+**   Stage 1: Common-emitter (Q33/Q34) with TL input matching
+**   Stage 2: Common-base cascode (Q35/Q36) with TL collector loads
+**   Bias: Current mirror (Q37)
+
+.subckt RXAMP_77GD INP INN OUTP OUTN VCC GND
+
+** === Transmission Line Models (microstrip on SG13G2 BEOL) ===
+** Z0=85 Ohm differential, εeff≈2.5, vp≈190µm/ps
+
+** Input matching TLs (97µm length, Z0=85)
+XTLINP INP  net7  GND TL_85_97u
+XTLINN INN  net1  GND TL_85_97u
+
+** Emitter degeneration TLs (58µm, Z0=85)
+XTLDEG1 net7 BIAS6 GND TL_85_58u
+XTLDEG2 net1 BIAS6 GND TL_85_58u
+
+** Collector load TLs (151µm, Z0=85)
+XTLLD1 VCC net6 GND TL_85_151u
+XTLLD2 VCC net3 GND TL_85_151u
+
+** === Active Devices ===
+** Input differential pair (common-emitter)
+XQ33 net8 net7 net4 sub! npn13G2l Nx=4 El=2.5u
+XQ34 net1_c net1 net4 sub! npn13G2l Nx=4 El=2.5u
+
+** Cascode pair (common-base)
+XQ35 net6 B3536 net8 sub! npn13G2l Nx=4 El=2.5u
+XQ36 net3 B3536 net1_c sub! npn13G2l Nx=4 El=2.5u
+
+** Bias mirror
+XQ37 BIAS6 BIAS6 net2 sub! npn13G2l Nx=1 El=2.5u
+
+** === Bias Resistors ===
+** Cascode base bias
+XR30 VCC B3536 rppd w=3e-6 l=18.23e-6 b=0 m=2
+XR31 B3536 GND  rppd w=3e-6 l=18.23e-6 b=0 m=1
+
+** Mirror bias
+XR32 VCC BIAS6 rppd w=3e-6 l=18.23e-6 b=0 m=2
+
+** Mirror emitter degeneration
+XR33 net2 GND rppd w=2.5e-6 l=10.53e-6 b=0 m=14
+
+** Tail current source
+XR29 net4 GND rsil w=7e-6 l=38.8e-6 b=0 m=4
+
+** === Coupling Capacitors ===
+** Input shunt matching caps (6µm × 6µm MIM, to ground)
+XC53 INP GND cap_cmim w=6e-6 l=6e-6 m=1
+XC54 INN GND cap_cmim w=6e-6 l=6e-6 m=1
+
+** Output series DC blocking (4µm × 4µm MIM)
+XC55 net6 OUTN cap_cmim w=4e-6 l=4e-6 m=1
+XC56 net3 OUTP cap_cmim w=4e-6 l=4e-6 m=1
+
+** === Supply Decoupling ===
+XC57 VCC B3536 cap_cmim w=100e-6 l=15e-6 m=1
+XC58 VCC BIAS6 cap_cmim w=100e-6 l=20e-6 m=1
+XC59 BIAS6 GND  cap_cmim w=100e-6 l=20e-6 m=1
+XC60 VCC GND   cap_cmim w=100e-6 l=15e-6 m=1
+XC61 VCC GND   cap_cmim w=100e-6 l=15e-6 m=1
+
+.ends RXAMP_77GD
+
+** === Transmission Line Subcircuits ===
+** Using multi-section lumped pi-model for accuracy at 77 GHz
+** Parameters: R=22.16k/m, L=445.9nH/m, C=61.5pF/m, Z0=85 Ohm
+** vphase = 1/sqrt(LC) = 1/sqrt(445.9e-9 * 61.5e-12) = 191 µm/ps
+** At 77 GHz: lambda = 191e-6/77e9 = 2.48 µm?? No...
+** vphase = 1/sqrt(L_per_m * C_per_m) = 1/sqrt(445.9e-9 * 61.5e-12) = 1.91e8 m/s
+** lambda at 77G = 1.91e8/77e9 = 2.48 mm
+** So 97µm = 0.039 lambda, 151µm = 0.061 lambda (short lines, lumped OK with 4 sections)
+
+.subckt TL_85_97u IN OUT GND
+* 4-section pi model, each section 24.25µm
+* L_sec = 445.9e-9 * 24.25e-6 = 10.81pH
+* C_sec = 61.5e-12 * 24.25e-6 = 1.49fF
+* R_sec = 22.16e3 * 24.25e-6 = 0.537 Ohm
+C1 IN GND 0.745fF
+R1 IN n1 0.537
+L1 n1 n2 10.81pH
+C2 n2 GND 1.49fF
+R2 n2 n3 0.537
+L2 n3 n4 10.81pH
+C3 n4 GND 1.49fF
+R3 n4 n5 0.537
+L3 n5 n6 10.81pH
+C4 n6 GND 1.49fF
+R4 n6 n7 0.537
+L4 n7 OUT 10.81pH
+C5 OUT GND 0.745fF
+.ends
+
+.subckt TL_85_58u IN OUT GND
+* 2-section pi model, each section 29µm
+* L_sec = 445.9e-9 * 29e-6 = 12.93pH
+* C_sec = 61.5e-12 * 29e-6 = 1.78fF
+C1 IN GND 0.89fF
+R1 IN n1 0.643
+L1 n1 n2 12.93pH
+C2 n2 GND 1.78fF
+R2 n2 n3 0.643
+L2 n3 OUT 12.93pH
+C3 OUT GND 0.89fF
+.ends
+
+.subckt TL_85_151u IN OUT GND
+* 6-section pi model, each section 25.17µm
+* L_sec = 445.9e-9 * 25.17e-6 = 11.22pH
+* C_sec = 61.5e-12 * 25.17e-6 = 1.55fF
+C1 IN GND 0.775fF
+R1 IN n1 0.558
+L1 n1 n2 11.22pH
+C2 n2 GND 1.55fF
+R2 n2 n3 0.558
+L2 n3 n4 11.22pH
+C3 n4 GND 1.55fF
+R3 n4 n5 0.558
+L3 n5 n6 11.22pH
+C4 n6 GND 1.55fF
+R4 n6 n7 0.558
+L4 n7 n8 11.22pH
+C5 n8 GND 1.55fF
+R5 n8 n9 0.558
+L5 n9 n10 11.22pH
+C6 n10 GND 1.55fF
+R6 n10 n11 0.558
+L6 n11 OUT 11.22pH
+C7 OUT GND 0.775fF
+.ends

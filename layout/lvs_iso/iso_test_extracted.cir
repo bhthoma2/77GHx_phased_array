@@ -1,0 +1,35 @@
+* Extracted by KLayout with SG13G2 LVS runset on : 17/07/2026 11:07
+
+.SUBCKT ISO_TEST G1 G1$1 G2 G2$1 W
+Q$1 \$26 \$27 \$60 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$2 \$28 \$29 \$60 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$11 \$315 \$314 \$327 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$12 \$315 \$316 \$327 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$21 \$570 \$570 \$315 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$25 \$674 \$673 \$26 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$26 \$675 \$673 \$28 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$41 \$1154 \$1153 \$1187 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$42 \$1155 \$1156 \$1187 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$45 \$1271 \$1270 \$1334 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$46 \$1272 \$1273 \$1334 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$49 G1 \$1335 \$1188 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$50 \$1335 G1 \$1188 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$61 \$1697 \$1698 \$1271 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$62 \$1699 \$1698 \$1272 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$65 \$1751 \$1730 \$1154 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$66 \$1753 \$1752 \$1154 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$67 \$1753 \$1752 \$1155 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$68 \$1751 \$1730 \$1155 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+R$77 \$14 \$18 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$78 \$116 \$115 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$79 \$1095 \$1101 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$80 \$1102 \$1112 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$81 \$1189 \$1188 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$82 \$2108 \$2111 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$83 \$2109 \$2112 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+C$84 \$1119 \$1120 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$85 \$1121 \$1189 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$86 \$1119 \$1118 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$87 G1 W G2 \$1 sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+C$88 G1$1 W G2$1 \$1 sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+.ENDS ISO_TEST

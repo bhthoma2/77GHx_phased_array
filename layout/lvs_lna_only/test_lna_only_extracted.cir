@@ -1,0 +1,16 @@
+* Extracted by KLayout with SG13G2 LVS runset on : 17/07/2026 13:57
+
+.SUBCKT LNA_ONLY_TEST
+Q$1 \$23 \$17 \$26 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$2 \$23 \$18 \$26 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$5 \$46 \$47 \$23 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$6 \$47 \$46 \$23 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$9 \$112 \$106 \$116 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$10 \$113 \$107 \$116 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$17 \$158 \$150 \$112 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$18 \$159 \$150 \$113 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+R$25 \$12 \$11 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$26 \$91 \$92 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+C$27 \$95 \$94 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$28 \$95 \$96 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+.ENDS LNA_ONLY_TEST

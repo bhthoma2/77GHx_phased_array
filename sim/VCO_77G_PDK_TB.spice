@@ -1,0 +1,93 @@
+** 77 GHz VCO - Hardcoded VBIC Model for Nx=2, El=2.5µm
+** Run with: ngspice -b VCO_77G_PDK_TB.spice
+
+** === Hardcoded npn13G2l for Nx=2, El=2.5u ===
+** CJE = 2.166e-14*(1)*(0.5)^0.95 = 11.02fF
+** CJC = 3.83e-15*(1)*(0.5)^0.975 = 1.93fF
+** CBEO = 1.92e-15*(1)*(0.5)^0.95 = 0.977fF
+** CBCO = 6.33e-15*(1)*(0.5)^0.975 = 3.19fF
+
+.model npn_vco npn level=4
++ tnom=27
++ cbeo=0.977e-15 cje=11.02e-15 pe=0.92 me=0.12 aje=-0.5 wbe=1.0
++ cbco=3.19e-15 cjc=1.93e-15 pc=0.558 mc=0.12 ajc=-0.5
++ cjep=3.92e-15 cjcp=4.77e-15 ps=0.46 ms=0.23 ajs=-0.5
++ fc=0.80 vef=189 ver=5.3
++ is=3.75e-17 nf=1.004
++ ibei=1.024e-19 nei=1.035
++ iben=6.12e-16 nen=2.0
++ ikf=0.016 nr=1.01
++ ibci=1.5e-19 nci=1.05
++ ibcn=5.0e-16 ncn=1.7
++ ikr=0.005
++ wsp=1 isp=2.0e-20 nfp=1.04
++ ibcip=1.23e-15 ncip=1.0
++ ibcnp=2.5e-15 ncnp=1.5
++ ikp=5.0e-5
++ ibeip=2.0e-19 ibenp=1.0e-14
++ re=5.87 rcx=7.29 rci=10.6
++ vo=0.8 gamm=3e-14 hrcf=1000
++ rbx=5.08 rbi=14.52 rbp=30.0 rs=2.0
++ avc1=2.4 avc2=10.81
++ tf=0.231e-12 xtf=10 vtf=20 itf=0.829 tr=5e-13
+
+** Resistor/cap models
+.subckt cap_cmim PLUS MINUS w=10e-6 l=10e-6 m=1
+.param Ctot={1.5e-3*w*l*m}
+C1 PLUS MINUS {Ctot}
+.ends
+
+.subckt rppd 1 2 bn w=3e-6 l=18e-6 b=0 m=1
+.param Rtot={260*(l/w)/m}
+R1 1 2 {Rtot}
+.ends
+
+.subckt rsil 1 2 bn w=7e-6 l=38.8e-6 b=0 m=1
+.param Rtot={7*(l/w)/m}
+R1 1 2 {Rtot}
+.ends
+
+** npn13G2l wrapper for VCO (uses hardcoded model)
+.subckt npn13G2l c b e bn Nx=2 le=2.5e-6
+Q1 c b e npn_vco
+.ends
+
+** === TL models ===
+.include RXAMP_77GD.spice
+.include VCO_77G.spice
+
+** === TESTBENCH ===
+VCC VCC 0 PWL(0 0 0.1n 2.4)
+VTUNE VTUNE 0 1.2
+
+XVCO OUTP OUTN VTUNE VCC 0 VCO_77G
+
+RL1 OUTP 0 500
+RL2 OUTN 0 500
+Ikick OUTP 0 PWL(0 0 1p 100u 10p 100u 11p 0)
+
+.control
+
+echo "=== VCO with Hardcoded VBIC (Nx=2, El=2.5u) ==="
+tran 0.1p 5n 0 0.1p
+
+let vdiff = v(outp) - v(outn)
+meas tran vosc_early pp vdiff from=0.5n to=1n
+meas tran vosc_late pp vdiff from=4n to=5n
+meas tran t1 when vdiff=0 rise=10
+meas tran t2 when vdiff=0 rise=11
+let fosc = 1/(t2-t1)
+
+echo ""
+echo "=== VCO RESULTS (REAL VBIC PARAMETERS) ==="
+echo "Output swing (early):"
+print vosc_early
+echo "Output swing (steady):"
+print vosc_late
+echo "Oscillation frequency:"
+print fosc
+echo ""
+
+.endc
+.end
+

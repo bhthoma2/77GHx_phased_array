@@ -1,0 +1,52 @@
+* Schematic netlist for PHASED_ARRAY_77G_TOP
+* Ports: G1(CVAR2.G2), G1|W(OUTP/VCC), G2(CVAR1.G1), G2$1(CVAR2.G1)
+
+.SUBCKT PHASED_ARRAY_77G_TOP G1 G1|W G2 G2$1
+
+* === VCO - Cross-Coupled Pair ===
+Q$49 G1|W OUTN VCO_TAIL \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$50 OUTN G1|W VCO_TAIL \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+R$81 VCO_DECAP VCO_TAIL \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+C$85 G1|W VCO_DECAP cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$87 G1|W G1|W G2 \$1 sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+C$88 G1 G1|W G2$1 \$1 sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+
+* === TXPA - Differential Cascode ===
+Q$1 TXP_MID G1|W TX_TAIL \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$2 TXN_MID OUTN TX_TAIL \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$25 ANT_TX VCB TXP_MID \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$26 ANT_TX VCB TXN_MID \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+
+* === LNA - Differential Cascode ===
+Q$45 LNA_MIDP LNA_VCB LNA_TAIL \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$46 LNA_MIDN LNA_VCB2 LNA_TAIL \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$61 RF_P LNA_INP LNA_MIDP \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$62 RF_N LNA_INP LNA_MIDN \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+
+* === MIXER - Gilbert Cell ===
+Q$41 MIX_MIDP RF_P MIX_TAIL \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$42 MIX_MIDN RF_N MIX_TAIL \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$65 IFP G1|W MIX_MIDP \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$66 IFN OUTN MIX_MIDP \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$67 IFN OUTN MIX_MIDN \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$68 IFP G1|W MIX_MIDN \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+
+* === ILFD - Injection-Locked Frequency Divider ===
+Q$11 ILFD_MID G1|W ILFD_TAIL \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$12 ILFD_MID OUTN ILFD_TAIL \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$21 DIV_P DIV_N ILFD_MID \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$22 DIV_N DIV_P ILFD_MID \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+
+* === Bias Network Resistors ===
+R$77 BIAS_R77_P BIAS_R77_M \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$78 BIAS_R78_P BIAS_R78_M \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$79 BIAS_R79_P BIAS_R79_M \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$80 BIAS_R80_P BIAS_R80_M \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$82 BIAS_R82_P BIAS_R82_M \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$83 BIAS_R83_P BIAS_R83_M \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+
+* === Decoupling Caps ===
+C$84 G1|W CAP84_M cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$86 G1|W CAP86_M cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+
+.ENDS PHASED_ARRAY_77G_TOP

@@ -1,0 +1,26 @@
+* IF Amplifier — Single-stage diff pair (one stage of two)
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+
+VCC vcc 0 DC 3.3
+VIN_P inp 0 DC 0.9 AC 0.5m
+VIN_N inn 0 DC 0.9 AC -0.5m
+
+XQ1 outp inp tail 0 npn13G2l m=2
+XQ2 outn inn tail 0 npn13G2l m=2
+RL1 vcc outp 500
+RL2 vcc outn 500
+ITAIL tail 0 DC 2m
+
+.control
+ac dec 50 1k 100g
+let vdiff = vm(outp) + vm(outn)
+let gain_db = db(v(outp) - v(outn))
+meas ac gmax max gain_db
+meas ac f3db when gain_db=gmax-3 fall=1
+echo "=== IFA (single stage) ==="
+print gmax
+print f3db
+quit
+.endc
+.end

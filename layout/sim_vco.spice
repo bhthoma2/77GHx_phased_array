@@ -1,0 +1,60 @@
+* 77 GHz VCO Simulation — IHP SG13G2
+* Transient analysis to verify oscillation frequency
+
+* PDK HBT Model (HICUM built into ngspice)
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+
+* Supply
+VCC vcc 0 DC 3.3
+
+* VCO Core: Cross-coupled npn13G2l pair
+XQVCO1 outp outn vco_tail 0 npn13G2l m=2 Nx=2 selft=0
+XQVCO2 outn outp vco_tail 0 npn13G2l m=2 Nx=2 selft=0
+
+* Tail current source (5mA total)
+ITAIL vco_tail 0 DC 5m
+
+* Tank: LC resonator targeting 77 GHz
+* HBT parasitics add ~100fF. Total C ~150fF at 42.5GHz with L=45pH.
+* For 77GHz: L = 1/(w^2*C_total). With C_parasitic~100fF from HBT,
+* need L=25pH and minimal external C to let parasitics dominate.
+L1 vcc outp 27p IC=0
+L2 vcc outn 27p IC=0
+
+* Varactor only (HBT parasitics provide ~100fF)
+CVAR1 outp 0 15f
+CVAR2 outn 0 12f
+
+* Decoupling
+CDEC vcc 0 10p
+
+* Break symmetry for startup (slight cap mismatch: 40f vs 35f above)
+
+* Help DC convergence: set initial node voltages
+.nodeset v(outp)=3.3 v(outn)=3.3 v(vco_tail)=2.4
+
+* Simulation options
+.options gmin=1e-10 reltol=5e-3 abstol=1e-10 vntol=1e-4
+.options itl1=1000 itl2=200 itl4=500
+.options method=gear maxord=3
+.options noopiter
+
+* Transient: 0.2ps step, 1ns total
+.tran 0.2p 1n
+
+* Measurements
+.meas tran freq_osc trig v(outp) val=3.3 rise=40 targ v(outp) val=3.3 rise=41
+.meas tran vswing pp v(outp) from=0.5n to=1n
+
+.control
+run
+set filetype=ascii
+wrdata /home/bthomas3/Videos/77GHz_phased_array/layout/sim_vco_out.txt v(outp) v(outn)
+let period = freq_osc
+let freq = 1/period
+print freq
+print vswing
+quit
+.endc
+
+.end

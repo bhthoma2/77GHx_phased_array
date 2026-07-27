@@ -1,0 +1,118 @@
+* Top-level simulation: PHASED_ARRAY_77G_TOP
+* Verify VCO oscillation at 77 GHz
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+
+* === TOP-LEVEL SUBCIRCUIT (ngspice-compatible) ===
+.subckt PHASED_ARRAY_77G_TOP G1 VCC G2 G2_1
+
+* VCO Tank (inductors on TopMetal2 - not extracted by LVS)
+L1 VCC OUTP 27p
+L2 VCC OUTN 27p
+* VCO Cross-Coupled Pair (m=2 each)
+XQ49 OUTP OUTN VCO_TAIL 0 npn13G2l m=2 Nx=1 selft=0
+XQ50 OUTN OUTP VCO_TAIL 0 npn13G2l m=2 Nx=1 selft=0
+R81 VCO_DECAP VCO_TAIL 50
+C85 VCC VCO_DECAP 48.86p
+CVAR1 OUTP G2 15f
+CVAR2 OUTN G2_1 15f
+
+* TXPA Differential Cascode (m=8 each)
+XQ1 TXP_MID OUTP TX_TAIL 0 npn13G2l m=8 Nx=1 selft=0
+XQ2 TXN_MID OUTN TX_TAIL 0 npn13G2l m=8 Nx=1 selft=0
+XQ25 ANT_TX VCB TXP_MID 0 npn13G2l m=8 Nx=1 selft=0
+XQ26 ANT_TX VCB TXN_MID 0 npn13G2l m=8 Nx=1 selft=0
+
+* LNA Differential Cascode (m=4 each)
+XQ45 LNA_MIDP LNA_VCB LNA_TAIL 0 npn13G2l m=4 Nx=1 selft=0
+XQ46 LNA_MIDN LNA_VCB2 LNA_TAIL 0 npn13G2l m=4 Nx=1 selft=0
+XQ61 RF_P LNA_INP LNA_MIDP 0 npn13G2l m=4 Nx=1 selft=0
+XQ62 RF_N LNA_INP LNA_MIDN 0 npn13G2l m=4 Nx=1 selft=0
+
+* Mixer Gilbert Cell
+XQ41 MIX_MIDP RF_P MIX_TAIL 0 npn13G2l m=4 Nx=1 selft=0
+XQ42 MIX_MIDN RF_N MIX_TAIL 0 npn13G2l m=4 Nx=1 selft=0
+XQ65 IFP OUTP MIX_MIDP 0 npn13G2l m=2 Nx=1 selft=0
+XQ66 IFN OUTN MIX_MIDP 0 npn13G2l m=2 Nx=1 selft=0
+XQ67 IFN OUTN MIX_MIDN 0 npn13G2l m=2 Nx=1 selft=0
+XQ68 IFP OUTP MIX_MIDN 0 npn13G2l m=2 Nx=1 selft=0
+
+* ILFD Injection-Locked Frequency Divider
+XQ11 ILFD_MID OUTP ILFD_TAIL 0 npn13G2l m=2 Nx=1 selft=0
+XQ12 ILFD_MID OUTN ILFD_TAIL 0 npn13G2l m=2 Nx=1 selft=0
+XQ21 DIV_P DIV_N ILFD_MID 0 npn13G2l m=2 Nx=1 selft=0
+XQ22 DIV_N DIV_P ILFD_MID 0 npn13G2l m=2 Nx=1 selft=0
+
+* Bias resistors and decoupling caps removed for simulation
+* (floating nodes cause singular matrix - biased externally via current sources)
+
+.ends PHASED_ARRAY_77G_TOP
+
+* === TESTBENCH ===
+XDUT G1 VCC G2 G2_1 PHASED_ARRAY_77G_TOP
+
+* Power supply
+VVCC VCC 0 DC 3.3
+Vsub sub 0 DC 0
+
+* Varicap tuning
+VTUNE1 G2 0 DC 1.5
+VTUNE2 G2_1 0 DC 1.5
+VG1 G1 0 DC 1.5
+
+* Bias: VCB for TXPA cascode (set above Vbe threshold)
+VVCB XDUT.VCB 0 DC 2.0
+* LNA cascode bias
+VLNA_VCB XDUT.LNA_VCB 0 DC 2.0
+VLNA_VCB2 XDUT.LNA_VCB2 0 DC 2.0
+* LNA input bias
+VLNA_INP XDUT.LNA_INP 0 DC 0.9
+
+* Tail current sources
+ITAIL_VCO XDUT.VCO_TAIL 0 DC 5m
+ITAIL_TX XDUT.TX_TAIL 0 DC 10m
+ITAIL_LNA XDUT.LNA_TAIL 0 DC 4m
+ITAIL_MIX XDUT.MIX_TAIL 0 DC 4m
+ITAIL_ILFD XDUT.ILFD_TAIL 0 DC 2m
+
+* Load resistors on floating output nodes
+RL_ANT XDUT.ANT_TX VCC 50
+RL_IFP XDUT.IFP VCC 200
+RL_IFN XDUT.IFN VCC 200
+RL_RFP XDUT.RF_P VCC 200
+RL_RFN XDUT.RF_N VCC 200
+RL_DIVP XDUT.DIV_P VCC 500
+RL_DIVN XDUT.DIV_N VCC 500
+
+* Simulation options (from working VCO sim)
+.options gmin=1e-10 reltol=5e-3 abstol=1e-10 vntol=1e-4
+.options itl1=1000 itl2=200 itl4=500
+.options method=gear maxord=3
+.options noopiter
+
+.tran 0.2p 3n
+
+.control
+run
+meas tran t1 WHEN v(XDUT.OUTN)=2.5 RISE=5
+meas tran t2 WHEN v(XDUT.OUTN)=2.5 RISE=6
+if (t2-t1 > 0)
+  let freq_ghz = 1.0 / (t2 - t1) / 1e9
+  echo "=== RESULTS ==="
+  echo "VCO Frequency = $&freq_ghz GHz"
+end
+meas tran voutp_max MAX v(VCC) from=2n to=3n
+meas tran voutp_min MIN v(VCC) from=2n to=3n
+meas tran voutn_max MAX v(XDUT.OUTN) from=2n to=3n
+meas tran voutn_min MIN v(XDUT.OUTN) from=2n to=3n
+let diff_swing = (voutp_max - voutp_min) + (voutn_max - voutn_min)
+echo "Differential Swing = $&diff_swing Vpp"
+meas tran div_p_max MAX v(XDUT.DIV_P) from=2n to=3n
+meas tran div_p_min MIN v(XDUT.DIV_P) from=2n to=3n
+let div_swing = div_p_max - div_p_min
+echo "ILFD DIV_P Swing = $&div_swing Vpp"
+.endc
+
+.end

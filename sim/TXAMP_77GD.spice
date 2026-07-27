@@ -1,0 +1,66 @@
+** 77 GHz TX Power Amplifier - Standalone SPICE Netlist
+** Modified from mWATTBAT TXAMP_150GD for 77 GHz phased array vibrometer
+** PDK: IHP SG13G2 (130nm SiGe BiCMOS)
+**
+** Topology: Two-stage cascode differential amplifier (same as LNA)
+**   Optimized for output power rather than noise figure
+**   Larger tail current for higher Psat
+
+.subckt TXAMP_77GD INP INN OUTP OUTN VCC GND
+
+** === Transmission Line Matching ===
+** Input matching TLs (97µm, Z0=85) — same as LNA
+XTLINP INP net1 GND TL_85_97u
+XTLINN INN net1 GND TL_85_97u
+
+** Emitter degeneration TLs (58µm, Z0=85)
+XTLDEG1 net1 BIAS5 GND TL_85_58u
+XTLDEG2 net1 BIAS5 GND TL_85_58u
+
+** Collector load TLs (151µm, Z0=85) — output matching
+XTLLD1 VCC net6 GND TL_85_151u
+XTLLD2 VCC net3 GND TL_85_151u
+
+** === Active Devices ===
+** Input differential pair (common-emitter)
+XQ28 net7 INP net4 GND npn13G2l Nx=4 El=2.5u
+XQ29 net1_c INN net4 GND npn13G2l Nx=4 El=2.5u
+
+** Cascode pair (common-base) — provides isolation + voltage gain
+XQ30 net6 B3031 net7 GND npn13G2l Nx=4 El=2.5u
+XQ31 net3 B3031 net1_c GND npn13G2l Nx=4 El=2.5u
+
+** Bias mirror
+XQ32 BIAS5 BIAS5 net2 GND npn13G2l Nx=1 El=2.5u
+
+** === Bias Resistors ===
+** Cascode base bias
+XR25 VCC B3031 rppd w=3e-6 l=18.23e-6 b=0 m=2
+XR26 B3031 GND rppd w=3e-6 l=18.23e-6 b=0 m=1
+
+** Mirror bias
+XR27 VCC BIAS5 rppd w=3e-6 l=18.23e-6 b=0 m=2
+
+** Mirror emitter degeneration
+XR28 net2 GND rppd w=2.5e-6 l=10.53e-6 b=0 m=14
+
+** Tail current source (same as LNA — could increase for more power)
+XR24 net4 GND rsil w=7e-6 l=38.8e-6 b=0 m=4
+
+** === Coupling Capacitors ===
+** Input shunt matching (6µm × 6µm)
+XC44 INP GND cap_cmim w=6e-6 l=6e-6 m=1
+XC45 INN GND cap_cmim w=6e-6 l=6e-6 m=1
+
+** Output series DC blocking (4µm × 4µm)
+XC46 net6 OUTN cap_cmim w=4e-6 l=4e-6 m=1
+XC47 net3 OUTP cap_cmim w=4e-6 l=4e-6 m=1
+
+** === Supply Decoupling ===
+XC48 VCC B3031 cap_cmim w=100e-6 l=15e-6 m=1
+XC49 VCC BIAS5 cap_cmim w=100e-6 l=20e-6 m=1
+XC50 BIAS5 GND cap_cmim w=100e-6 l=20e-6 m=1
+XC51 VCC GND cap_cmim w=100e-6 l=15e-6 m=1
+XC52 VCC GND cap_cmim w=100e-6 l=15e-6 m=1
+
+.ends TXAMP_77GD

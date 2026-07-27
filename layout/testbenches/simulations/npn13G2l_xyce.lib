@@ -1,0 +1,21 @@
+* npn13G2l VBIC model for Xyce - pre-evaluated for Nx=1, El=2.5, le=2.5um
+* Converted from IHP SG13G2 PDK (ngspice format)
+* Parameters evaluated at default geometry
+* Use flat Q devices directly (no subcircuit wrapper for Xyce compatibility)
+
+.model npn13G2l_mod NPN level=12
++ tnom=27 cbeo=1.92e-15 cje=2.166e-14 pe=0.92 me=0.12 aje=-0.50
++ wbe=1.00 cbco=6.33e-15 cjc=3.83e-15 pc=0.558 mc=0.12 ajc=-0.50
++ cjep=7.77e-15 cjcp=8.36e-15 ps=0.46 ms=0.23 ajs=-0.50 fc=0.80
++ vef=189 ver=5.3 is=7.50e-17 nf=1.004 ibei=2.01e-19 nei=1.035
++ iben=1.20e-15 nen=2.00 ikf=0.008 nr=1.01 ibci=3.00e-19 nci=1.050
++ ibcn=1.00e-15 ncn=1.70 ikr=0.0025 wsp=1 isp=4.00e-20 nfp=1.04
++ ibcip=2.00e-15 ncip=1.00 ibcnp=5.00e-15 ncnp=1.50 ikp=1.00e-04
++ ibeip=4.00e-19 ibenp=2.00e-14 re=12.76 rcx=15.6 rci=30.0
++ qco=1.00e-18 vo=0.80 gamm=3.00e-14 hrcf=1000 rbx=10.16 rbi=29.04
++ rbp=60.0 rs=4.0 avc1=2.40 avc2=10.81 tf=2.31e-13 qtf=1.00e-18
++ xtf=10.0 vtf=20.0 itf=0.4145 tr=5.00e-13 td=0 cth=4.18e-12
++ rth=1630 ea=1.045 eaie=1.078 eaic=1.12 eais=1.12 eane=1.12
++ eanc=1.12 eans=1.12 xre=-0.42 xrb=0.90 xrc=0.420 xrs=1.50
++ xvo=1.50 xis=2.30 xii=3.30 xin=3.30 tnf=0.00015 tavc=-0.00188
++ kfn=3.00e-9 afn=1.80 bfn=1.00

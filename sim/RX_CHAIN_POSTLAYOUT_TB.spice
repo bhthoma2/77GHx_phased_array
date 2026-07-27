@@ -1,0 +1,184 @@
+** 77 GHz RX Chain — POST-LAYOUT with extracted parasitics
+** LNA → Mixer → IF Amp (including routing parasitics)
+.control
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/r3_cmc.osdi
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/psp103_nqs.osdi
+.endc
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+
+.subckt cap_cmim PLUS MINUS w=10e-6 l=10e-6 m=1
+.param Ctot={1.5e-3*w*l*m}
+C1 PLUS MINUS {Ctot}
+.ends cap_cmim
+
+** === TL Models with post-layout parasitics (extra R/C from PEX) ===
+.subckt TL_85_97u IN OUT GND
+C1 IN GND 0.995fF
+R1 IN n1 0.75
+L1 n1 n2 14.4pH
+C2 n2 GND 1.99fF
+R2 n2 n3 0.75
+L2 n3 n4 14.4pH
+C3 n4 GND 1.99fF
+R3 n4 OUT 0.75
+C4 OUT GND 0.995fF
+.ends
+
+.subckt TL_85_210u IN OUT GND
+C1 IN GND 2.15fF
+R1 IN n1 1.55
+L1 n1 n2 31.2pH
+C2 n2 GND 4.30fF
+R2 n2 n3 1.55
+L2 n3 n4 31.2pH
+C3 n4 GND 4.30fF
+R3 n4 OUT 1.55
+C4 OUT GND 2.15fF
+.ends
+
+.subckt TL_85_58u IN OUT GND
+C1 IN GND 0.60fF
+R1 IN n1 0.43
+L1 n1 n2 8.6pH
+C2 n2 GND 1.19fF
+R2 n2 OUT 0.43
+C3 OUT GND 0.60fF
+.ends
+
+.subckt TL_85_125u IN OUT GND
+C1 IN GND 1.28fF
+R1 IN n1 0.92
+L1 n1 n2 18.6pH
+C2 n2 GND 2.56fF
+R2 n2 n3 0.92
+L2 n3 OUT 18.6pH
+C3 OUT GND 1.28fF
+.ends
+
+.subckt TL_85_49u IN OUT GND
+C1 IN GND 0.50fF
+R1 IN n1 0.36
+L1 n1 OUT 7.3pH
+C2 OUT GND 0.50fF
+.ends
+
+** === LNA (Differential Cascode, Nx=4) with routing parasitics ===
+.subckt LNA_77G_PL INP INN OUTP OUTN VCC VSS
+
+VB_IN bias_in VSS 0.92
+Rbin1 bias_in INP 10k
+Rbin2 bias_in INN 10k
+
+* Input matching
+XTLIN1 INP inp_m VSS TL_85_97u
+XTLIN2 INN inn_m VSS TL_85_97u
+Cin1 inp_m n_in1 30fF
+Cin2 inn_m n_in2 30fF
+
+* Via parasitics (collector to TL)
+Rvia_p n_col1 OUTP 2.5
+Rvia_n n_col2 OUTN 2.5
+
+* Input pair
+XQ1 n_cas1 n_in1 n_e1 VSS npn13G2l Nx=4 le=2.5e-6
+XQ2 n_cas2 n_in2 n_e2 VSS npn13G2l Nx=4 le=2.5e-6
+
+* Cascode
+VB_CAS bias_cas VSS 1.5
+XQ3 n_col1 bias_cas n_cas1 VSS npn13G2l Nx=4 le=2.5e-6
+XQ4 n_col2 bias_cas n_cas2 VSS npn13G2l Nx=4 le=2.5e-6
+
+* Degeneration
+XTLDEG1 n_e1 edeg1 VSS TL_85_58u
+XTLDEG2 n_e2 edeg2 VSS TL_85_58u
+Rdeg1 edeg1 VSS 5
+Rdeg2 edeg2 VSS 5
+
+* Load TLs
+XTLLD1 VCC OUTP VSS TL_85_210u
+XTLLD2 VCC OUTN VSS TL_85_210u
+
+* Routing parasitics
+Croute_p OUTP VSS 0.8fF
+Croute_n OUTN VSS 0.8fF
+
+.ends LNA_77G_PL
+
+** === Mixer (Gilbert Cell) with routing parasitics ===
+.subckt MIXER_77G_PL RFP RFN LOP LON IFP IFN VCC VSS
+
+* RF transconductor
+XQ5 n_sw1 RFP n_tail VSS npn13G2l Nx=4 le=2.5e-6
+XQ6 n_sw2 RFN n_tail VSS npn13G2l Nx=4 le=2.5e-6
+Rtail n_tail VSS 200
+
+* LO switching quad
+XQ1 IFP LOP n_sw1 VSS npn13G2l Nx=2 le=2.5e-6
+XQ2 IFN LON n_sw1 VSS npn13G2l Nx=2 le=2.5e-6
+XQ3 IFN LOP n_sw2 VSS npn13G2l Nx=2 le=2.5e-6
+XQ4 IFP LON n_sw2 VSS npn13G2l Nx=2 le=2.5e-6
+
+* Load resistors + routing parasitics
+Rload1 VCC IFP 500
+Rload2 VCC IFN 500
+Croute1 IFP VSS 0.5fF
+Croute2 IFN VSS 0.5fF
+
+.ends MIXER_77G_PL
+
+** === IF Amplifier ===
+.subckt IFAMP_PL INP INN OUTP OUTN VCC VSS
+
+XQ1 OUTP INP n_e1 VSS npn13G2l Nx=4 le=2.5e-6
+XQ2 OUTN INN n_e2 VSS npn13G2l Nx=4 le=2.5e-6
+Re1 n_e1 n_tail 50
+Re2 n_e2 n_tail 50
+Rtail n_tail VSS 100
+Rld1 VCC OUTP 200
+Rld2 VCC OUTN 200
+Croute1 OUTP VSS 0.3fF
+Croute2 OUTN VSS 0.3fF
+
+.ends IFAMP_PL
+
+** === Testbench ===
+VCC VCC 0 2.4
+VLO_P LOP 0 SIN(1.2 0.3 76.9G)
+VLO_N LON 0 SIN(1.2 -0.3 76.9G)
+
+* RF input: 77 GHz, -30 dBm single-ended ≈ 10mVpk
+VRF_P rfp 0 SIN(0 0.01 77G)
+VRF_N rfn 0 SIN(0 -0.01 77G)
+
+* RX chain
+XLNA rfp rfn lna_op lna_on VCC 0 LNA_77G_PL
+XMIX lna_op lna_on LOP LON if_p if_n VCC 0 MIXER_77G_PL
+XIFA if_p if_n out_p out_n VCC 0 IFAMP_PL
+
+RL1 out_p 0 1k
+RL2 out_n 0 1k
+
+.control
+tran 0.5p 5n uic
+
+meas tran vif_pp pp v(out_p) from=4n to=5n
+meas tran vrf_pp pp v(rfp) from=4n to=5n
+let gain_db = db(vif_pp/vrf_pp)
+
+echo ""
+echo "================================================"
+echo "  RX CHAIN POST-LAYOUT (LNA+Mixer+IF Amp)"
+echo "================================================"
+echo "RF input: 77 GHz, 20mVpp differential"
+echo "LO: 76.9 GHz, 600mVpp"
+echo "IF output (single-ended pp):"
+print vif_pp
+echo "Voltage gain (dB):"
+print gain_db
+echo "================================================"
+echo ""
+.endc
+.end

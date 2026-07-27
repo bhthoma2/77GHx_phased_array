@@ -1,0 +1,12 @@
+23-Jul-2026 11:32:37 | INFO    | KLayout version detected: 0.30.9
+23-Jul-2026 11:32:37 | INFO    | User-provided DRC rules JSON: /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/klayout/tech/drc/rule_decks/sg13g2_tech_default.json
+23-Jul-2026 11:32:37 | INFO    | Using DRC JSON file: /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/klayout/tech/drc/rule_decks/sg13g2_tech_default.json
+23-Jul-2026 11:32:37 | INFO    | Running IHP-SG13G2 main checks on design /home/bthomas3/Videos/77GHz_phased_array/tapeout/PHASED_ARRAY_77G_XTOR.gds, topcell: PHASED_ARRAY_77G_XTOR
+23-Jul-2026 11:32:44 | INFO    | Running IHP-SG13G2 sg13g2_maximal checks on design /home/bthomas3/Videos/77GHz_phased_array/tapeout/PHASED_ARRAY_77G_XTOR.gds, topcell: PHASED_ARRAY_77G_XTOR
+23-Jul-2026 11:32:54 | INFO    | Completed running Sg13g2_maximal checks.
+23-Jul-2026 11:32:55 | ERROR   | ==================================================================================
+23-Jul-2026 11:32:55 | ERROR   | ❌ --- KLayout DRC Check Failed: Violations were detected in the layout. --- ❌
+23-Jul-2026 11:32:55 | ERROR   | ==================================================================================
+23-Jul-2026 11:32:55 | ERROR   | Violated rules are : {'TM1.a', 'metal4_drw_Offgrid', 'metal2_drw_Offgrid', 'activ_mask_Offgrid', 'TV2.a', 'via3_drw_Offgrid', 'metal3_drw_Offgrid', 'metal5_drw_Offgrid', 'topmetal2_drw_Offgrid', 'activ_drw_Offgrid', 'metal2_pin_Offgrid', 'TM1.b', 'psd_drw_Offgrid', 'metal1_drw_Offgrid', 'via2_drw_Offgrid', 'emwind_drw_Offgrid', 'Slt.c.TM1', 'TM2.b', 'cont_drw_Offgrid', 'topvia2_drw_Offgrid', 'via1_drw_Offgrid', 'metal1_pin_Offgrid'}
+
+23-Jul-2026 11:32:55 | INFO    | Total DRC Run time: 17.99 seconds (including execution, analysis, and reporting)

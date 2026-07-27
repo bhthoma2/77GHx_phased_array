@@ -1,0 +1,10 @@
+15-Jul-2026 13:57:06 | INFO    | KLayout version detected: 0.30.9
+15-Jul-2026 13:57:06 | INFO    | User-provided DRC rules JSON: /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/klayout/tech/drc/rule_decks/sg13g2_tech_default.json
+15-Jul-2026 13:57:06 | INFO    | Using DRC JSON file: /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/klayout/tech/drc/rule_decks/sg13g2_tech_default.json
+15-Jul-2026 13:57:06 | INFO    | Running IHP-SG13G2 main checks on design /home/bthomas3/Videos/77GHz_phased_array/tapeout/PHASED_ARRAY_77G_XTOR.gds, topcell: PHASED_ARRAY_77G_XTOR
+15-Jul-2026 13:57:21 | INFO    | Running IHP-SG13G2 sg13g2_maximal checks on design /home/bthomas3/Videos/77GHz_phased_array/tapeout/PHASED_ARRAY_77G_XTOR.gds, topcell: PHASED_ARRAY_77G_XTOR
+15-Jul-2026 13:57:42 | INFO    | Completed running Sg13g2_maximal checks.
+15-Jul-2026 13:57:42 | INFO    | =====================================================================================
+15-Jul-2026 13:57:42 | INFO    | ✅ --- KLayout DRC Check Passed: No DRC violations detected in the layout. --- ✅
+15-Jul-2026 13:57:42 | INFO    | =====================================================================================
+15-Jul-2026 13:57:42 | INFO    | Total DRC Run time: 36.22 seconds (including execution, analysis, and reporting)

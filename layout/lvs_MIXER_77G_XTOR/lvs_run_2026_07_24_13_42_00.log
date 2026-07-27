@@ -1,0 +1,16 @@
+24-Jul-2026 09:42:01 | INFO    | Your Klayout version is: KLayout 0.30.9
+24-Jul-2026 09:42:01 | INFO    | Running SG13G2 LVS checks on design /home/bthomas3/Videos/77GHz_phased_array/layout/ALL_BLOCKS_77G.gds on cell MIXER_77G_XTOR
+24-Jul-2026 09:42:06 | INFO    | ==============================================================================
+24-Jul-2026 09:42:06 | INFO    | Important Summary
+24-Jul-2026 09:42:06 | INFO    | +------------------+--------------------------------------------------------------------+
+24-Jul-2026 09:42:06 | INFO    | | Status           | PASS                                                               |
+24-Jul-2026 09:42:06 | INFO    | | Mode             | COMPARE                                                            |
+24-Jul-2026 09:42:06 | INFO    | | Outcome          | Comparison mode: PASS (netlists match).                            |
+24-Jul-2026 09:42:06 | INFO    | | Layout           | ALL_BLOCKS_77G.gds                                                 |
+24-Jul-2026 09:42:06 | INFO    | | Top Cell         | MIXER_77G_XTOR                                                     |
+24-Jul-2026 09:42:06 | INFO    | | Results Dir      | /home/bthomas3/Videos/77GHz_phased_array/layout/lvs_MIXER_77G_XTOR |
+24-Jul-2026 09:42:06 | INFO    | | Warnings         | 0                                                                  |
+24-Jul-2026 09:42:06 | INFO    | | Errors           | 0                                                                  |
+24-Jul-2026 09:42:06 | INFO    | | Run Time (s)     | 5.133                                                              |
+24-Jul-2026 09:42:06 | INFO    | +------------------+--------------------------------------------------------------------+
+24-Jul-2026 09:42:06 | INFO    | ==============================================================================

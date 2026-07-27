@@ -1,0 +1,40 @@
+** 77 GHz CML Divide-by-2 — IHP SG13G2 PDK
+** Topology: Master-slave D-latch with cross-coupled feedback
+** Input: 77 GHz differential clock
+** Output: 38.5 GHz differential
+
+.subckt DIV2_77G CLKP CLKN OUTP OUTN VCC VSS
+
+** === Master Latch ===
+** Clock pair (tracks when CLK high)
+XQM1 net_md1 OUTP net_mclk VSS npn13G2l Nx=2 le=2.5e-6
+XQM2 net_md2 OUTN net_mclk VSS npn13G2l Nx=2 le=2.5e-6
+** Latch pair (holds when CLK low)
+XQM3 net_md1 net_md2 net_mlat VSS npn13G2l Nx=2 le=2.5e-6
+XQM4 net_md2 net_md1 net_mlat VSS npn13G2l Nx=2 le=2.5e-6
+** Clock switches
+XQM5 net_mclk CLKP net_mtail VSS npn13G2l Nx=2 le=2.5e-6
+XQM6 net_mlat CLKN net_mtail VSS npn13G2l Nx=2 le=2.5e-6
+** Load resistors
+RM1 VCC net_md1 120
+RM2 VCC net_md2 120
+** Tail current
+Rmtail net_mtail VSS 150
+
+** === Slave Latch ===
+** Clock pair (tracks when CLK low — antiphase to master)
+XQS1 OUTP net_md1 net_sclk VSS npn13G2l Nx=2 le=2.5e-6
+XQS2 OUTN net_md2 net_sclk VSS npn13G2l Nx=2 le=2.5e-6
+** Latch pair (holds when CLK high)
+XQS3 OUTP OUTN net_slat VSS npn13G2l Nx=2 le=2.5e-6
+XQS4 OUTN OUTP net_slat VSS npn13G2l Nx=2 le=2.5e-6
+** Clock switches (inverted clock vs master)
+XQS5 net_sclk CLKN net_stail VSS npn13G2l Nx=2 le=2.5e-6
+XQS6 net_slat CLKP net_stail VSS npn13G2l Nx=2 le=2.5e-6
+** Load resistors
+RS1 VCC OUTP 120
+RS2 VCC OUTN 120
+** Tail current
+Rstail net_stail VSS 150
+
+.ends DIV2_77G

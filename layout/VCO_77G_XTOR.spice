@@ -1,0 +1,18 @@
+* VCO_77G_XTOR reference schematic netlist
+* Cross-coupled npn13G2l VCO with SVaricap tuning
+* Nets: OUTP(G2), OUTN(G1|G2), VTUNE(G1), TAIL($6), VSS, VCC
+*       CV1.W(W), CV2.W(W$1)
+
+.SUBCKT VCO_77G_XTOR G1 G1|G2 G2 W W$1
+* Cross-coupled pair (Q1: C=OUTN, B=OUTP; Q2: C=OUTP, B=OUTN)
+Q$1 G1|G2 G2 \$6 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$2 G2 G1|G2 \$6 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+* Tail resistor (TAIL to VSS)
+R$5 \$5 \$6 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+* Decoupling cap (VCC to VSS)
+C$6 \$2 \$5 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+* CV1: G1=VTUNE, G2=OUTP, W=floating
+C$7 G1 W G2 \$1 sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+* CV2: G1=G2=OUTN (tied gates), W=floating
+C$8 G1|G2 W$1 G1|G2 \$1 sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+.ENDS VCO_77G_XTOR

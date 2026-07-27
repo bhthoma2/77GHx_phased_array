@@ -1,0 +1,63 @@
+** 77 GHz Wilkinson Power Divider
+** Quarter-wave at 77 GHz, Z0=60 Ohm, differential
+** Used for LO distribution in phased array
+
+.subckt WILKINSON_77GD INP INN OUT1P OUT1N OUT2P OUT2N GND
+
+** Quarter-wave TLs (590µm at 77 GHz, Z0=60)
+XTLQ1 INP OUT1P GND TL_60_590u
+XTLQ2 INP OUT2P GND TL_60_590u
+XTLQ3 INN OUT1N GND TL_60_590u
+XTLQ4 INN OUT2N GND TL_60_590u
+
+** Isolation resistors (100 Ohm between outputs)
+XR19 OUT1P OUT2P rppd w=3e-6 l=12.51e-6 b=0 m=13
+XR20 OUT1N OUT2N rppd w=3e-6 l=12.51e-6 b=0 m=13
+
+.ends WILKINSON_77GD
+
+** Quarter-wave TL at 77 GHz (590µm, Z0=60 Ohm)
+** R=13.55k/m, L=331.35nH/m, C=91.75pF/m
+.subckt TL_60_590u IN OUT GND
+* 12-section pi model, each section 49.2µm
+* L_sec = 331.35e-9 * 49.2e-6 = 16.3pH
+* C_sec = 91.75e-12 * 49.2e-6 = 4.51fF
+* R_sec = 13.55e3 * 49.2e-6 = 0.667 Ohm
+C1 IN GND 2.255fF
+R1 IN n1 0.667
+L1 n1 n2 16.3pH
+C2 n2 GND 4.51fF
+R2 n2 n3 0.667
+L2 n3 n4 16.3pH
+C3 n4 GND 4.51fF
+R3 n4 n5 0.667
+L3 n5 n6 16.3pH
+C4 n6 GND 4.51fF
+R4 n6 n7 0.667
+L4 n7 n8 16.3pH
+C5 n8 GND 4.51fF
+R5 n8 n9 0.667
+L5 n9 n10 16.3pH
+C6 n10 GND 4.51fF
+R6 n10 n11 0.667
+L6 n11 n12 16.3pH
+C7 n12 GND 4.51fF
+R7 n12 n13 0.667
+L7 n13 n14 16.3pH
+C8 n14 GND 4.51fF
+R8 n14 n15 0.667
+L8 n15 n16 16.3pH
+C9 n16 GND 4.51fF
+R9 n16 n17 0.667
+L9 n17 n18 16.3pH
+C10 n18 GND 4.51fF
+R10 n18 n19 0.667
+L10 n19 n20 16.3pH
+C11 n20 GND 4.51fF
+R11 n20 n21 0.667
+L11 n21 n22 16.3pH
+C12 n22 GND 4.51fF
+R12 n22 n23 0.667
+L12 n23 OUT 16.3pH
+C13 OUT GND 2.255fF
+.ends

@@ -1,0 +1,60 @@
+* TX Power Amplifier Harmonic Balance - 77GHz Differential Cascode PA
+* Xyce HB simulation - Large signal (0dBm = 316mV peak into 50ohm)
+
+.include /home/bthomas3/Videos/77GHz_phased_array/layout/testbenches/simulations/npn13G2l_xyce.lib
+
+* Supply
+VCC vcc 0 DC 3.3
+
+* Bias
+VCAS vcas 0 DC 2.4
+VBIAS vbias 0 DC 0.9
+
+* Differential cascode PA
+* Driver stage (common emitter) - 4 parallel devices
+Q1a c1p inp e1p 0 npn13G2l_mod
+Q1b c1p inp e1p 0 npn13G2l_mod
+Q1c c1p inp e1p 0 npn13G2l_mod
+Q1d c1p inp e1p 0 npn13G2l_mod
+Q2a c1n inn e1n 0 npn13G2l_mod
+Q2b c1n inn e1n 0 npn13G2l_mod
+Q2c c1n inn e1n 0 npn13G2l_mod
+Q2d c1n inn e1n 0 npn13G2l_mod
+RE1 e1p 0 2
+RE2 e1n 0 2
+
+* Cascode (common base) - 4 parallel devices
+Q3a outp vcas c1p 0 npn13G2l_mod
+Q3b outp vcas c1p 0 npn13G2l_mod
+Q3c outp vcas c1p 0 npn13G2l_mod
+Q3d outp vcas c1p 0 npn13G2l_mod
+Q4a outn vcas c1n 0 npn13G2l_mod
+Q4b outn vcas c1n 0 npn13G2l_mod
+Q4c outn vcas c1n 0 npn13G2l_mod
+Q4d outn vcas c1n 0 npn13G2l_mod
+
+* Load (matching network modeled as resistive for HB)
+RL1 vcc outp 50
+RL2 vcc outn 50
+
+* Bias network
+RB1 vbias inp 5k
+RB2 vbias inn 5k
+
+* Large-signal 77GHz input (0dBm = 316mV peak differential, so 158mV each)
+VIN_P inp 0 DC 0.9 SIN(0.9 158m 77e9)
+VIN_N inn 0 DC 0.9 SIN(0.9 -158m 77e9)
+
+* Nodesets for convergence
+.NODESET v(c1p)=2.0 v(c1n)=2.0 v(outp)=2.9 v(outn)=2.9
++ v(e1p)=0.5 v(e1n)=0.5 v(inp)=0.9 v(inn)=0.9
+
+* HB analysis at 77GHz
+.OPTIONS HBINT NUMFREQ=7 TAHB=2
+.OPTIONS NONLIN MAXSTEP=500 SEARCHMETHOD=2 CONTINUATION=GMIN ABSTOL=1e-5 RELTOL=5e-2
+.HB 77e9
+
+.PRINT HB_FD v(outp) v(outn) i(VCC)
+.PRINT HB_TD v(outp) v(outn)
+
+.end

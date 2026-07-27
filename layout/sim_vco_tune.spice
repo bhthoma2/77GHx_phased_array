@@ -1,0 +1,81 @@
+* 77 GHz VCO Tuning Sweep — IHP SG13G2
+* Sweep VTUNE from 0 to 3.3V, measure oscillation frequency at each point
+
+* PDK HBT Model
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+
+* Supply
+VCC vcc 0 DC 3.3
+VTUNE vtune 0 DC 1.5
+
+* VCO Core
+XQVCO1 outp outn vco_tail 0 npn13G2l m=2 Nx=2 selft=0
+XQVCO2 outn outp vco_tail 0 npn13G2l m=2 Nx=2 selft=0
+
+* Tail current
+ITAIL vco_tail 0 DC 5m
+
+* Tank inductors (27pH for ~77GHz)
+L1 vcc outp 27p IC=0
+L2 vcc outn 27p IC=0
+
+* Voltage-dependent varactor: C varies with VTUNE
+* sg13_hv_svaricap typical: Cmin~50fF at 0V, Cmax~150fF at 3.3V
+* Model as VCCS charging a cap (behavioral)
+* Simpler: run multiple sims with different fixed cap values
+CVAR1 outp 0 15f
+CVAR2 outn 0 12f
+
+* Decoupling
+CDEC vcc 0 10p
+
+* Asymmetry for startup
+.nodeset v(outp)=3.3 v(outn)=3.3 v(vco_tail)=2.4
+
+.options gmin=1e-10 reltol=5e-3 abstol=1e-10 vntol=1e-4
+.options itl1=1000 itl2=200 itl4=500
+.options method=gear maxord=3 noopiter
+
+.tran 0.2p 1n
+
+.meas tran freq_osc trig v(outp) val=3.3 rise=40 targ v(outp) val=3.3 rise=41
+.meas tran vswing pp v(outp) from=0.5n to=1n
+
+.control
+let vtune_vals = vector(7)
+let freq_results = vector(7)
+let swing_results = vector(7)
+let idx = 0
+
+foreach vt 0.0 0.5 1.0 1.5 2.0 2.5 3.3
+  alter vtune dc = $vt
+  * Scale varactor: C = 10fF + 15fF*(vtune/3.3)
+  let cval = 10e-15 + 15e-15 * $vt / 3.3
+  alter cvar1 = $&cval
+  let cval2 = 8e-15 + 12e-15 * $vt / 3.3
+  alter cvar2 = $&cval2
+  tran 0.2p 1n
+  meas tran period trig v(outp) val=3.3 rise=40 targ v(outp) val=3.3 rise=41
+  let f = 1/period
+  let vtune_vals[idx] = $vt
+  let freq_results[idx] = f
+  meas tran sw pp v(outp) from=0.5n to=1n
+  let swing_results[idx] = sw
+  echo "VTUNE=$vt  Freq=$&f  Swing=$&sw"
+  let idx = idx + 1
+  reset
+end
+
+echo ""
+echo "=== VCO Tuning Curve ==="
+echo "VTUNE(V)  Freq(GHz)  Swing(Vpp)"
+let idx = 0
+foreach vt 0.0 0.5 1.0 1.5 2.0 2.5 3.3
+  let fg = freq_results[idx] / 1e9
+  echo "$vt  $&fg  $&swing_results[idx]"
+  let idx = idx + 1
+end
+quit
+.endc
+
+.end

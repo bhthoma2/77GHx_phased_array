@@ -1,0 +1,16 @@
+17-Jul-2026 11:23:36 | INFO    | Your Klayout version is: KLayout 0.30.9
+17-Jul-2026 11:23:36 | INFO    | Running SG13G2 LVS checks on design /home/bthomas3/Videos/77GHz_phased_array/layout/test_lo_only2.gds on cell PHASED_ARRAY_77G_TOP
+17-Jul-2026 11:23:40 | INFO    | ==============================================================================
+17-Jul-2026 11:23:40 | INFO    | Important Summary
+17-Jul-2026 11:23:40 | INFO    | +------------------+--------------------------------------------------------------+
+17-Jul-2026 11:23:40 | INFO    | | Status           | NET_ONLY                                                     |
+17-Jul-2026 11:23:40 | INFO    | | Mode             | NET_ONLY                                                     |
+17-Jul-2026 11:23:40 | INFO    | | Outcome          | NET_ONLY mode: extracted netlist generated from layout only. |
+17-Jul-2026 11:23:40 | INFO    | | Layout           | test_lo_only2.gds                                            |
+17-Jul-2026 11:23:40 | INFO    | | Top Cell         | PHASED_ARRAY_77G_TOP                                         |
+17-Jul-2026 11:23:40 | INFO    | | Results Dir      | /home/bthomas3/Videos/77GHz_phased_array/layout/lvs_lo2      |
+17-Jul-2026 11:23:40 | INFO    | | Warnings         | 0                                                            |
+17-Jul-2026 11:23:40 | INFO    | | Errors           | 0                                                            |
+17-Jul-2026 11:23:40 | INFO    | | Run Time (s)     | 3.824                                                        |
+17-Jul-2026 11:23:40 | INFO    | +------------------+--------------------------------------------------------------+
+17-Jul-2026 11:23:40 | INFO    | ==============================================================================

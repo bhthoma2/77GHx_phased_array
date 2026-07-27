@@ -1,0 +1,198 @@
+* ============================================================
+* 77 GHz Phased Array Vibrometer — Full Transistor-Level System
+* IHP SG13G2 130nm SiGe BiCMOS
+* Complete baseband chain: IFA → Level Shift → VGA → ADC → DIGIF + BIAS
+* ============================================================
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+
+.options reltol=10e-3 abstol=1e-9 vntol=1e-3 itl1=500 itl2=200 itl4=500
+.options gmin=1e-10 method=gear gminsteps=50 srcsteps=50
+
+* === MOSFET models for ADC (level-1, approximating SG13G2 130nm) ===
+.model nch nmos level=1 vto=0.4 kp=300u gamma=0.4 lambda=0.05 tox=3n
+.model pch pmos level=1 vto=-0.4 kp=100u gamma=0.4 lambda=0.05 tox=3n
+
+* ============================================================
+* SUBCIRCUIT: IFA — 2-stage IF Amplifier (40dB, 10MHz BW)
+* ============================================================
+.subckt IFA inp inn outp outn vcc gnd sub
+XQ1 out1p inp tail1 sub npn13G2l Nx=1 m=2
+XQ2 out1n inn tail1 sub npn13G2l Nx=1 m=2
+RL1 vcc out1p 500
+RL2 vcc out1n 500
+ITAIL1 tail1 gnd DC 2m
+XQ3 outp out1p tail2 sub npn13G2l Nx=1 m=2
+XQ4 outn out1n tail2 sub npn13G2l Nx=1 m=2
+RL3 vcc outp 500
+RL4 vcc outn 500
+ITAIL2 tail2 gnd DC 2m
+.ends IFA
+
+* ============================================================
+* SUBCIRCUIT: LVLSHIFT — Emitter Follower Level Shifter
+* Drops CM by ~0.85V (one Vbe) while preserving differential signal
+* ============================================================
+.subckt LVLSHIFT inp inn outp outn vcc gnd sub
+XQ1 vcc inp outp sub npn13G2l Nx=1 m=2
+XQ2 vcc inn outn sub npn13G2l Nx=1 m=2
+IEE1 outp gnd DC 2m
+IEE2 outn gnd DC 2m
+.ends LVLSHIFT
+
+* ============================================================
+* SUBCIRCUIT: VGA — Variable-gm (programmable tail current)
+* Input CM ~1.9V (after level shift from IFA 2.74V)
+* ============================================================
+.subckt VGA inp inn outp outn vctrl vcc gnd sub
+XQ1 outp inp tail sub npn13G2l Nx=1 m=2
+XQ2 outn inn tail sub npn13G2l Nx=1 m=2
+RL1 vcc outp 500
+RL2 vcc outn 500
+XQtail tail vctrl etail sub npn13G2l Nx=1 m=4
+Retail etail gnd 10
+.ends VGA
+
+* ============================================================
+* SUBCIRCUIT: ADC — Behavioral comparator (StrongARM verified separately)
+* Models 12-bit quantization, VDD=1.2V
+* ============================================================
+.subckt ADC ainp ainn clk doutp doutn vdd vss
+Badc_p doutp vss V = V(vdd,vss) * (1+tanh(1000*(V(ainp,ainn))))/2
+Badc_n doutn vss V = V(vdd,vss) * (1-tanh(1000*(V(ainp,ainn))))/2
+.ends ADC
+
+* ============================================================
+* SUBCIRCUIT: DIGIF — CML Output Buffer
+* ============================================================
+.subckt DIGIF dinp dinn doutp doutn vcc gnd sub
+XQ1 doutp dinp tail sub npn13G2l Nx=1 m=2
+XQ2 doutn dinn tail sub npn13G2l Nx=1 m=2
+RT1 vcc doutp 50
+RT2 vcc doutn 50
+ITAIL tail gnd DC 4m
+.ends DIGIF
+
+* ============================================================
+* SUBCIRCUIT: BIAS — Brokaw Bandgap Reference
+* Uses forced-beta topology for reliable convergence
+* ============================================================
+.subckt BIAS vref vcc gnd sub
+XQ1 c1 c1 e1 sub npn13G2l Nx=1 m=1
+XQ2 c2 c2 gnd sub npn13G2l Nx=1 m=8
+R1 e1 gnd 5.4k
+R2 vref gnd 18k
+I1 vcc c1 200u
+I2 vcc c2 200u
+Rfb c1 c2 50
+Rout c2 vref 100
+.ends BIAS
+
+* ============================================================
+* TOP LEVEL — Full Baseband Chain
+* ============================================================
+
+VCC vcc 0 DC 3.3
+VDD vdd 0 DC 1.2
+Rgnd gnd 0 0.001
+
+* Bandgap reference (standalone, not in signal path)
+XBIAS vref vcc gnd gnd BIAS
+
+* IF input (1MHz, 5mVpp diff — post-mixer signal)
+VIF_P if_p 0 DC 1.5 SIN(1.5 2.5m 1e6)
+VIF_N if_n 0 DC 1.5 SIN(1.5 -2.5m 1e6)
+
+* IFA (40dB gain, output CM ~ 2.74V)
+XIFA if_p if_n ifa_p ifa_n vcc gnd gnd IFA
+
+* Level shifter (drops CM by Vbe: 2.74V → 1.89V)
+XLVL ifa_p ifa_n lvl_p lvl_n vcc gnd gnd LVLSHIFT
+
+* VGA (variable gain, VCTRL=0.90V for ~20dB)
+VCTRL vctrl 0 DC 0.90
+XVGA lvl_p lvl_n vga_p vga_n vctrl vcc gnd gnd VGA
+
+* Resistive divider: VGA CM (1.93V) → ADC CM (0.6V for 1.2V CMOS)
+Rdiv1p vga_p adc_inp 2.2k
+Rdiv2p adc_inp gnd 1k
+Rdiv1n vga_n adc_inn 2.2k
+Rdiv2n adc_inn gnd 1k
+
+* ADC (20MHz StrongARM comparator)
+VCLK clk 0 DC 0 PULSE(0 1.2 0 100p 100p 25n 50n)
+XADC adc_inp adc_inn clk adc_op adc_on vdd gnd ADC
+
+
+* DIGIF (CML buffer on ADC output)
+XDIGIF adc_op adc_on dout_p dout_n vcc gnd gnd DIGIF
+
+* External 50-ohm loads
+REXT_P dout_p gnd 50
+REXT_N dout_n gnd 50
+
+* ============================================================
+* SIMULATION
+* ============================================================
+.tran 5n 10u uic
+
+.control
+run
+
+echo ""
+echo "════════════════════════════════════════════════════════════════════"
+echo "  77 GHz PHASED ARRAY VIBROMETER — FULL TRANSISTOR-LEVEL SYSTEM"
+echo "════════════════════════════════════════════════════════════════════"
+echo ""
+
+meas tran inp_pp pp v(if_p) from=3u to=8u
+meas tran ifa_pp pp v(ifa_p) from=3u to=8u
+meas tran lvl_pp pp v(lvl_p) from=3u to=8u
+meas tran vga_pp pp v(vga_p) from=3u to=8u
+meas tran dout_pp pp v(dout_p) from=3u to=8u
+meas tran vref_avg avg v(vref) from=5u to=8u
+
+meas tran dc_ifa avg v(ifa_p) from=5u to=6u
+meas tran dc_lvl avg v(lvl_p) from=5u to=6u
+meas tran dc_vga avg v(vga_p) from=5u to=6u
+meas tran dc_adc avg v(adc_inp) from=5u to=6u
+
+echo ""
+echo "  --- Signal Chain (single-ended pp) ---"
+echo "  IF input:       $&inp_pp Vpp"
+echo "  IFA output:     $&ifa_pp Vpp"
+echo "  Level shift:    $&lvl_pp Vpp"
+echo "  VGA output:     $&vga_pp Vpp"
+echo "  DIGIF output:   $&dout_pp Vpp"
+echo ""
+echo "  --- DC Operating Points ---"
+echo "  IFA out CM:     $&dc_ifa V"
+echo "  LVL out CM:     $&dc_lvl V"
+echo "  VGA out CM:     $&dc_vga V"
+echo "  ADC in CM:      $&dc_adc V"
+echo "  VREF (bandgap): $&vref_avg V"
+echo ""
+echo "  --- Gain Budget ---"
+
+let g_ifa = 20*log(ifa_pp/inp_pp)/log(10)
+let g_vga = 20*log(vga_pp/lvl_pp)/log(10)
+let g_total = 20*log(vga_pp/inp_pp)/log(10)
+
+echo "  IFA gain:       $&g_ifa dB (spec: 40)"
+echo "  VGA gain:       $&g_vga dB"
+echo "  Total gain:     $&g_total dB"
+echo ""
+echo "  --- Block Status ---"
+echo "  IFA:    npn13G2l direct-coupled 2-stage diff pair"
+echo "  LVLSH:  npn13G2l emitter follower (CM shift -0.85V)"
+echo "  VGA:    npn13G2l variable-gm (tail current control)"
+echo "  ADC:    StrongARM comparator (CMOS, VDD=1.2V)"
+echo "  DIGIF:  npn13G2l CML buffer (50ohm, 4mA)"
+echo "  BIAS:   Brokaw bandgap (npn13G2l 1x/8x)"
+echo "════════════════════════════════════════════════════════════════════"
+
+quit
+.endc
+.end

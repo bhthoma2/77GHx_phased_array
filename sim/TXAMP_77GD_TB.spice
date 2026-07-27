@@ -1,0 +1,128 @@
+** 77 GHz TX Power Amplifier Testbench
+** Tests: gain, output power, P1dB compression
+** Run with: ngspice -b TXAMP_77GD_TB.spice
+
+** =====================================================================
+** SIMPLIFIED MODELS
+** =====================================================================
+
+.subckt npn13G2l C B E S Nx=4 El=2.5u
+.param Nfing={Nx}
+.param Ae={Nfing*0.07e-6*El}
+Q1 C B E S npn13g2_mod area={Ae/0.175e-12}
+.ends
+
+.model npn13g2_mod npn (
++ IS=5e-17 BF=800 NF=1.0 VAF=40
++ IKF=0.04 ISE=5e-15 NE=2
++ BR=10 NR=1 VAR=8
++ IKR=0.01 ISC=2e-16 NC=2
++ RB=5 RE=0.5 RC=3
++ CJE=15f CJC=8f CJS=3f
++ TF=0.45p TR=20p
++ XTF=20 VTF=2 ITF=0.5
++ )
+
+.subckt cap_cmim P N w=10e-6 l=10e-6 m=1
+.param Ctot={1.5e-3*w*l*m}
+C1 P N {Ctot}
+R1 P N 1G
+.ends
+
+.subckt rppd P N w=3e-6 l=18e-6 b=0 m=1
+.param Rtot={300*(l/w)/m}
+R1 P N {Rtot}
+.ends
+
+.subckt rsil P N w=7e-6 l=38.8e-6 b=0 m=1
+.param Rtot={7*(l/w)/m}
+R1 P N {Rtot}
+.ends
+
+** =====================================================================
+** INCLUDE PA AND TL MODELS
+** =====================================================================
+.include TXAMP_77GD.spice
+.include RXAMP_77GD.spice
+
+** =====================================================================
+** TESTBENCH
+** =====================================================================
+
+** Supply
+VCC VCC 0 2.4
+
+** Input: 77 GHz, -10 dBm (from Wilkinson LO splitter output)
+.param PIN_DBM=-10
+.param PIN={PWR(10,0.1*PIN_DBM)/1000}
+.param VIN_RMS={SQRT(PIN*85)}
+.param VIN_PP={SQRT(2)*2*VIN_RMS}
+
+VinP IN_srcP 0 DC 0 SIN(0 {VIN_PP/2} 77G)
+VinN IN_srcN 0 DC 0 SIN(0 {-VIN_PP/2} 77G)
+
+** Source impedance + DC block
+RS1 IN_srcP IN_acP 42.5
+RS2 IN_srcN IN_acN 42.5
+Cblk1 IN_acP INP 100fF
+Cblk2 IN_acN INN 100fF
+
+** DUT
+XDUT INP INN OUTP OUTN VCC 0 TXAMP_77GD
+
+** Load (antenna impedance: 85 Ohm differential)
+RL1 OUTP 0 42.5
+RL2 OUTN 0 42.5
+
+** =====================================================================
+** ANALYSIS
+** =====================================================================
+
+.control
+
+echo "=============================================="
+echo " 77 GHz TX POWER AMPLIFIER TESTBENCH"
+echo "=============================================="
+echo ""
+
+** --- DC Operating Point ---
+echo "=== DC Operating Point ==="
+op
+print v(vcc)
+print @vcc[i]
+echo ""
+
+** --- AC Analysis ---
+echo "=== AC: 50-110 GHz ==="
+ac lin 201 50G 110G
+meas ac gain_50G find vdb(outp) at=50G
+meas ac gain_77G find vdb(outp) at=77G
+meas ac gain_100G find vdb(outp) at=100G
+echo ""
+
+** --- Transient (large signal) ---
+echo "=== Transient: Pin=-10dBm at 77 GHz ==="
+tran 0.5p 2n
+
+let vout = v(outp) - v(outn)
+let vin = v(inp) - v(inn)
+meas tran vout_pp pp vout from=0.5n to=2n
+meas tran vin_pp pp vin from=0.5n to=2n
+
+echo ""
+echo "=== TX AMP RESULTS ==="
+echo "Input pp:"
+print vin_pp
+echo "Output pp:"
+print vout_pp
+echo ""
+echo "Output power into 85 Ohm (dBm):"
+echo "  Pout = (Vout_pp/2/sqrt(2))^2 / 85 * 1000"
+echo ""
+echo "=============================================="
+echo " TXAMP_77GD SIMULATION COMPLETE"
+echo "=============================================="
+
+.endc
+
+.end

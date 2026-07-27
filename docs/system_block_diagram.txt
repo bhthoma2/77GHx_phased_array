@@ -1,0 +1,158 @@
+╔══════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                 77 GHz FMCW PHASED ARRAY VIBROMETER — SYSTEM BLOCK DIAGRAM                     ║
+║                 IHP SG13G2 (130nm SiGe BiCMOS) — Autonomous Drone Landmine Detection           ║
+╚══════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+                                    ┌─────────────┐
+                                    │   ANTENNA   │
+                                    │  (77 GHz)   │
+                                    └──────┬──────┘
+                                           │
+                              TX ◄─────────┼─────────► RX
+                                           │
+         ┌─────────────────────────────────┼─────────────────────────────────┐
+         │                                 │                                 │
+         ▼                                 ▼                                 │
+  ┌─────────────┐                  ┌─────────────┐                          │
+  │    TXPA     │                  │     LNA     │                          │
+  │  (PA 77G)   │                  │  (2-stage)  │                          │
+  │             │                  │             │                          │
+  │ Pout~0dBm  │                  │ Gain=14.9dB │                          │
+  │ Nx=8, TL   │                  │ NF<4dB      │                          │
+  │ Ic=101mA   │                  │ TL-matched  │                          │
+  └──────▲──────┘                  └──────┬──────┘                          │
+         │                                 │                                 │
+         │                                 ▼                                 │
+         │                         ┌─────────────┐                          │
+         │                         │   MIXER     │                          │
+         │              LO ──────► │(Gilbert Cell)│                          │
+         │              │          │             │                          │
+         │              │          │ CG=25.7dB  │                          │
+         │              │          │ IF=1-10MHz  │                          │
+         │              │          └──────┬──────┘                          │
+         │              │                 │                                  │
+         │              │                 ▼  IF (1-10 MHz)                   │
+         │              │          ┌─────────────┐                          │
+         │              │          │     IFA     │                          │
+         │              │          │ (2-stage)   │                          │
+         │              │          │             │                          │
+         │              │          │ Gain=40dB   │                          │
+         │              │          │ BW=10MHz    │                          │
+         │              │          │ 23.3dB/stg  │                          │
+         │              │          └──────┬──────┘                          │
+         │              │                 │                                  │
+         │              │                 ▼                                  │
+         │              │          ┌─────────────┐                          │
+         │              │          │     VGA     │                          │
+         │              │          │(Variable-gm)│                          │
+         │              │          │             │    ┌──────────┐          │
+         │              │          │ Range=57dB  │◄───│  AGC     │          │
+         │              │          │ 0-31dB ctrl │    │ (Digital)│          │
+         │              │          │ VCTRL=0.65- │    └──────────┘          │
+         │              │          │       0.95V │                          │
+         │              │          └──────┬──────┘                          │
+         │              │                 │                                  │
+         │              │                 ▼                                  │
+         │              │          ┌─────────────┐                          │
+         │              │          │     ADC     │                          │
+         │              │          │ (12-bit SAR)│                          │
+         │              │          │             │                          │
+         │              │          │ StrongARM   │                          │
+         │              │          │ 20 MSPS     │                          │
+         │              │          │ C-DAC       │                          │
+         │              │          └──────┬──────┘                          │
+         │              │                 │  12-bit digital                  │
+         │              │                 ▼                                  │
+         │              │          ┌─────────────┐                          │
+         │              │          │    DIGIF    │                          │
+         │              │          │(CML Buffer) │──────────► DIGITAL       │
+         │              │          │             │            BACKEND       │
+         │              │          │ 819mV swing │            (DSP/FFT)     │
+         │              │          │ 2.8ps rise  │                          │
+         │              │          └─────────────┘                          │
+         │              │                                                    │
+         │              │                                                    │
+  ┌──────┴──────────────┴──────────────────────────────────────────────┐    │
+  │                         LO GENERATION                               │    │
+  │                                                                     │    │
+  │  ┌─────────────┐         ┌─────────────┐                          │    │
+  │  │     VCO     │────────►│    ILFD     │                          │    │
+  │  │  (77 GHz)   │  77GHz  │   (÷2)     │──► 38.5 GHz (optional)   │    │
+  │  │             │         │             │                          │    │
+  │  │ f=76.1GHz   │         │ TL stubs    │                          │    │
+  │  │ Vdiff=1.05V │         │ f_out=38GHz │                          │    │
+  │  │ Pdc=19.8mW  │         │             │                          │    │
+  │  └──────▲──────┘         └─────────────┘                          │    │
+  │          │                                                          │    │
+  │          │ VTUNE (FMCW ramp)                                        │    │
+  │  ┌───────┴───────┐                                                 │    │
+  │  │  FMCW Ramp    │                                                 │    │
+  │  │  Generator    │                                                 │    │
+  │  └───────────────┘                                                 │    │
+  └─────────────────────────────────────────────────────────────────────┘    │
+                                                                             │
+  ┌──────────────────────────────────────────────────────────────────────────┘
+  │
+  │  ┌─────────────┐
+  └──│    BIAS     │
+     │  (Bandgap)  │───────► VREF=1.177V, TC=8.6ppm/°C
+     │             │───────► IBIAS to all blocks
+     │ Brokaw ref  │
+     └─────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                           SIGNAL FLOW SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+  TX Path:  VCO (77GHz) ──► TXPA (+4dB) ──► Antenna (0dBm EIRP)
+
+  RX Path:  Antenna ──► LNA (+15dB) ──► Mixer (+26dB, ×LO) ──► IF (1MHz)
+            ──► IFA (+40dB) ──► VGA (0-31dB) ──► ADC (12-bit) ──► DIGIF
+
+  LO Path:  VCO (77GHz) ──► Mixer LO port
+                         ──► ILFD (÷2, 38.5GHz for sub-harmonic mixing)
+
+═══════════════════════════════════════════════════════════════════════════════
+                           PERFORMANCE SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+  Block     │ Gain/Spec          │ Power    │ Architecture
+  ──────────┼────────────────────┼──────────┼─────────────────────────────
+  LNA       │ 14.9 dB @ 77GHz   │ ~53 mW   │ 2× TL-matched cascode
+  Mixer     │ 25.7 dB CG        │ ~40 mW   │ Gilbert cell
+  IFA       │ 40 dB (2×20dB)    │ ~13 mW   │ Diff pair, 10MHz BW
+  VGA       │ 0-31 dB           │ ~7 mW    │ Variable-gm (Itail ctrl)
+  ADC       │ 12-bit, 20MSPS    │ ~50 mW   │ StrongARM + C-DAC (SAR)
+  DIGIF     │ 819mV, 2.8ps      │ ~238 mW  │ CML buffer
+  VCO       │ 76.1 GHz          │ ~20 mW   │ Cross-coupled LC
+  TXPA      │ ~0 dBm diff       │ ~333 mW  │ TL-matched cascode, Nx=8
+  ILFD      │ 38.05 GHz (÷2)    │ ~72 mW   │ TL-stub resonator
+  BIAS      │ 1.177V, 8.6ppm/°C │ ~5 mW    │ Brokaw bandgap
+  ──────────┼────────────────────┼──────────┼─────────────────────────────
+  TOTAL     │                    │ ~831 mW  │
+
+═══════════════════════════════════════════════════════════════════════════════
+                         FMCW RADAR PARAMETERS
+═══════════════════════════════════════════════════════════════════════════════
+
+  Carrier frequency:      77 GHz
+  Chirp bandwidth:        4 GHz (76-80 GHz)
+  Chirp duration:         1 ms
+  Beat frequency:         f_b = 2·BW·R/(c·T) = 267 kHz/m
+  Range resolution:       Δr = c/(2·BW) = 3.75 cm
+  Max detection range:    10 m (f_b = 2.67 MHz)
+  Velocity resolution:    Δv = λ/(2·T) = 1.95 mm/s
+  ADC sampling rate:      20 MSPS (Nyquist for 10m range)
+  Vibration sensitivity:  <1 µm (phase detection)
+
+═══════════════════════════════════════════════════════════════════════════════
+                         PROCESS TECHNOLOGY
+═══════════════════════════════════════════════════════════════════════════════
+
+  Foundry:    IHP Microelectronics
+  Process:    SG13G2 (130nm SiGe BiCMOS)
+  HBT:        npn13G2l (fT=350GHz, fmax=450GHz)
+  MOSFET:     sg13_lv_nmos/pmos (VDD=1.2V, PSP103)
+  Supply:     3.3V (HBT), 1.2V (CMOS digital/ADC)
+  Metal:      7 layers (TM2 for mm-wave TL)

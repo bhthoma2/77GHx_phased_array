@@ -1,0 +1,31 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/layout/testbenches/tb_vco.sch
+**.subckt tb_vco
+XQ49 OUTP OUTN VCO_TAIL sub! npn13G2l Nx=1 El=1.0
+XQ50 OUTN OUTP VCO_TAIL sub! npn13G2l Nx=1 El=1.0
+L1 VCC OUTP 27p
+L2 VCC OUTN 27p
+CVAR1 OUTP OUTN 15f
+CVAR2 VCO_TAIL net1 12f
+CVAR3 net1 net2 12f
+ITAIL net3 net4 DC 5m
+VCC VCC net5 DC 3.3
+**** begin user architecture code
+
+
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+.options gmin=1e-10 reltol=5e-3 abstol=1e-10 vntol=1e-4
+.options itl1=1000 itl2=200 itl4=500
+.options method=gear maxord=3
+.options noopiter
+.tran 0.2p 1.5n
+.meas tran freq_osc trig v(outp) val=3.3 rise=40 targ v(outp) val=3.3 rise=41
+.meas tran vswing pp v(outp) from=0.5n to=1.5n
+
+
+**** end user architecture code
+**.ends
+.GLOBAL GND
+.end

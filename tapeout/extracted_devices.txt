@@ -1,0 +1,7 @@
+* Extracted device list for VCO_77G_XTOR
+* From: /home/bthomas3/Videos/77GHz_phased_array/layout/VCO_77G_XTOR.gds
+
+SVaricap: 2 instances
+cmim: 1 instances
+npn13G2L: 4 instances
+rppd: 1 instances

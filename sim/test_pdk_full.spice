@@ -1,0 +1,22 @@
+** Full PDK load test — ngspice-46 with OSDI
+.control
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/r3_cmc.osdi
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/psp103_nqs.osdi
+.endc
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+
+VCC vcc 0 2.4
+XQ1 vcc base 0 0 npn13G2l Nx=4 le=2.5e-6
+Rbase vcc base 10k
+
+.op
+.control
+run
+echo "=== FULL PDK LOAD SUCCESSFUL ==="
+print v(base)
+print @vcc[i]
+.endc
+.end

@@ -1,0 +1,16 @@
+22-Jul-2026 10:53:50 | INFO    | Your Klayout version is: KLayout 0.30.9
+22-Jul-2026 10:53:50 | INFO    | Running SG13G2 LVS checks on design /home/bthomas3/Videos/77GHz_phased_array/layout/PHASED_ARRAY_77G_TOP.gds on cell PHASED_ARRAY_77G_TOP
+22-Jul-2026 10:53:57 | INFO    | ==============================================================================
+22-Jul-2026 10:53:57 | INFO    | Important Summary
+22-Jul-2026 10:53:57 | INFO    | +------------------+--------------------------------------------------------------+
+22-Jul-2026 10:53:57 | INFO    | | Status           | PASS                                                         |
+22-Jul-2026 10:53:57 | INFO    | | Mode             | COMPARE                                                      |
+22-Jul-2026 10:53:57 | INFO    | | Outcome          | Comparison mode: PASS (netlists match).                      |
+22-Jul-2026 10:53:57 | INFO    | | Layout           | PHASED_ARRAY_77G_TOP.gds                                     |
+22-Jul-2026 10:53:57 | INFO    | | Top Cell         | PHASED_ARRAY_77G_TOP                                         |
+22-Jul-2026 10:53:57 | INFO    | | Results Dir      | /home/bthomas3/Videos/77GHz_phased_array/layout/lvs_top      |
+22-Jul-2026 10:53:57 | INFO    | | Warnings         | 0                                                            |
+22-Jul-2026 10:53:57 | INFO    | | Errors           | 0                                                            |
+22-Jul-2026 10:53:57 | INFO    | | Run Time (s)     | 7.653                                                        |
+22-Jul-2026 10:53:57 | INFO    | +------------------+--------------------------------------------------------------+
+22-Jul-2026 10:53:57 | INFO    | ==============================================================================

@@ -1,0 +1,166 @@
+** 77 GHz Full RX Chain Testbench
+** Signal path: Antenna → LNA → Mixer → IF Amp → ADC
+** LO = 77 GHz, RF = 76.9 GHz, IF = 100 MHz
+** Run with: ngspice -b RX_CHAIN_TB.spice
+
+** =====================================================================
+** SIMPLIFIED MODELS
+** =====================================================================
+
+.subckt npn13G2l C B E S Nx=4 El=2.5u
+.param Nfing={Nx}
+.param Ae={Nfing*0.07e-6*El}
+Q1 C B E S npn13g2_mod area={Ae/0.175e-12}
+.ends
+
+.model npn13g2_mod npn (
++ IS=5e-17 BF=800 NF=1.0 VAF=40
++ IKF=0.04 ISE=5e-15 NE=2
++ BR=10 NR=1 VAR=8
++ IKR=0.01 ISC=2e-16 NC=2
++ RB=5 RE=0.5 RC=3
++ CJE=15f CJC=8f CJS=3f
++ TF=0.45p TR=20p
++ XTF=20 VTF=2 ITF=0.5
++ )
+
+.subckt cap_cmim P N w=10e-6 l=10e-6 m=1
+.param Ctot={1.5e-3*w*l*m}
+C1 P N {Ctot}
+R1 P N 1G
+.ends
+
+.subckt rppd P N w=3e-6 l=18e-6 b=0 m=1
+.param Rtot={300*(l/w)/m}
+R1 P N {Rtot}
+.ends
+
+.subckt rsil P N w=7e-6 l=38.8e-6 b=0 m=1
+.param Rtot={7*(l/w)/m}
+R1 P N {Rtot}
+.ends
+
+** =====================================================================
+** INCLUDE ALL BLOCKS
+** =====================================================================
+.include RXAMP_77GD.spice
+.include MIXER_77GD.spice
+.include IFAMP.spice
+.include WILKINSON_77GD.spice
+
+** =====================================================================
+** TESTBENCH: FULL RX CHAIN
+** =====================================================================
+
+** Supply
+VCC VCC 0 2.4
+
+** === RF INPUT (antenna signal) ===
+** 76.9 GHz, -60 dBm (typical received signal from target at 2m)
+.param FRF=76.9G
+.param PRF_DBM=-60
+.param PRF={PWR(10,0.1*PRF_DBM)/1000}
+.param VRF_RMS={SQRT(PRF*85)}
+.param VRF_PP={SQRT(2)*2*VRF_RMS}
+
+VrfP RF_srcP 0 DC 0 SIN(0 {VRF_PP/2} {FRF})
+VrfN RF_srcN 0 DC 0 SIN(0 {-VRF_PP/2} {FRF})
+RS_RFP RF_srcP RF_acP 42.5
+RS_RFN RF_srcN RF_acN 42.5
+Cblk_RFP RF_acP ANT_P 100fF
+Cblk_RFN RF_acN ANT_N 100fF
+
+** === LO SOURCE (from VCO/PLL — modeled as ideal) ===
+** 77 GHz, -3 dBm
+.param FLO=77G
+.param PLO_DBM=-3
+.param PLO={PWR(10,0.1*PLO_DBM)/1000}
+.param VLO_RMS={SQRT(PLO*85)}
+.param VLO_PP={SQRT(2)*2*VLO_RMS}
+
+VloP LO_srcP 0 DC 0 SIN(0 {VLO_PP/2} {FLO})
+VloN LO_srcN 0 DC 0 SIN(0 {-VLO_PP/2} {FLO})
+RS_LOP LO_srcP LO_acP 42.5
+RS_LON LO_srcN LO_acN 42.5
+Cblk_LOP LO_acP LO_P 100fF
+Cblk_LON LO_acN LO_N 100fF
+
+** === WILKINSON DIVIDER (LO split to mixer) ===
+XWILK LO_P LO_N LO_MIX_P LO_MIX_N LO_TX_P LO_TX_N 0 WILKINSON_77GD
+
+** === LNA ===
+XLNA ANT_P ANT_N LNA_OP LNA_ON VCC 0 RXAMP_77GD
+
+** === MIXER ===
+** Connect LNA output to mixer RF, Wilkinson output to mixer LO
+Cblk_MRF_P LNA_OP MIX_RFP 50fF
+Cblk_MRF_N LNA_ON MIX_RFN 50fF
+XMIX LO_MIX_P LO_MIX_N MIX_RFP MIX_RFN IF_P IF_N VCC 0 MIXER_77GD
+
+** === IF AMPLIFIER ===
+XIFAMP IF_P IF_N IFOUT_P IFOUT_N VCC 0 IFAMP
+
+** === IF OUTPUT LOAD (to ADC, 1k differential) ===
+RL_IFP IFOUT_P 0 500
+RL_IFN IFOUT_N 0 500
+
+** =====================================================================
+** ANALYSIS
+** =====================================================================
+
+.control
+
+echo "=============================================="
+echo " 77 GHz FULL RX CHAIN SIMULATION"
+echo " ANT → LNA → MIXER → IF AMP → OUTPUT"
+echo "=============================================="
+echo ""
+
+** --- DC Operating Point ---
+echo "=== DC Operating Point ==="
+op
+echo "Total supply current:"
+print @vcc[i]
+echo ""
+
+** --- Transient (50ns to see IF at 100 MHz) ---
+echo "=== Transient: RF=76.9G, LO=77G, IF=100MHz ==="
+tran 0.2p 50n 0 0.2p
+
+let vrf_in = v(ant_p) - v(ant_n)
+let vlna_out = v(lna_op) - v(lna_on)
+let vif_mix = v(if_p) - v(if_n)
+let vif_out = v(ifout_p) - v(ifout_n)
+
+meas tran vrf_pp pp vrf_in from=20n to=50n
+meas tran vlna_pp pp vlna_out from=20n to=50n
+meas tran vif_mix_pp pp vif_mix from=20n to=50n
+meas tran vif_out_pp pp vif_out from=20n to=50n
+
+echo ""
+echo "=============================================="
+echo " RX CHAIN RESULTS"
+echo "=============================================="
+echo ""
+echo "RF input (76.9 GHz) pp:"
+print vrf_pp
+echo "LNA output pp:"
+print vlna_pp
+echo "Mixer IF output pp:"
+print vif_mix_pp
+echo "IF Amp output pp:"
+print vif_out_pp
+echo ""
+echo "Chain gains:"
+echo "  LNA gain = vlna_pp / vrf_pp"
+echo "  Mixer CG = vif_mix_pp / vlna_pp"
+echo "  IF gain  = vif_out_pp / vif_mix_pp"
+echo "  TOTAL    = vif_out_pp / vrf_pp"
+echo ""
+echo "=============================================="
+echo " SIMULATION COMPLETE"
+echo "=============================================="
+
+.endc
+
+.end

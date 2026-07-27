@@ -1,0 +1,7 @@
+set XSCHEM_LIBRARY_PATH {}
+append XSCHEM_LIBRARY_PATH /home/bthomas3/Videos/xschem_install/share/xschem/xschem_library
+append XSCHEM_LIBRARY_PATH :/home/bthomas3/Videos/xschem_install/share/xschem/xschem_library/devices
+append XSCHEM_LIBRARY_PATH :/home/bthomas3/Videos/77GHz_phased_array/xschem/blocks
+append XSCHEM_LIBRARY_PATH :/home/bthomas3/Videos/77GHz_phased_array/xschem
+append XSCHEM_LIBRARY_PATH :/home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/xschem
+set SG13G2_MODELS /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models

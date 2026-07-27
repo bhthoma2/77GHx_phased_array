@@ -1,0 +1,125 @@
+** 4-bit Switched-Line Phase Shifter — Full IHP SG13G2 PDK
+** 77 GHz, 22.5° LSB, states: 0° to 337.5° in 16 steps
+** Each bit: SPDT switch selects between reference TL and delayed TL
+.control
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/r3_cmc.osdi
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/psp103_nqs.osdi
+.endc
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+
+.subckt cap_cmim PLUS MINUS w=10e-6 l=10e-6 m=1
+.param Ctot={1.5e-3*w*l*m}
+C1 PLUS MINUS {Ctot}
+.ends cap_cmim
+
+** === Phase shift bit: differential SPDT using HBT switches ===
+** When CTRL=high: signal goes through DELAY path
+** When CTRL=low: signal goes through REF path
+** Delta_phase = extra TL length in delay path
+**
+** At 77 GHz, wavelength in TL = v_phase / f
+** v_phase = 1/sqrt(L*C) = 1/sqrt(445.9e-9 * 61.5e-12) = 6.04e6 m/s (!)
+** Wait — that's wrong. Let me recalculate:
+** v_phase = 1/sqrt(L_per_m * C_per_m) = 1/sqrt(445.9e-9 * 61.5e-12)
+**         = 1/sqrt(2.742e-20) = 1/(1.656e-10) = 6.04e9 m/s... no
+** Actually: L=445.9 nH/m, C=61.5 pF/m
+** v = 1/sqrt(445.9e-9 * 61.5e-12) = 1/sqrt(2.74e-17) = 1/1.656e-8.5
+** Let me be careful: sqrt(445.9e-9 * 61.5e-12) = sqrt(2.742e-17) = 1.656e-8.5
+** No: 445.9e-9 = 4.459e-7, 61.5e-12 = 6.15e-11
+** product = 2.742e-17, sqrt = 1.656e-8... hmm
+** v = 1/1.656e-8 = 6.04e7 m/s? That's 0.2c — reasonable for on-chip TL!
+**
+** lambda = v/f = 6.04e7 / 77e9 = 784 µm
+** 22.5° = lambda * 22.5/360 = 784 * 0.0625 = 49 µm extra length
+** 45° = 98 µm, 90° = 196 µm, 180° = 392 µm
+
+** === Fixed-length TL models ===
+.subckt TL_100u IN OUT GND
+C1 IN GND 3.075fF
+R1 IN n1 2.216
+L1 n1 OUT 44.59pH
+C2 OUT GND 3.075fF
+.ends
+
+.subckt TL_296u IN OUT GND
+C1 IN GND 9.1fF
+R1 IN n1 6.56
+L1 n1 OUT 131.9pH
+C2 OUT GND 9.1fF
+.ends
+
+** === Single 90° phase shift bit (simplified: just bit 2) ===
+** Reference: 100µm, Delay: 296µm → 90° extra phase
+.subckt PS_BIT90 INP INN OUTP OUTN VCC VSS CTRL CTRLB
+
+** Reference path (CTRLB=high → ON)
+XQr1 nrp CTRLB nre1 VSS npn13G2l Nx=2 le=2.5e-6
+Rre1 nre1 INP 5
+XTLrp nrp nrpo VSS TL_100u
+XQr2 OUTP CTRLB nrpo VSS npn13G2l Nx=2 le=2.5e-6
+
+XQr3 nrn CTRLB nre2 VSS npn13G2l Nx=2 le=2.5e-6
+Rre2 nre2 INN 5
+XTLrn nrn nrno VSS TL_100u
+XQr4 OUTN CTRLB nrno VSS npn13G2l Nx=2 le=2.5e-6
+
+** Delay path (CTRL=high → ON)
+XQd1 ndp CTRL nde1 VSS npn13G2l Nx=2 le=2.5e-6
+Rde1 nde1 INP 5
+XTLdp ndp ndpo VSS TL_296u
+XQd2 OUTP CTRL ndpo VSS npn13G2l Nx=2 le=2.5e-6
+
+XQd3 ndn CTRL nde2 VSS npn13G2l Nx=2 le=2.5e-6
+Rde2 nde2 INN 5
+XTLdn ndn ndno VSS TL_296u
+XQd4 OUTN CTRL ndno VSS npn13G2l Nx=2 le=2.5e-6
+
+.ends PS_BIT90
+
+** === Testbench: Test 0° and 90° states ===
+VCC VCC 0 2.4
+VB_IN VB_IN 0 0.92
+
+** RF input at 77 GHz
+Vrf rfin 0 SIN(0 50m 77G)
+Vrfn rfinn 0 SIN(0 -50m 77G)
+Cblock1 rfin psin 100fF
+Cblock2 rfinn psinn 100fF
+Rbias1 VB_IN psin 10k
+Rbias2 VB_IN psinn 10k
+
+** Phase shifter: 90° bit, CTRL=high selects delay path
+VCTRL ctrl 0 2.0
+VCTRLB ctrlb 0 0.5
+
+XPS psin psinn psout psoutn VCC 0 ctrl ctrlb PS_BIT90
+
+Rout1 psout 0 200
+Rout2 psoutn 0 200
+
+.option method=gear reltol=1e-3 abstol=1e-12 vntol=1e-6 gmin=1e-12 itl4=200
+
+.control
+tran 0.5p 2n 0.5n 0.5p
+
+meas tran vout_pp pp v(psout) from=1n to=2n
+meas tran vin_pp pp v(rfin) from=1n to=2n
+
+echo ""
+echo "========================================="
+echo "  4-BIT PHASE SHIFTER — IHP SG13G2 PDK"
+echo "  State: 90° (B2=ON)"
+echo "========================================="
+echo "Input Vpp (diff):"
+print vin_pp
+echo "Output Vpp (diff):"
+print vout_pp
+echo "Insertion loss (dB):"
+let il_db = 20*log(vout_pp/vin_pp)/log(10)
+print il_db
+echo "========================================="
+.endc
+.end

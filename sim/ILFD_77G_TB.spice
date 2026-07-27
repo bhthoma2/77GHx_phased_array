@@ -1,0 +1,62 @@
+** ILFD Testbench — 77 GHz → 38.5 GHz divide-by-2
+.control
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/r3_cmc.osdi
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/psp103_nqs.osdi
+.endc
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+
+.subckt cap_cmim PLUS MINUS w=10e-6 l=10e-6 m=1
+.param Ctot={1.5e-3*w*l*m}
+C1 PLUS MINUS {Ctot}
+.ends cap_cmim
+
+.include ILFD_77G.spice
+
+** === Testbench ===
+VCC VCC 0 2.4
+
+** 77 GHz injection signal (0 dBm, 316 mV into 50 Ohm)
+Vinj_p INP 0 SIN(0.92 0.3 77G)
+Vinj_n INN 0 SIN(0.92 -0.3 77G)
+
+XILFD INP INN OUTP OUTN VCC 0 ILFD_77G
+
+CL1 OUTP 0 5fF
+CL2 OUTN 0 5fF
+
+.control
+tran 0.1p 3n 0 0.1p
+
+let vdiff_out = v(outp) - v(outn)
+let vdiff_in = v(inp) - v(inn)
+
+meas tran vout_pp pp vdiff_out from=2n to=3n
+meas tran vout_avg avg vdiff_out from=2n to=3n
+meas tran tout1 when vdiff_out=vout_avg rise=8
+meas tran tout2 when vdiff_out=vout_avg rise=9
+let fout = 1/(tout2-tout1)
+
+meas tran tin1 when vdiff_in=0 rise=20
+meas tran tin2 when vdiff_in=0 rise=21
+let fin = 1/(tin2-tin1)
+
+let div_ratio = fin/fout
+
+echo ""
+echo "========================================="
+echo "  ILFD (÷2) — IHP SG13G2 PDK"
+echo "========================================="
+echo "Input frequency:"
+print fin
+echo "Output frequency:"
+print fout
+echo "Division ratio:"
+print div_ratio
+echo "Output swing (Vpp diff):"
+print vout_pp
+echo "========================================="
+.endc
+.end

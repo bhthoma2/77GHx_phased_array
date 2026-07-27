@@ -1,0 +1,35 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/layout/testbenches/tb_mixer.sch
+**.subckt tb_mixer
+XQ41 MIX_MIDP RF_P MIX_TAIL sub! npn13G2l Nx=1 El=1.0
+XQ42 MIX_MIDN RF_N MIX_TAIL sub! npn13G2l Nx=1 El=1.0
+XQ65 IFP LOP MIX_MIDP sub! npn13G2l Nx=1 El=1.0
+XQ66 IFN LON MIX_MIDP sub! npn13G2l Nx=1 El=1.0
+XQ67 IFN LON MIX_MIDN sub! npn13G2l Nx=1 El=1.0
+XQ68 IFP LOP MIX_MIDN sub! npn13G2l Nx=1 El=1.0
+RL_IFP VCC IFP 1k
+RL_IFN VCC IFN 1k
+VCC VCC GND DC 3.3
+ITAIL MIX_TAIL GND DC 4m
+VRF_P RF_P GND DC 0.9 SIN(0.9 0.01 77e9)
+VRF_N RF_N GND DC 0.9 SIN(0.9 -0.01 77e9)
+VLO_P LOP GND DC 0.9 SIN(0.9 0.5 77.01e9)
+VLO_N LON GND DC 0.9 SIN(0.9 -0.5 77.01e9)
+**** begin user architecture code
+
+
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+.options gmin=1e-10 reltol=5e-3 abstol=1e-10 vntol=1e-4
+.options itl1=1000 itl2=200 itl4=500
+.options method=gear maxord=3
+.options noopiter
+.tran 1p 50n
+.meas tran vswing_ifp pp v(ifp) from=40n to=50n
+.meas tran vswing_ifn pp v(ifn) from=40n to=50n
+
+
+**** end user architecture code
+**.ends
+.end

@@ -1,0 +1,53 @@
+** 77 GHz LNA - Real IHP SG13G2 PDK Models
+** Run with: ngspice -b RXAMP_77GD_PDK_TB.spice
+
+.subckt RXAMP_77GD_PDK INP INN OUTP OUTN VCC GND
+
+** === Transmission Lines (multi-section lumped pi) ===
+** Input matching (97µm, Z0=85)
+XTLINP INP net7 GND TL_85_97u
+XTLINN INN net1 GND TL_85_97u
+
+** Emitter degeneration (58µm, Z0=85)
+XTLDEG1 net7 BIAS6 GND TL_85_58u
+XTLDEG2 net1 BIAS6 GND TL_85_58u
+
+** Collector loads (151µm, Z0=85)
+XTLLD1 VCC net6 GND TL_85_151u
+XTLLD2 VCC net3 GND TL_85_151u
+
+** === Active Devices (real PDK npn13G2l) ===
+** Input differential pair
+XQ33 net8 net7 net4 GND npn13G2l Nx=4 le=2.5e-6
+XQ34 net1_c net1 net4 GND npn13G2l Nx=4 le=2.5e-6
+
+** Cascode pair
+XQ35 net6 B3536 net8 GND npn13G2l Nx=4 le=2.5e-6
+XQ36 net3 B3536 net1_c GND npn13G2l Nx=4 le=2.5e-6
+
+** Bias mirror
+XQ37 BIAS6 BIAS6 net2 GND npn13G2l Nx=1 le=2.5e-6
+
+** === Bias Resistors (real PDK rppd/rsil with bn terminal) ===
+XR30 VCC B3536 GND rppd w=3e-6 l=18.23e-6 b=0 m=2
+XR31 B3536 GND GND rppd w=3e-6 l=18.23e-6 b=0 m=1
+XR32 VCC BIAS6 GND rppd w=3e-6 l=18.23e-6 b=0 m=2
+XR33 net2 GND GND rppd w=2.5e-6 l=10.53e-6 b=0 m=14
+XR29 net4 GND GND rsil w=7e-6 l=38.8e-6 b=0 m=4
+
+** === Capacitors (real PDK cap_cmim) ===
+** Input shunt matching
+XC53 INP GND cap_cmim w=6e-6 l=6e-6 m=1
+XC54 INN GND cap_cmim w=6e-6 l=6e-6 m=1
+
+** Output DC blocking
+XC55 net6 OUTN cap_cmim w=4e-6 l=4e-6 m=1
+XC56 net3 OUTP cap_cmim w=4e-6 l=4e-6 m=1
+
+** Supply decoupling
+XC57 VCC B3536 cap_cmim w=100e-6 l=15e-6 m=1
+XC58 VCC BIAS6 cap_cmim w=100e-6 l=20e-6 m=1
+XC59 BIAS6 GND cap_cmim w=100e-6 l=20e-6 m=1
+XC60 VCC GND cap_cmim w=100e-6 l=15e-6 m=1
+
+.ends RXAMP_77GD_PDK

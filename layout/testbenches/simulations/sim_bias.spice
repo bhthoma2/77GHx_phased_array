@@ -1,0 +1,56 @@
+* Bandgap Reference — Self-biased with behavioral PMOS mirror
+* The mirror copies branch1 current to branch2 (GVCCS)
+* Current self-sets to IPTAT = ΔVBE/RPTAT
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+
+VCC vcc 0 DC 3.3
+
+* Sense current in branch 1 via 0V source
+VI1 vcc c1_top DC 0
+RC1 c1_top c1 1k
+
+* Mirror: copy branch1 current to branch2 (ideal PMOS mirror behavior)
+F_mirror vcc c2 VI1 1
+RC2_dummy c2 c2x 0.001
+
+* Q1(1x) and Q2(8x), diode-connected
+XQ1 c1 c1 ecom 0 npn13G2l
+XQ2 c2x c2x e2 0 npn13G2l m=8
+
+* RPTAT from e2 to ecom: ΔVBE = VT*ln(8) appears across it
+RPTAT e2 ecom 5k
+
+* R1 from common emitter node to GND
+* Both IE1 and IRPTAT flow through R1
+* VREF = VBE_Q1 + V(ecom) = VBE + 2*I*R1
+R1 ecom 0 param_r1
+
+* Startup (small leakage to avoid degenerate solution)
+Rstart vcc c1 2Meg
+
+* Output divider: VREF = V(c1) * Rbot/(Rtop+Rbot) = 3.24 * 10/27 ≈ 1.2V
+* TC preserved since divider is ratiometric
+Rtop c1 vref 17k
+Rbot vref 0 10k
+
+.param param_r1 = 20k
+
+.control
+op
+echo "=== BANDGAP FINAL ==="
+echo "V(c1) = $&v(c1) V"
+echo "VREF = $&v(vref) V"
+echo "I_branch = $&@vi1[i] A"
+
+dc temp -40 125 5
+meas dc vref_27 find v(vref) at=27
+meas dc vref_min min v(vref)
+meas dc vref_max max v(vref)
+let tc = 1e6*(vref_max-vref_min)/vref_27/165
+echo "VREF@27C = $&vref_27 V"
+echo "Range = $&vref_min to $&vref_max V"
+echo "TC = $&tc ppm/C"
+quit
+.endc
+.end

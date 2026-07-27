@@ -1,0 +1,85 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/layout/testbenches/tb_fullchip.sch
+**.subckt tb_fullchip
+XQ49 OUTP OUTN VCO_TAIL sub! npn13G2l Nx=2 El=1.0
+XQ50 OUTN OUTP VCO_TAIL sub! npn13G2l Nx=2 El=1.0
+L_VCOP VCC OUTP 27p
+L_VCON VCC OUTN 27p
+C_VAR1 OUTP OUTN 15f
+C_VAR2 OUTP GND 12f
+C_VAR3 OUTN GND 12f
+I_VCO VCO_TAIL GND PWL(0 0 0.2n 5m 10n 5m)
+XQ1 TXP_MID TX_INP TX_TAIL sub! npn13G2l Nx=8 El=1.0
+XQ2 TXN_MID TX_INN TX_TAIL sub! npn13G2l Nx=8 El=1.0
+XQ25 ANT_TXP VCB_TX TXP_MID sub! npn13G2l Nx=8 El=1.0
+XQ26 ANT_TXN VCB_TX TXN_MID sub! npn13G2l Nx=8 El=1.0
+RL_TXP VCC ANT_TXP 50
+RL_TXN VCC ANT_TXN 50
+C_CPTXP OUTP TX_INP 100f
+C_CPTXN OUTN TX_INN 100f
+R_BIASTXP TX_INP VCC 10k
+R_BIASTXN TX_INN VCC 10k
+I_TX TX_TAIL GND PWL(0 0 0.2n 10m 10n 10m)
+V_VCB_TX VCB_TX GND PWL(0 0 0.2n 2.0 10n 2.0)
+XQ61 LNA_MIDP RF_INP LNA_TAIL sub! npn13G2l Nx=4 El=1.0
+XQ62 LNA_MIDN RF_INN LNA_TAIL sub! npn13G2l Nx=4 El=1.0
+XQ45 RF_P VCB_LNA LNA_MIDP sub! npn13G2l Nx=4 El=1.0
+XQ46 RF_N VCB_LNA LNA_MIDN sub! npn13G2l Nx=4 El=1.0
+RL_LNAP VCC RF_P 200
+RL_LNAN VCC RF_N 200
+I_LNA LNA_TAIL GND PWL(0 0 0.2n 6m 10n 6m)
+V_VCB_LNA VCB_LNA GND PWL(0 0 0.2n 2.0 10n 2.0)
+V_RFP RF_INP GND DC 0.9 SIN(0.9 0.001 77e9)
+V_RFN RF_INN GND DC 0.9 SIN(0.9 -0.001 77e9)
+XQ41 MIX_MIDP RF_P MIX_TAIL sub! npn13G2l Nx=4 El=1.0
+XQ42 MIX_MIDN RF_N MIX_TAIL sub! npn13G2l Nx=4 El=1.0
+XQ65 IFP LO_P MIX_MIDP sub! npn13G2l Nx=2 El=1.0
+XQ66 IFN LO_N MIX_MIDP sub! npn13G2l Nx=2 El=1.0
+XQ67 IFN LO_N MIX_MIDN sub! npn13G2l Nx=2 El=1.0
+XQ68 IFP LO_P MIX_MIDN sub! npn13G2l Nx=2 El=1.0
+RL_IFP VCC IFP 1k
+RL_IFN VCC IFN 1k
+C_CPLOP OUTP LO_P 100f
+C_CPLON OUTN LO_N 100f
+R_BIASLOP VCC LO_P 10k
+R_BIASLON VCC LO_N 10k
+I_MIX MIX_TAIL GND PWL(0 0 0.2n 4m 10n 4m)
+XQ21 DIVP DIVN ILFD_TAIL sub! npn13G2l Nx=4 El=1.0
+XQ22 DIVN DIVP ILFD_TAIL sub! npn13G2l Nx=4 El=1.0
+XQ11 DIVP INJ_P ILFD_TAIL sub! npn13G2l Nx=2 El=1.0
+XQ12 DIVN INJ_N ILFD_TAIL sub! npn13G2l Nx=2 El=1.0
+L_DIVP VCC DIVP 120p
+L_DIVN VCC DIVN 120p
+R_DIVP VCC sub! 5
+R_DIVN VCC DIVN 5
+C_DIVP DIVP GND 20f
+C_DIVN DIVN GND 20f
+C_CPINJP OUTP INJ_P 500f
+C_CPINJN OUTN INJ_N 500f
+R_BIASINJP VCC INJ_P 2k
+R_BIASINJN VCC INJ_N 2k
+I_ILFD ILFD_TAIL GND PWL(0 0 0.2n 4m 10n 4m)
+VCC VCC GND PWL(0 0 0.2n 3.3 10n 3.3)
+**** begin user architecture code
+
+
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+.options gmin=1e-10 reltol=5e-3 abstol=1e-10 vntol=1e-4
+.options itl1=1000 itl2=200 itl4=500
+.options method=gear maxord=3
+.options noopiter
+.tran 0.2p 4n
+.meas tran vco_freq trig v(outp) val=3.3 rise=200 targ v(outp) val=3.3 rise=201
+.meas tran vco_swing pp v(outp) from=3n to=4n
+.meas tran txpa_swing pp v(ant_txp) from=3n to=4n
+.meas tran lna_swing pp v(rf_p) from=3n to=4n
+.meas tran mixer_ifp pp v(ifp) from=3n to=4n
+.meas tran ilfd_freq trig v(divp) val=3.3 rise=100 targ v(divp) val=3.3 rise=101
+.meas tran ilfd_swing pp v(divp) from=3n to=4n
+
+
+**** end user architecture code
+**.ends
+.end

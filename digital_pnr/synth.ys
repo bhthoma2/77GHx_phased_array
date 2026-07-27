@@ -1,0 +1,24 @@
+read_verilog -sv ../rtl/vibrometer_mocomp_top.v
+read_verilog -sv ../rtl/radar_mac_accel.v
+read_verilog -sv ../rtl/slowtime_fft.v
+read_verilog -sv ../rtl/sram_if.v
+read_verilog -sv ../rtl/spi_serializer.v
+read_verilog -sv ../rtl/deconv_kernel_estimator_top_level.v
+read_verilog -sv ../rtl/iir_notch_filter.v
+read_verilog -sv ../rtl/cordic_rect_to_polar.v
+read_verilog -sv ../rtl/cordic_polar_to_rect.v
+read_verilog -sv ../rtl/fixed_pt_div.v
+read_verilog -sv ../rtl/deserializer.v
+read_verilog -sv ../rtl/serializer.v
+
+hierarchy -check -top vibrometer_mocomp_top
+proc; opt; fsm; opt; memory; opt
+techmap; opt
+dfflibmap -liberty /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.ref/sg13g2_stdcell/lib/sg13g2_stdcell_typ_1p20V_25C.lib
+abc -liberty /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.ref/sg13g2_stdcell/lib/sg13g2_stdcell_typ_1p20V_25C.lib
+clean
+opt_clean -purge
+
+stat -liberty /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.ref/sg13g2_stdcell/lib/sg13g2_stdcell_typ_1p20V_25C.lib
+
+write_verilog build/vibrometer_mocomp_top.v

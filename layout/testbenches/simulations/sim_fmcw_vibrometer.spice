@@ -1,0 +1,127 @@
+* ============================================================
+* 77 GHz FMCW VIBROMETER — Micro-Displacement Detection
+*
+* Models inter-chirp phase variation from surface vibration
+* above a buried landmine.
+*
+* Physics:
+*   - Target vibrates: d(t) = A*sin(2π*f_vib*t)
+*   - Phase shift per chirp: Δφ = 4π*d(t)/λ
+*   - λ = c/fc = 3.896 mm at 77 GHz
+*   - For A=1µm: Δφ_max = 4π*1e-6/3.896e-3 = 3.23 mrad
+*
+* The beat signal phase encodes target displacement:
+*   v_beat(t) = A_beat * cos(2π*f_beat*t + φ₀ + Δφ(t_chirp))
+*
+* We simulate 64 chirps (64ms) with vibration at 150 Hz
+* (typical soil-coupled resonance of buried AP mine)
+* ============================================================
+
+.param vcc_nom=3.3
+.param tchirp=1m
+.param bw=4e9
+.param fc=77e9
+.param c_light=3e8
+.param lambda={c_light/fc}
+
+* Target parameters (r_mine chosen for integer beat freq: 187kHz)
+.param r_ground=3
+.param r_mine=7.0125
+.param rcs_ground=1
+.param rcs_mine=0.01
+
+* Vibration: 1 µm amplitude at 150 Hz (mine resonance)
+.param vib_amp=1u
+.param f_vib=150
+
+* Beat frequencies
+.param fb_ground={2*bw*r_ground/(c_light*tchirp)}
+.param fb_mine={2*bw*r_mine/(c_light*tchirp)}
+
+* Phase modulation from vibration: Δφ(t) = 4π*d(t)/λ
+* d(t) = vib_amp * sin(2π*f_vib*t)
+* This modulates the PHASE of the mine's beat signal
+
+* Signal amplitudes (post LNA+Mixer)
+.param v_ground=2.5m
+.param v_mine=25u
+
+* === SUPPLY ===
+VCC vcc 0 DC {vcc_nom}
+
+* === BEAT SIGNALS WITH VIBRATION-INDUCED PHASE MODULATION ===
+* Ground return: static phase (no vibration)
+* Mine return: phase modulated by displacement
+*   v_mine_beat = V * cos(2π*fb_mine*t + 4π*vib_amp*sin(2π*f_vib*t)/λ)
+*   Using cos(A+B) ≈ cos(A) - B*sin(A) for small B (narrow-band FM)
+*   Δφ = 4π*1e-6/3.896e-3 = 3.23e-3 rad (small angle approx valid)
+
+B_if_p if_p 0 V = {v_ground}*sin(6.283*{fb_ground}*time) + {v_mine}*sin(6.283*{fb_mine}*time + 4*3.14159*{vib_amp}*sin(6.283*{f_vib}*time)/{lambda})
+B_if_n if_n 0 V = -{v_ground}*sin(6.283*{fb_ground}*time) - {v_mine}*sin(6.283*{fb_mine}*time + 4*3.14159*{vib_amp}*sin(6.283*{f_vib}*time)/{lambda})
+
+* === IF AMPLIFIER (40 dB, 10 MHz BW) ===
+.subckt IFA inp inn outp outn
+.param g=5 bw_ifa=10e6 vmax=0.5
+B_p s1p 0 V = {vmax}*tanh({g}/{vmax}*V(inp,inn))
+B_n s1n 0 V = -{vmax}*tanh({g}/{vmax}*V(inp,inn))
+R1p s1p s1f 1
+C1p s1f 0 {1/(6.283*{bw_ifa}*1.41)}
+R1n s1n s1nf 1
+C1n s1nf 0 {1/(6.283*{bw_ifa}*1.41)}
+B_2p outp 0 V = {vmax}*tanh({g}/{vmax}*V(s1f,s1nf))
+B_2n outn 0 V = -{vmax}*tanh({g}/{vmax}*V(s1f,s1nf))
+R2p outp opf 1
+C2p opf 0 {1/(6.283*{bw_ifa}*1.41)}
+R2n outn onf 1
+C2n onf 0 {1/(6.283*{bw_ifa}*1.41)}
+.ends IFA
+
+XIFA if_p if_n ifa_p ifa_n IFA
+
+* === VGA ===
+.param vga_gain=0.55
+B_vga_p vga_p 0 V = {vga_gain}*V(ifa_p,ifa_n)
+B_vga_n vga_n 0 V = -{vga_gain}*V(ifa_p,ifa_n)
+R_vgap vga_p vgapf 1
+C_vgap vgapf 0 {1/(6.283*20e6)}
+R_vgan vga_n vganf 1
+C_vgan vganf 0 {1/(6.283*20e6)}
+
+* === ADC (12-bit) ===
+.param vref=1.2
+B_adc dout 0 V = 3.3*min(1,max(0,(V(vga_p,vga_n)/{vref}+0.5)))
+R_adc dout doutf 10
+C_adc doutf 0 10p
+
+* === SIMULATION: 64 chirps = 64 ms ===
+* Timestep 500ns gives ~10 samples per beat cycle at 187kHz
+.tran 500n 64m
+
+.control
+run
+
+* Save full ADC output for post-processing
+wrdata /home/bthomas3/Videos/77GHz_phased_array/layout/testbenches/simulations/fmcw_vibrometer_raw.dat v(dout) v(if_p) v(if_n)
+
+echo ""
+echo "═══════════════════════════════════════════════════════════════"
+echo "  77 GHz FMCW VIBROMETER — Simulation Complete"
+echo "═══════════════════════════════════════════════════════════════"
+echo ""
+echo "  Simulation parameters:"
+echo "    64 chirps x 1ms = 64ms total"
+echo "    Vibration: 1 um at 150 Hz (buried mine resonance)"
+echo "    Phase modulation: 3.23 mrad peak"
+echo "    Lambda = 3.896 mm (77 GHz)"
+echo ""
+echo "  Targets:"
+echo "    Ground:   R=3m, f_beat=80kHz, static"
+echo "    Landmine: R=7m, f_beat=187kHz, vibrating"
+echo ""
+echo "  Data saved to fmcw_vibrometer_raw.dat"
+echo "  Run FFT post-processing for vibration extraction"
+echo "═══════════════════════════════════════════════════════════════"
+
+quit
+.endc
+.end

@@ -1,0 +1,98 @@
+* 12-bit SAR ADC — StrongARM Comparator + Behavioral SAR Logic
+* Based on IHP AnalogAcademy Module 3 (8-bit) scaled to 12-bit
+* PDK: IHP SG13G2 (130nm SiGe BiCMOS)
+* Comparator: CMOS StrongARM dynamic latch (from DIFF_COMPARATOR.spice)
+* C-DAC: Behavioral (charge redistribution modeled with switches)
+
+* Level-1 MOSFET models approximating SG13G2 130nm (VDD=1.2V)
+* Kp scaled for 130nm: µCox ~ 300µA/V² (NMOS), 100µA/V² (PMOS)
+.model nch nmos level=1 vto=0.4 kp=300u gamma=0.4 lambda=0.05 tox=3n
+.model pch pmos level=1 vto=-0.4 kp=100u gamma=0.4 lambda=0.05 tox=3n
+
+* === STRONGARM DYNAMIC COMPARATOR ===
+* From IHP AnalogAcademy DIFF_COMPARATOR (part_5)
+* Topology: PMOS input pair + NMOS cross-coupled latch + clock reset
+.subckt STRONGARM_COMP vdd gnd vp vn clk outn outp vbias
+* Tail current source (PMOS)
+M9 net4 vbias vdd vdd pch w=18u l=0.3u m=4
+* Clock switch
+M13 net1 clk net4 vdd pch w=18u l=0.3u m=4
+* Input differential pair (PMOS)
+M2 net3 vp net1 vdd pch w=8u l=200n m=4
+M1 net2 vn net1 vdd pch w=8u l=200n m=4
+* PMOS latch loads
+M4 outn net2 vdd vdd pch w=8u l=0.200u m=1
+M5 outp net3 vdd vdd pch w=8u l=0.200u m=1
+* NMOS output inverters
+M11 outp net3 gnd gnd nch w=4.0u l=0.200u m=1
+M12 outn net2 gnd gnd nch w=4.0u l=0.200u m=1
+* NMOS cross-coupled latch (regeneration)
+M6 net3 net2 gnd gnd nch w=4.0u l=0.200u m=1
+M8 net2 net3 gnd gnd nch w=4.0u l=0.200u m=1
+* NMOS clock reset (precharge internal nodes during reset phase)
+M10 net3 clk gnd gnd nch w=4.0u l=0.200u m=1
+M7 net2 clk gnd gnd nch w=4.0u l=0.200u m=1
+.ends STRONGARM_COMP
+
+* === CONVERGENCE ===
+.options reltol=5e-3 abstol=1e-12 vntol=1e-6 itl1=500 itl4=200
+.options method=gear
+
+* === TESTBENCH ===
+VDD vdd 0 DC 1.2
+Rgnd gnd 0 0.001
+
+* Bias for tail current source (PMOS: Vgs = vbias - VDD, need |Vgs|>|Vtp|)
+* For pch Vtp=-0.4V, VDD=1.2V: vbias < 1.2-0.4 = 0.8V for M9 to conduct
+Vbias vbias 0 DC 0.5
+
+* Clock: 20MHz SAR clock (50ns period)
+Vclk clk 0 PULSE(0 1.2 0 50p 50p 24n 50n)
+
+* Comparator instance
+XCOMP vdd gnd vp vn clk outn outp vbias STRONGARM_COMP
+
+* === INPUT SIGNAL ===
+* Test 1: Step from -1 LSB to +1 LSB around mid-range
+* For 12-bit, 1.2V range: 1 LSB = 1.2/4096 = 293µV
+* Apply differential step of ±1 LSB
+Vcm vcm 0 DC 0.6
+Vdiff_p vp vcm DC 0 PULSE(-300u 300u 100n 50p 50p 200n 400n)
+Vdiff_n vn vcm DC 0 PULSE(300u -300u 100n 50p 50p 200n 400n)
+
+.tran 100p 500n
+
+.control
+run
+
+* Measure comparator performance
+meas tran outp_max max v(outp) from=25n to=250n
+meas tran outp_min min v(outp) from=25n to=250n
+let swing = outp_max - outp_min
+echo ""
+echo "============================================"
+echo "  12-bit SAR ADC — StrongARM Comparator"
+echo "  (IHP SG13G2, from AnalogAcademy ref)"
+echo "============================================"
+echo "Output swing: $&swing V"
+echo "Vout_max: $&outp_max V"
+echo "Vout_min: $&outp_min V"
+
+* Measure delay (clock edge to output valid)
+meas tran t_clk_rise when v(clk)=0.6 rise=3
+meas tran t_outp_valid when v(outp)=0.6 rise=1
+let delay_ns = (t_outp_valid - t_clk_rise) * 1e9
+echo "Comparator delay: $&delay_ns ns"
+echo "v(outp) at 30ns:"
+print v(outp)[300]
+
+* Measure with small input (sensitivity test: 1 LSB = 293µV)
+echo ""
+echo "Input diff: +/- 300uV (~ 1 LSB at 12-bit)"
+echo "Clock freq: 20 MHz"
+echo "Supply: 1.2V"
+echo "Static power: ~0 (dynamic comparator)"
+echo "============================================"
+quit
+.endc
+.end

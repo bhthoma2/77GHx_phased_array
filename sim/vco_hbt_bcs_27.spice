@@ -1,0 +1,102 @@
+** 77 GHz VCO — corner: hbt_bcs  temp: -40
+.control
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/r3_cmc.osdi
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/psp103_nqs.osdi
+.endc
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_bcs
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+
+.temp 27
+
+** === MIM Cap subckt ===
+.subckt cap_cmim PLUS MINUS w=10e-6 l=10e-6 m=1
+.param Ctot={1.5e-3*w*l*m}
+C1 PLUS MINUS {Ctot}
+.ends cap_cmim
+
+** === TL Models (Z0=85 Ohm) ===
+.subckt TL_85_105u IN OUT GND
+C1 IN GND 0.805fF
+R1 IN n1 0.582
+L1 n1 n2 11.71pH
+C2 n2 GND 1.61fF
+R2 n2 n3 0.582
+L2 n3 n4 11.71pH
+C3 n4 GND 1.61fF
+R3 n4 n5 0.582
+L3 n5 n6 11.71pH
+C4 n6 GND 1.61fF
+R4 n6 n7 0.582
+L4 n7 OUT 11.71pH
+C5 OUT GND 0.805fF
+.ends
+
+.subckt TL_85_135u IN OUT GND
+C1 IN GND 1.385fF
+R1 IN n1 0.997
+L1 n1 n2 20.07pH
+C2 n2 GND 2.77fF
+R2 n2 n3 0.997
+L2 n3 n4 20.07pH
+C3 n4 GND 2.77fF
+R3 n4 n5 0.997
+L3 n5 OUT 20.07pH
+C4 OUT GND 1.385fF
+.ends
+
+** === VCO Core ===
+.subckt VCO_77G OUTP OUTN VTUNE VCC VSS
+
+XQ1 OUTP OUTN net_tail VSS npn13G2l Nx=2 le=2.5e-6
+XQ2 OUTN OUTP net_tail VSS npn13G2l Nx=2 le=2.5e-6
+
+XTLRES1 OUTP res1_end VSS TL_85_135u
+XTLRES2 OUTN res2_end VSS TL_85_135u
+
+Cvar1 OUTP net_var1 3fF
+Rvar1 net_var1 VTUNE 500
+Cvar2 OUTN net_var2 3fF
+Rvar2 net_var2 VTUNE 500
+
+Rtail net_tail VSS 200
+
+XTLCHK1 VCC OUTP VSS TL_85_105u
+XTLCHK2 VCC OUTN VSS TL_85_105u
+
+Cdecap VCC VSS 3pF
+
+.ends VCO_77G
+
+** === Testbench ===
+VCC VCC 0 PWL(0 0 0.1n 2.4)
+VTUNE VTUNE 0 1.2
+
+XVCO OUTP OUTN VTUNE VCC 0 VCO_77G
+
+RL1 OUTP 0 500
+RL2 OUTN 0 500
+Ikick OUTP 0 PWL(0 0 1p 100u 10p 100u 11p 0)
+
+.control
+tran 0.1p 5n 0 0.1p
+
+let vdiff = v(outp) - v(outn)
+meas tran vosc_pp pp vdiff from=4n to=5n
+meas tran t1 when vdiff=0 rise=10
+meas tran t2 when vdiff=0 rise=11
+let fosc = 1/(t2-t1)
+
+echo ""
+echo "========================================="
+echo "  VCO RESULTS  corner=hbt_bcs  temp=27"
+echo "========================================="
+echo "Oscillation frequency:"
+print fosc
+echo "Output swing (Vpp diff):"
+print vosc_pp
+echo "========================================="
+echo ""
+.endc
+.end

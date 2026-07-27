@@ -1,0 +1,29 @@
+** IF Amplifier - Baseband (DC to ~1 GHz)
+** Directly reused from mWATTBAT (frequency-independent)
+** Topology: Differential pair with resistive load + output buffer
+
+.subckt IFAMP INP INN OUTP OUTN VCC GND
+
+** Differential pair (input stage)
+XQ1 net_cp INP net_tail GND npn13G2l Nx=4 El=2.5u
+XQ2 net_cn INN net_tail GND npn13G2l Nx=4 El=2.5u
+
+** Load resistors
+XRL1 VCC net_cp rppd w=2e-6 l=71.25e-6 b=20 m=1
+XRL2 VCC net_cn rppd w=2e-6 l=71.25e-6 b=20 m=1
+
+** Tail current
+XRT net_tail GND rppd w=2.5e-6 l=11.255e-6 b=6 m=1
+
+** Emitter followers (output buffer)
+XQ3 VCC net_cp OUTP GND npn13G2l Nx=4 El=2.5u
+XQ4 VCC net_cn OUTN GND npn13G2l Nx=4 El=2.5u
+
+** Output bias resistors
+XRO1 OUTP GND rppd w=2e-6 l=89.64e-6 b=34 m=1
+XRO2 OUTN GND rppd w=2e-6 l=89.64e-6 b=34 m=1
+
+** Supply decoupling
+XCD1 VCC GND cap_cmim w=100e-6 l=20e-6 m=1
+
+.ends IFAMP

@@ -1,0 +1,138 @@
+** 77 GHz LNA Testbench - S-parameter, Transient, and Noise Analysis
+** PDK: IHP SG13G2
+** Run with: ngspice RXAMP_77GD_TB.spice
+**
+** This testbench uses ideal component models as stand-ins for the PDK models.
+** For accurate results, replace the .include lines below with the actual
+** SG13G2 PDK model paths once IIC-OSIC-TOOLS is set up.
+
+** =====================================================================
+** PDK MODEL INCLUDES (uncomment when PDK is available)
+** =====================================================================
+** .lib $PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+** .lib $PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+** .lib $PDK_ROOT/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+
+** =====================================================================
+** SIMPLIFIED MODELS (for initial connectivity/functionality check)
+** Replace with PDK models for accurate mmWave simulation
+** =====================================================================
+
+** npn13G2l: IHP SiGe HBT (fT~350GHz, fmax~450GHz)
+** Simplified Gummel-Poon model with representative parameters
+.subckt npn13G2l C B E S Nx=4 El=2.5u
+.param Nfing={Nx}
+.param Ae={Nfing*0.07e-6*El}
+Q1 C B E S npn13g2_mod area={Ae/0.175e-12}
+.ends
+
+.model npn13g2_mod npn (
++ IS=5e-17 BF=800 NF=1.0 VAF=40
++ IKF=0.04 ISE=5e-15 NE=2
++ BR=10 NR=1 VAR=8
++ IKR=0.01 ISC=2e-16 NC=2
++ RB=5 RE=0.5 RC=3
++ CJE=15f CJC=8f CJS=3f
++ TF=0.45p TR=20p
++ XTF=20 VTF=2 ITF=0.5
++ )
+
+** cap_cmim: MIM capacitor (1.5 fF/µm²)
+.subckt cap_cmim P N w=10e-6 l=10e-6 m=1
+.param Ctot={1.5e-3*w*l*m}
+C1 P N {Ctot}
+R1 P N 1G
+.ends
+
+** rppd: P+ poly resistor (~300 Ω/sq)
+.subckt rppd P N w=3e-6 l=18e-6 b=0 m=1
+.param Rtot={300*(l/w)/m}
+R1 P N {Rtot}
+.ends
+
+** rsil: Silicided resistor (~7 Ω/sq)
+.subckt rsil P N w=7e-6 l=38.8e-6 b=0 m=1
+.param Rtot={7*(l/w)/m}
+R1 P N {Rtot}
+.ends
+
+** =====================================================================
+** INCLUDE LNA SUBCIRCUIT
+** =====================================================================
+.include RXAMP_77GD.spice
+
+** =====================================================================
+** TESTBENCH
+** =====================================================================
+
+** Supply (GND = node 0)
+VCC VCC 0 2.4
+
+** Input source (differential, 85 Ohm)
+.param PIN_DBM=-30
+.param PIN={PWR(10,0.1*PIN_DBM)/1000}
+.param VIN_RMS={SQRT(PIN*85)}
+.param VIN_PP={SQRT(2)*2*VIN_RMS}
+
+VinP INP_src 0 DC 0 AC 1 SIN(0 {VIN_PP/2} 77G)
+VinN INN_src 0 DC 0 AC -1 SIN(0 {-VIN_PP/2} 77G)
+
+** Source impedance (85 Ohm differential = 42.5 each side)
+RS1 INP_src INP_ac 42.5
+RS2 INN_src INN_ac 42.5
+
+** DC blocking caps at input (large, low impedance at 77 GHz)
+Cblock1 INP_ac INP 100fF
+Cblock2 INN_ac INN 100fF
+
+** DUT
+XDUT INP INN OUTP OUTN VCC 0 RXAMP_77GD
+
+** Load impedance (85 Ohm differential = 42.5 each side)
+RL1 OUTP 0 42.5
+RL2 OUTN 0 42.5
+
+** =====================================================================
+** ANALYSIS
+** =====================================================================
+
+.control
+
+** --- DC Operating Point ---
+echo "=== DC Operating Point ==="
+op
+print v(vcc)
+print @vcc[i]
+
+** --- AC Analysis (S-parameters via gain) ---
+echo ""
+echo "=== AC Analysis: 50 GHz to 110 GHz ==="
+ac lin 201 50G 110G
+
+let vout_diff = v(outp) - v(outn)
+let gain_dB = db(vout_diff)
+print gain_dB[100]
+meas ac gain_50G find vdb(outp) at=50G
+meas ac gain_77G find vdb(outp) at=77G
+meas ac gain_100G find vdb(outp) at=100G
+
+echo ""
+echo "=== Transient Analysis at 77 GHz ==="
+tran 0.5p 1n
+
+let vout_t = v(outp) - v(outn)
+let vin_t = v(inp) - v(inn)
+meas tran vout_pp pp vout_t
+meas tran vin_pp pp vin_t
+echo ""
+echo "=============================================="
+echo "  RXAMP_77GD SIMULATION COMPLETE"
+echo "=============================================="
+echo ""
+echo "IMPORTANT: These results use simplified transistor models."
+echo "For accurate mmWave results, install IHP SG13G2 PDK."
+echo ""
+
+.endc
+
+.end

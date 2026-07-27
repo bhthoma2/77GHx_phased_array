@@ -1,0 +1,11 @@
+* Extracted by KLayout with SG13G2 LVS runset on : 24/07/2026 09:42
+
+.SUBCKT MIXER_77G_XTOR
+Q$1 \$31 \$32 \$37 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$2 \$33 \$34 \$37 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$9 \$81 \$72 \$31 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$11 \$81 \$72 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+R$17 \$18 \$19 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$18 \$111 \$112 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$19 \$113 \$114 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+.ENDS MIXER_77G_XTOR

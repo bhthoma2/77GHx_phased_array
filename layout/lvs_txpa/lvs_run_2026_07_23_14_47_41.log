@@ -1,0 +1,16 @@
+23-Jul-2026 10:47:41 | INFO    | Your Klayout version is: KLayout 0.30.9
+23-Jul-2026 10:47:41 | INFO    | Running SG13G2 LVS checks on design /home/bthomas3/Videos/77GHz_phased_array/layout/TXPA_77G_XTOR.gds on cell TXAMP_77GD
+23-Jul-2026 10:47:43 | INFO    | ==============================================================================
+23-Jul-2026 10:47:43 | INFO    | Important Summary
+23-Jul-2026 10:47:43 | INFO    | +------------------+--------------------------------------------------------------+
+23-Jul-2026 10:47:43 | INFO    | | Status           | NET_ONLY                                                     |
+23-Jul-2026 10:47:43 | INFO    | | Mode             | NET_ONLY                                                     |
+23-Jul-2026 10:47:43 | INFO    | | Outcome          | NET_ONLY mode: extracted netlist generated from layout only. |
+23-Jul-2026 10:47:43 | INFO    | | Layout           | TXPA_77G_XTOR.gds                                            |
+23-Jul-2026 10:47:43 | INFO    | | Top Cell         | TXAMP_77GD                                                   |
+23-Jul-2026 10:47:43 | INFO    | | Results Dir      | /home/bthomas3/Videos/77GHz_phased_array/layout/lvs_txpa     |
+23-Jul-2026 10:47:43 | INFO    | | Warnings         | 0                                                            |
+23-Jul-2026 10:47:43 | INFO    | | Errors           | 0                                                            |
+23-Jul-2026 10:47:43 | INFO    | | Run Time (s)     | 2.724                                                        |
+23-Jul-2026 10:47:43 | INFO    | +------------------+--------------------------------------------------------------+
+23-Jul-2026 10:47:43 | INFO    | ==============================================================================

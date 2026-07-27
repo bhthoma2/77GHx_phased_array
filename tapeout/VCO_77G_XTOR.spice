@@ -1,0 +1,12 @@
+* Extracted by KLayout with SG13G2 LVS runset on : 15/07/2026 13:52
+
+.SUBCKT VCO_77G_XTOR G1 G1$1 G2 G2$1 W W$1
+Q$1 \$31 \$32 \$36 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$2 \$29 \$30 \$35 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$3 \$39 \$40 \$53 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$4 \$37 \$38 \$52 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+R$5 \$13 \$14 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+C$6 \$10 \$2 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$7 G1 W G2 \$1 sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+C$8 G1$1 W$1 G2$1 \$1 sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+.ENDS VCO_77G_XTOR

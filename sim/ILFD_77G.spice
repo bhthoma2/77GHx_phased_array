@@ -1,0 +1,201 @@
+** Injection-Locked Frequency Divider (÷2) — 77 GHz → 38.5 GHz
+** Topology: Cross-coupled LC oscillator at ~38.5 GHz with tail injection at 77 GHz
+** The 2nd harmonic of the 38.5 GHz oscillation locks to the 77 GHz input
+
+.subckt ILFD_77G INP INN OUTP OUTN VCC VSS
+
+** Cross-coupled pair (free-running at ~38.5 GHz)
+XQ1 OUTP OUTN net_tail VSS npn13G2l Nx=2 le=2.5e-6
+XQ2 OUTN OUTP net_tail VSS npn13G2l Nx=2 le=2.5e-6
+
+** Resonator stubs tuned for ~38.5 GHz
+** 38.5 GHz needs longer stubs → ~470µm
+XTLRES1 OUTP res1_end VSS TL_85_850u
+XTLRES2 OUTN res2_end VSS TL_85_850u
+
+** DC feed choke (~250µm)
+XTLCHK1 VCC OUTP VSS TL_85_250u
+XTLCHK2 VCC OUTN VSS TL_85_250u
+
+** Injection transistors (77 GHz input drives tail current)
+XQinj1 net_tail INP net_inj_tail VSS npn13G2l Nx=2 le=2.5e-6
+XQinj2 net_tail INN net_inj_tail VSS npn13G2l Nx=2 le=2.5e-6
+
+** Tail bias
+Rtail net_inj_tail VSS 100
+
+** Decoupling
+Cdecap VCC VSS 3pF
+
+.ends ILFD_77G
+
+** === TL 850µm resonator (Z0=85) — ~38.5 GHz ===
+.subckt TL_85_850u IN OUT GND
+* 17 sections × 50µm each
+C1 IN GND 1.538fF
+R1 IN n1 1.108
+L1 n1 n2 22.3pH
+C2 n2 GND 3.075fF
+R2 n2 n3 1.108
+L2 n3 n4 22.3pH
+C3 n4 GND 3.075fF
+R3 n4 n5 1.108
+L3 n5 n6 22.3pH
+C4 n6 GND 3.075fF
+R4 n6 n7 1.108
+L4 n7 n8 22.3pH
+C5 n8 GND 3.075fF
+R5 n8 n9 1.108
+L5 n9 n10 22.3pH
+C6 n10 GND 3.075fF
+R6 n10 n11 1.108
+L6 n11 n12 22.3pH
+C7 n12 GND 3.075fF
+R7 n12 n13 1.108
+L7 n13 n14 22.3pH
+C8 n14 GND 3.075fF
+R8 n14 n15 1.108
+L8 n15 n16 22.3pH
+C9 n16 GND 3.075fF
+R9 n16 n17 1.108
+L9 n17 n18 22.3pH
+C10 n18 GND 3.075fF
+R10 n18 n19 1.108
+L10 n19 n20 22.3pH
+C11 n20 GND 3.075fF
+R11 n20 n21 1.108
+L11 n21 n22 22.3pH
+C12 n22 GND 3.075fF
+R12 n22 n23 1.108
+L12 n23 n24 22.3pH
+C13 n24 GND 3.075fF
+R13 n24 n25 1.108
+L13 n25 n26 22.3pH
+C14 n26 GND 3.075fF
+R14 n26 n27 1.108
+L14 n27 n28 22.3pH
+C15 n28 GND 3.075fF
+R15 n28 n29 1.108
+L15 n29 n30 22.3pH
+C16 n30 GND 3.075fF
+R16 n30 n31 1.108
+L16 n31 n32 22.3pH
+C17 n32 GND 3.075fF
+R17 n32 n33 1.108
+L17 n33 OUT 22.3pH
+C18 OUT GND 1.538fF
+.ends
+
+** === TL 700µm resonator (Z0=85) ===
+.subckt TL_85_700u IN OUT GND
+* 14 sections × 50µm each
+* L_sec = 445.9e-9 * 50e-6 = 22.3pH
+* C_sec = 61.5e-12 * 50e-6 = 3.075fF
+* R_sec = 22.16e3 * 50e-6 = 1.108
+C1 IN GND 1.538fF
+R1 IN n1 1.108
+L1 n1 n2 22.3pH
+C2 n2 GND 3.075fF
+R2 n2 n3 1.108
+L2 n3 n4 22.3pH
+C3 n4 GND 3.075fF
+R3 n4 n5 1.108
+L3 n5 n6 22.3pH
+C4 n6 GND 3.075fF
+R4 n6 n7 1.108
+L4 n7 n8 22.3pH
+C5 n8 GND 3.075fF
+R5 n8 n9 1.108
+L5 n9 n10 22.3pH
+C6 n10 GND 3.075fF
+R6 n10 n11 1.108
+L6 n11 n12 22.3pH
+C7 n12 GND 3.075fF
+R7 n12 n13 1.108
+L7 n13 n14 22.3pH
+C8 n14 GND 3.075fF
+R8 n14 n15 1.108
+L8 n15 n16 22.3pH
+C9 n16 GND 3.075fF
+R9 n16 n17 1.108
+L9 n17 n18 22.3pH
+C10 n18 GND 3.075fF
+R10 n18 n19 1.108
+L10 n19 n20 22.3pH
+C11 n20 GND 3.075fF
+R11 n20 n21 1.108
+L11 n21 n22 22.3pH
+C12 n22 GND 3.075fF
+R12 n22 n23 1.108
+L12 n23 n24 22.3pH
+C13 n24 GND 3.075fF
+R13 n24 n25 1.108
+L13 n25 n26 22.3pH
+C14 n26 GND 3.075fF
+R14 n26 n27 1.108
+L14 n27 OUT 22.3pH
+C15 OUT GND 1.538fF
+.ends
+
+** === TL 470µm resonator (Z0=85) ===
+.subckt TL_85_470u IN OUT GND
+* 10 sections × 47µm each
+* L_sec = 445.9e-9 * 47e-6 = 20.96pH
+* C_sec = 61.5e-12 * 47e-6 = 2.89fF
+* R_sec = 22.16e3 * 47e-6 = 1.042
+C1 IN GND 1.445fF
+R1 IN n1 1.042
+L1 n1 n2 20.96pH
+C2 n2 GND 2.89fF
+R2 n2 n3 1.042
+L2 n3 n4 20.96pH
+C3 n4 GND 2.89fF
+R3 n4 n5 1.042
+L3 n5 n6 20.96pH
+C4 n6 GND 2.89fF
+R4 n6 n7 1.042
+L4 n7 n8 20.96pH
+C5 n8 GND 2.89fF
+R5 n8 n9 1.042
+L5 n9 n10 20.96pH
+C6 n10 GND 2.89fF
+R6 n10 n11 1.042
+L6 n11 n12 20.96pH
+C7 n12 GND 2.89fF
+R7 n12 n13 1.042
+L7 n13 n14 20.96pH
+C8 n14 GND 2.89fF
+R8 n14 n15 1.042
+L8 n15 n16 20.96pH
+C9 n16 GND 2.89fF
+R9 n16 n17 1.042
+L9 n17 n18 20.96pH
+C10 n18 GND 2.89fF
+R10 n18 n19 1.042
+L10 n19 OUT 20.96pH
+C11 OUT GND 1.445fF
+.ends
+
+** === TL 250µm choke (Z0=85) ===
+.subckt TL_85_250u IN OUT GND
+* 5 sections × 50µm each
+* L_sec = 445.9e-9 * 50e-6 = 22.3pH
+* C_sec = 61.5e-12 * 50e-6 = 3.075fF
+* R_sec = 22.16e3 * 50e-6 = 1.108
+C1 IN GND 1.538fF
+R1 IN n1 1.108
+L1 n1 n2 22.3pH
+C2 n2 GND 3.075fF
+R2 n2 n3 1.108
+L2 n3 n4 22.3pH
+C3 n4 GND 3.075fF
+R3 n4 n5 1.108
+L3 n5 n6 22.3pH
+C4 n6 GND 3.075fF
+R4 n6 n7 1.108
+L4 n7 n8 22.3pH
+C5 n8 GND 3.075fF
+R5 n8 n9 1.108
+L5 n9 OUT 22.3pH
+C6 OUT GND 1.538fF
+.ends

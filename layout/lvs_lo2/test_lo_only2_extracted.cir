@@ -1,0 +1,35 @@
+* Extracted by KLayout with SG13G2 LVS runset on : 17/07/2026 11:23
+
+.SUBCKT PHASED_ARRAY_77G_TOP G1 G1$1 G2 G2$1 W
+Q$1 \$56 G1 \$95 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$2 \$57 \$58 \$95 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$11 \$395 G1 \$409 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$12 \$395 \$396 \$409 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$21 \$650 \$650 \$395 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$25 G1 \$771 \$56 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$26 G1 \$771 \$57 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$41 \$1395 \$1396 \$1435 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$42 \$1397 \$1398 \$1435 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$45 \$1534 \$1533 \$1609 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$46 \$1535 \$1536 \$1609 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$49 G1 \$2102 \$1466 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$50 \$2102 G1 \$1466 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$61 \$1396 \$2037 \$1534 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$62 \$1398 \$2037 \$1535 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$65 \$2100 G1 \$1395 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$66 \$2101 \$2102 \$1395 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$67 \$2101 \$2102 \$1397 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$68 \$2100 G1 \$1397 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+R$77 \$43 \$44 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$78 \$170 \$171 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$79 \$1328 \$1329 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$80 \$1345 \$1344 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$81 \$1450 \$1466 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$82 \$2523 \$2525 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$83 \$2524 \$2526 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+C$84 \$1298 \$1343 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$85 \$1298 \$1450 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$86 \$1298 \$1342 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$87 G1 W G2 \$1 sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+C$88 G1$1 W G2$1 \$1 sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+.ENDS PHASED_ARRAY_77G_TOP

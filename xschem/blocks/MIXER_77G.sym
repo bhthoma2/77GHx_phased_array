@@ -1,0 +1,32 @@
+v {xschem version=3.4.7 file_version=1.2}
+G {}
+K {type=subcircuit
+format="@name @pinlist @symname"
+template="name=x1"}
+V {}
+S {}
+E {}
+L 4 -40 -30 40 -30 {}
+L 4 40 -30 40 30 {}
+L 4 40 30 -40 30 {}
+L 4 -40 30 -40 -30 {}
+L 4 0 -30 0 -40 {}
+L 4 -40 -20 -50 -20 {}
+L 4 -40 -8 -50 -8 {}
+L 4 -40 8 -50 8 {}
+L 4 -40 20 -50 20 {}
+L 4 -10 30 -10 40 {}
+L 4 10 30 10 40 {}
+L 4 40 -10 50 -10 {}
+L 4 40 10 50 10 {}
+B 5 -2.5 -42.5 2.5 -37.5 {name=VCC dir=inout}
+B 5 -52.5 -22.5 -47.5 -17.5 {name=RF_P dir=in}
+B 5 -52.5 -10.5 -47.5 -5.5 {name=RF_N dir=in}
+B 5 -52.5 5.5 -47.5 10.5 {name=LO_P dir=in}
+B 5 -52.5 17.5 -47.5 22.5 {name=LO_N dir=in}
+B 5 -12.5 37.5 -7.5 42.5 {name=GND dir=inout}
+B 5 7.5 37.5 12.5 42.5 {name=sub! dir=inout}
+B 5 47.5 -12.5 52.5 -7.5 {name=IF_P dir=out}
+B 5 47.5 7.5 52.5 12.5 {name=IF_N dir=out}
+T {@name} -35 -28 0 0 0.2 0.2 {}
+T {MIXER_77G} -28 -5 0 0 0.15 0.15 {}

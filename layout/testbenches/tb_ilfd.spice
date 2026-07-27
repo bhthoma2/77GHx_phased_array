@@ -1,0 +1,36 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/layout/testbenches/tb_ilfd.sch
+**.subckt tb_ilfd
+XQ21 DIVP DIVN DIV_TAIL sub! npn13G2l Nx=1 El=1.0
+XQ22 DIVN DIVP DIV_TAIL sub! npn13G2l Nx=1 El=1.0
+XQ11 DIVP INJ_P DIV_TAIL sub! npn13G2l Nx=1 El=1.0
+XQ12 DIVN INJ_N DIV_TAIL sub! npn13G2l Nx=1 El=1.0
+L_DIVP L_MIDP DIVP 120p
+L_DIVN L_MIDN DIVN 120p
+RS_DIVP VCC L_MIDP 5
+RS_DIVN VCC L_MIDN 5
+C_DIVP GND DIVP 20f
+C_DIVN GND DIVN 20f
+VCC VCC GND DC 3.3
+ITAIL DIV_TAIL GND DC 4m
+VINJ_P INJ_P GND DC 0.9 SIN(0.9 200m 77e9)
+VINJ_N INJ_N GND DC 0.9 SIN(0.9 -200m 77e9)
+**** begin user architecture code
+
+
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+.options gmin=1e-10 reltol=5e-3 abstol=1e-10 vntol=1e-4
+.options itl1=1000 itl2=200 itl4=500
+.options method=gear maxord=3
+.options noopiter
+.tran 0.2p 3n
+.meas tran vdivp pp v(divp) from=1n to=3n
+.meas tran vdivn pp v(divn) from=1n to=3n
+.meas tran freq_div trig v(divp) val=3.3 rise=50 targ v(divp) val=3.3 rise=51
+
+
+**** end user architecture code
+**.ends
+.end

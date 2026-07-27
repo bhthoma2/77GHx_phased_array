@@ -1,0 +1,5 @@
+create_clock -name clk -period 5.0 [get_ports clk]
+set_input_delay -clock clk 0.5 [all_inputs]
+set_output_delay -clock clk 0.5 [all_outputs]
+set_load 0.01 [all_outputs]
+set_driving_cell -lib_cell sg13g2_buf_2 [all_inputs]

@@ -1,0 +1,131 @@
+** 77 GHz Gilbert Cell Mixer - Standalone SPICE Netlist
+** Modified from mWATTBAT MIXER for 77 GHz phased array vibrometer
+** PDK: IHP SG13G2 (130nm SiGe BiCMOS)
+**
+** Topology: Double-balanced Gilbert cell
+**   RF transconductance pair: Q20, Q21
+**   LO switching quad: Q22, Q23, Q24, Q25
+**   Bias mirrors: Q26 (LO), Q27 (RF)
+
+.subckt MIXER_77GD LOP LON RFP RFN IFP IFN VCC GND
+
+** === Transmission Line Matching ===
+** LO port matching (49µm, Z0=85)
+XTLLO1P LOP BLOP GND TL_85_49u
+XTLLO2P BLOP BLOP2 GND TL_85_49u
+XTLLO1N LON BLON GND TL_85_49u
+XTLLO2N BLON BLON2 GND TL_85_49u
+
+** LO bias feed TLs (66µm, Z0=85)
+XTLLO3P LOBIAS BLOP GND TL_85_66u
+XTLLO4N LOBIAS BLON GND TL_85_66u
+
+** RF port matching (125µm, Z0=85)
+XTLRF1P RFP BRFP GND TL_85_125u
+XTLRF2P BRFP BRFP2 GND TL_85_125u
+XTLRF1N RFN BRFN GND TL_85_125u
+XTLRF2N BRFN BRFN2 GND TL_85_125u
+
+** RF bias feed TLs (125µm, Z0=85)
+XTLRF3P RFBIAS BRFP GND TL_85_125u
+XTLRF4N RFBIAS BRFN GND TL_85_125u
+
+** === Active Devices ===
+** LO switching quad
+XQ22 IFP_int BLOP ELOL GND npn13G2l Nx=4 El=2.5u
+XQ23 IFN_int BLON ELOL GND npn13G2l Nx=4 El=2.5u
+XQ24 IFP_int BLOP ELOR GND npn13G2l Nx=4 El=2.5u
+XQ25 IFN_int BLON ELOR GND npn13G2l Nx=4 El=2.5u
+
+** RF transconductance pair
+XQ20 ELOL BRFP GND GND npn13G2l Nx=4 El=2.5u
+XQ21 ELOR BRFN GND GND npn13G2l Nx=4 El=2.5u
+
+** Bias mirrors
+XQ26 LOBIAS LOBIAS GND GND npn13G2l Nx=1 El=2.5u
+XQ27 RFBIAS RFBIAS GND GND npn13G2l Nx=1 El=2.5u
+
+** === Bias Resistors ===
+** IF load resistors (from VCC to IF outputs)
+XR21 VCC IFP_int rppd w=3e-6 l=18.23e-6 b=0 m=2
+XR22 VCC IFN_int rppd w=3e-6 l=18.23e-6 b=0 m=2
+
+** LO bias from VCC
+XR23 VCC LOBIAS rppd w=3e-6 l=27.48e-6 b=0 m=1
+
+** RF bias from VCC (shared with LO through resistor divider)
+XR24 LOBIAS RFBIAS rppd w=3e-6 l=18.23e-6 b=0 m=1
+
+** === Coupling Capacitors ===
+** LO DC blocking (5µm × 5µm MIM)
+XC37 LOP GND cap_cmim w=5e-6 l=5e-6 m=1
+XC38 LON GND cap_cmim w=5e-6 l=5e-6 m=1
+
+** RF DC blocking (4µm × 4µm MIM)
+XC39 RFP GND cap_cmim w=4e-6 l=4e-6 m=1
+XC40 RFN GND cap_cmim w=4e-6 l=4e-6 m=1
+
+** === Output (IF) ===
+** Series DC blocking to IF output
+XC_IFP IFP_int IFP cap_cmim w=10e-6 l=10e-6 m=1
+XC_IFN IFN_int IFN cap_cmim w=10e-6 l=10e-6 m=1
+
+** === Supply Decoupling ===
+XC41 VCC LOBIAS cap_cmim w=30e-6 l=30e-6 m=1
+XC42 RFBIAS GND cap_cmim w=30e-6 l=30e-6 m=1
+XC43 VCC GND cap_cmim w=30e-6 l=30e-6 m=1
+
+.ends MIXER_77GD
+
+** === Additional TL Subcircuits ===
+
+.subckt TL_85_49u IN OUT GND
+* 2-section pi model, each section 24.5µm
+* L_sec = 445.9e-9 * 24.5e-6 = 10.92pH
+* C_sec = 61.5e-12 * 24.5e-6 = 1.51fF
+C1 IN GND 0.755fF
+R1 IN n1 0.543
+L1 n1 n2 10.92pH
+C2 n2 GND 1.51fF
+R2 n2 n3 0.543
+L2 n3 OUT 10.92pH
+C3 OUT GND 0.755fF
+.ends
+
+.subckt TL_85_66u IN OUT GND
+* 3-section pi model, each section 22µm
+* L_sec = 445.9e-9 * 22e-6 = 9.81pH
+* C_sec = 61.5e-12 * 22e-6 = 1.35fF
+C1 IN GND 0.675fF
+R1 IN n1 0.488
+L1 n1 n2 9.81pH
+C2 n2 GND 1.35fF
+R2 n2 n3 0.488
+L2 n3 n4 9.81pH
+C3 n4 GND 1.35fF
+R3 n4 n5 0.488
+L3 n5 OUT 9.81pH
+C4 OUT GND 0.675fF
+.ends
+
+.subckt TL_85_125u IN OUT GND
+* 5-section pi model, each section 25µm
+* L_sec = 445.9e-9 * 25e-6 = 11.15pH
+* C_sec = 61.5e-12 * 25e-6 = 1.54fF
+C1 IN GND 0.77fF
+R1 IN n1 0.554
+L1 n1 n2 11.15pH
+C2 n2 GND 1.54fF
+R2 n2 n3 0.554
+L2 n3 n4 11.15pH
+C3 n4 GND 1.54fF
+R3 n4 n5 0.554
+L3 n5 n6 11.15pH
+C4 n6 GND 1.54fF
+R4 n6 n7 0.554
+L4 n7 n8 11.15pH
+C5 n8 GND 1.54fF
+R5 n8 n9 0.554
+L5 n9 OUT 11.15pH
+C6 OUT GND 0.77fF
+.ends

@@ -1,0 +1,138 @@
+** 77 GHz TX Power Amplifier — Full IHP SG13G2 PDK
+** Topology: Differential cascode (same as LNA, larger devices for power)
+.control
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/r3_cmc.osdi
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/psp103_nqs.osdi
+.endc
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+
+.subckt cap_cmim PLUS MINUS w=10e-6 l=10e-6 m=1
+.param Ctot={1.5e-3*w*l*m}
+C1 PLUS MINUS {Ctot}
+.ends cap_cmim
+
+** === TL Models ===
+.subckt TL_85_97u IN OUT GND
+C1 IN GND 0.77fF
+R1 IN n1 0.554
+L1 n1 n2 11.15pH
+C2 n2 GND 1.54fF
+R2 n2 n3 0.554
+L2 n3 n4 11.15pH
+C3 n4 GND 1.54fF
+R3 n4 n5 0.554
+L3 n5 n6 11.15pH
+C4 n6 GND 1.54fF
+R4 n6 n7 0.554
+L4 n7 OUT 11.15pH
+C5 OUT GND 0.77fF
+.ends
+
+.subckt TL_85_210u IN OUT GND
+C1 IN GND 0.92fF
+R1 IN n1 0.665
+L1 n1 n2 13.38pH
+C2 n2 GND 1.845fF
+R2 n2 n3 0.665
+L2 n3 n4 13.38pH
+C3 n4 GND 1.845fF
+R3 n4 n5 0.665
+L3 n5 n6 13.38pH
+C4 n6 GND 1.845fF
+R4 n6 n7 0.665
+L4 n7 n8 13.38pH
+C5 n8 GND 1.845fF
+R5 n8 n9 0.665
+L5 n9 n10 13.38pH
+C6 n10 GND 1.845fF
+R6 n10 n11 0.665
+L6 n11 n12 13.38pH
+C7 n12 GND 1.845fF
+R7 n12 n13 0.665
+L7 n13 OUT 13.38pH
+C8 OUT GND 0.92fF
+.ends
+
+.subckt TL_85_58u IN OUT GND
+C1 IN GND 0.89fF
+R1 IN n1 0.643
+L1 n1 n2 12.9pH
+C2 n2 GND 1.79fF
+R2 n2 n3 0.643
+L2 n3 OUT 12.9pH
+C3 OUT GND 0.89fF
+.ends
+
+** === TX PA (Differential Cascode, Nx=8 for power) ===
+.subckt TXAMP_77GD INP INN OUTP OUTN VCC VSS
+
+XQ1 net_c1 INP net_e1 VSS npn13G2l Nx=8 le=2.5e-6
+XQ2 net_c2 INN net_e2 VSS npn13G2l Nx=8 le=2.5e-6
+XQ3 OUTP VB1 net_c1 VSS npn13G2l Nx=8 le=2.5e-6
+XQ4 OUTN VB1 net_c2 VSS npn13G2l Nx=8 le=2.5e-6
+
+XTL_IN1 INP net_in1 VSS TL_85_97u
+XTL_IN2 INN net_in2 VSS TL_85_97u
+XTL_LOAD1 VCC OUTP VSS TL_85_210u
+XTL_LOAD2 VCC OUTN VSS TL_85_210u
+XTL_DEG1 net_e1 VSS VSS TL_85_58u
+XTL_DEG2 net_e2 VSS VSS TL_85_58u
+
+Cin1 net_in1 VSS 30fF
+Cin2 net_in2 VSS 30fF
+
+RB1 VCC VB1 1k
+CB1 VB1 VSS 1pF
+
+.ends TXAMP_77GD
+
+** === Testbench ===
+VCC VCC 0 2.4
+VB_IN VB_IN 0 0.92
+
+Vrf INP_ac 0 SIN(0 100m 77G)
+Vrfn INN_ac 0 SIN(0 -100m 77G)
+Cblock1 INP_ac INP 100fF
+Cblock2 INN_ac INN 100fF
+Rbias1 VB_IN INP 10k
+Rbias2 VB_IN INN 10k
+
+XTXPA INP INN OUTP OUTN VCC 0 TXAMP_77GD
+
+RL1 OUTP 0 50
+RL2 OUTN 0 50
+
+.control
+** AC
+ac dec 100 50G 110G
+meas ac gain_77g find vdb(outp) at=77G
+
+** Transient
+tran 0.1p 2n 0.5n 0.1p
+meas tran vout_pp pp v(outp) from=1n to=2n
+meas tran vin_pp pp v(inp_ac) from=1n to=2n
+
+** Power calculation (into 50 Ohm diff)
+let pout_w = (vout_pp/2/1.414)^2/50
+let pout_dbm = 10*log(pout_w/1e-3)/log(10)
+
+echo ""
+echo "========================================="
+echo "  TX PA — FULL IHP SG13G2 PDK"
+echo "========================================="
+echo "AC Gain at 77 GHz (SE, dB):"
+print gain_77g
+echo "Output Vpp (SE, into 50 Ohm):"
+print vout_pp
+echo "Input Vpp:"
+print vin_pp
+echo "Output Power (dBm, SE into 50 Ohm):"
+print pout_dbm
+echo "ICC:"
+print @vcc[i]
+echo "========================================="
+.endc
+.end

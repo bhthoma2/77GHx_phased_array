@@ -1,0 +1,112 @@
+** 77 GHz VCO Testbench - Startup and Oscillation
+** Verify oscillation frequency and tuning range
+** Run with: ngspice -b VCO_77G_TB.spice
+
+** =====================================================================
+** SIMPLIFIED MODELS
+** =====================================================================
+
+.subckt npn13G2l C B E S Nx=4 El=2.5u
+.param Nfing={Nx}
+.param Ae={Nfing*0.07e-6*El}
+Q1 C B E S npn13g2_mod area={Ae/0.175e-12}
+.ends
+
+.model npn13g2_mod npn (
++ IS=5e-17 BF=800 NF=1.0 VAF=40
++ IKF=0.04 ISE=5e-15 NE=2
++ BR=10 NR=1 VAR=8
++ IKR=0.01 ISC=2e-16 NC=2
++ RB=5 RE=0.5 RC=3
++ CJE=15f CJC=8f CJS=3f
++ TF=0.45p TR=20p
++ XTF=20 VTF=2 ITF=0.5
++ )
+
+.subckt cap_cmim P N w=10e-6 l=10e-6 m=1
+.param Ctot={1.5e-3*w*l*m}
+C1 P N {Ctot}
+R1 P N 1G
+.ends
+
+.subckt rppd P N w=3e-6 l=18e-6 b=0 m=1
+.param Rtot={300*(l/w)/m}
+R1 P N {Rtot}
+.ends
+
+.subckt rsil P N w=7e-6 l=38.8e-6 b=0 m=1
+.param Rtot={7*(l/w)/m}
+R1 P N {Rtot}
+.ends
+
+** =====================================================================
+** INCLUDE VCO AND TL MODELS
+** =====================================================================
+.include VCO_77G.spice
+.include RXAMP_77GD.spice
+
+** =====================================================================
+** TESTBENCH
+** =====================================================================
+
+** Supply (ramp up to help startup)
+VCC VCC 0 PWL(0 0 0.1n 2.4)
+
+** Tuning voltage (center = 1.2V)
+VTUNE VTUNE 0 1.2
+
+** DUT
+XVCO OUTP OUTN VTUNE VCC 0 VCO_77G
+
+** Output load (high-Z, buffer input)
+RL1 OUTP 0 500
+RL2 OUTN 0 500
+
+** Startup kick (small asymmetry to break symmetry)
+Ikick OUTP 0 PWL(0 0 1p 100u 10p 100u 11p 0)
+
+** =====================================================================
+** ANALYSIS
+** =====================================================================
+
+.control
+
+echo "=============================================="
+echo " 77 GHz VCO OSCILLATION TEST"
+echo "=============================================="
+echo ""
+
+echo "=== Transient: Checking oscillation startup ==="
+tran 0.1p 5n 0 0.1p
+
+let vdiff = v(outp) - v(outn)
+
+** Check for oscillation (signal should grow)
+meas tran vosc_early pp vdiff from=0.5n to=1n
+meas tran vosc_mid pp vdiff from=2n to=3n
+meas tran vosc_late pp vdiff from=4n to=5n
+
+echo ""
+echo "=== VCO RESULTS ==="
+echo "Output swing (early, 0.5-1ns):"
+print vosc_early
+echo "Output swing (mid, 2-3ns):"
+print vosc_mid
+echo "Output swing (steady, 4-5ns):"
+print vosc_late
+echo ""
+
+** Measure frequency from zero crossings in steady state
+meas tran t1 when vdiff=0 rise=10
+meas tran t2 when vdiff=0 rise=11
+let fosc = 1/(t2-t1)
+echo "Oscillation frequency:"
+print fosc
+echo ""
+echo "=============================================="
+echo " VCO_77G SIMULATION COMPLETE"
+echo "=============================================="
+
+.endc
+
+.end

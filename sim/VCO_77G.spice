@@ -1,0 +1,192 @@
+** 77 GHz Cross-Coupled VCO
+** PDK: IHP SG13G2 (130nm SiGe BiCMOS)
+**
+** Topology: Cross-coupled npn13G2l differential pair
+**   TL resonator (~590µm open stub for λ/4 at 77 GHz)
+**   Junction varactor for frequency tuning
+**   Target: 72-82 GHz tuning range, <-90 dBc/Hz @ 1MHz offset
+
+.subckt VCO_77G OUTP OUTN VTUNE VCC GND
+
+** === Cross-Coupled Pair ===
+** Nx=2 to reduce parasitic capacitance (target higher freq)
+XQ1 OUTP OUTN net_tail GND npn13G2l Nx=2 El=2.5u
+XQ2 OUTN OUTP net_tail GND npn13G2l Nx=2 El=2.5u
+
+** === TL Resonator Stubs (open-ended) ===
+** Real PDK: Nx=2 gives CJE≈10.5fF, CJC≈2fF per HBT → ~25fF per node total
+** For 77 GHz with 25fF: need L ≈ 170pH → stub len = 170pH/445.9nH/m = 380µm
+** Use 350µm (slightly shorter, choke adds remaining inductance)
+XTLRES1 OUTP res1_end GND TL_85_135u
+XTLRES2 OUTN res2_end GND TL_85_135u
+
+** === Varactor Tuning ===
+Cvar1 OUTP net_var1 3fF
+Rvar1 net_var1 VTUNE 10
+Cvar2 OUTN net_var2 3fF
+Rvar2 net_var2 VTUNE 10
+
+** === Bias ===
+Rtail net_tail GND 200
+
+** === DC Feed (TL choke — tuned for 77 GHz) ===
+XTLCHK1 VCC OUTP GND TL_85_105u
+XTLCHK2 VCC OUTN GND TL_85_105u
+
+** === Supply Decoupling ===
+XCD1 VCC GND cap_cmim w=100e-6 l=20e-6 m=1
+
+.ends VCO_77G
+
+** === TL choke (105µm, Z0=85) ===
+.subckt TL_85_105u IN OUT GND
+* 4-section pi model, each section 26.25µm
+* L_sec = 445.9e-9 * 26.25e-6 = 11.71pH
+* C_sec = 61.5e-12 * 26.25e-6 = 1.61fF
+* R_sec = 22.16e3 * 26.25e-6 = 0.582 Ohm
+C1 IN GND 0.805fF
+R1 IN n1 0.582
+L1 n1 n2 11.71pH
+C2 n2 GND 1.61fF
+R2 n2 n3 0.582
+L2 n3 n4 11.71pH
+C3 n4 GND 1.61fF
+R3 n4 n5 0.582
+L3 n5 n6 11.71pH
+C4 n6 GND 1.61fF
+R4 n6 n7 0.582
+L4 n7 OUT 11.71pH
+C5 OUT GND 0.805fF
+.ends
+
+** === TL resonator stub (135µm, Z0=85) ===
+.subckt TL_85_135u IN OUT GND
+* 3-section pi model, each section 45µm
+* L_sec = 445.9e-9 * 45e-6 = 20.07pH
+* C_sec = 61.5e-12 * 45e-6 = 2.77fF
+* R_sec = 22.16e3 * 45e-6 = 0.997 Ohm
+C1 IN GND 1.385fF
+R1 IN n1 0.997
+L1 n1 n2 20.07pH
+C2 n2 GND 2.77fF
+R2 n2 n3 0.997
+L2 n3 n4 20.07pH
+C3 n4 GND 2.77fF
+R3 n4 n5 0.997
+L3 n5 OUT 20.07pH
+C4 OUT GND 1.385fF
+.ends
+
+** === TL resonator stub (185µm, Z0=85) ===
+.subckt TL_85_185u IN OUT GND
+* 4-section pi model, each section 46.25µm
+* L_sec = 445.9e-9 * 46.25e-6 = 20.62pH
+* C_sec = 61.5e-12 * 46.25e-6 = 2.84fF
+* R_sec = 22.16e3 * 46.25e-6 = 1.025 Ohm
+C1 IN GND 1.42fF
+R1 IN n1 1.025
+L1 n1 n2 20.62pH
+C2 n2 GND 2.84fF
+R2 n2 n3 1.025
+L2 n3 n4 20.62pH
+C3 n4 GND 2.84fF
+R3 n4 n5 1.025
+L3 n5 n6 20.62pH
+C4 n6 GND 2.84fF
+R4 n6 n7 1.025
+L4 n7 OUT 20.62pH
+C5 OUT GND 1.42fF
+.ends
+
+** === TL resonator stub (350µm, Z0=85) ===
+.subckt TL_85_350u IN OUT GND
+* 8-section pi model, each section 43.75µm
+* L_sec = 445.9e-9 * 43.75e-6 = 19.51pH
+* C_sec = 61.5e-12 * 43.75e-6 = 2.69fF
+* R_sec = 22.16e3 * 43.75e-6 = 0.970 Ohm
+C1 IN GND 1.345fF
+R1 IN n1 0.970
+L1 n1 n2 19.51pH
+C2 n2 GND 2.69fF
+R2 n2 n3 0.970
+L2 n3 n4 19.51pH
+C3 n4 GND 2.69fF
+R3 n4 n5 0.970
+L3 n5 n6 19.51pH
+C4 n6 GND 2.69fF
+R4 n6 n7 0.970
+L4 n7 n8 19.51pH
+C5 n8 GND 2.69fF
+R5 n8 n9 0.970
+L5 n9 n10 19.51pH
+C6 n10 GND 2.69fF
+R6 n10 n11 0.970
+L6 n11 n12 19.51pH
+C7 n12 GND 2.69fF
+R7 n12 n13 0.970
+L7 n13 n14 19.51pH
+C8 n14 GND 2.69fF
+R8 n14 n15 0.970
+L8 n15 OUT 19.51pH
+C9 OUT GND 1.345fF
+.ends
+
+** === TL resonator stub (50µm, Z0=85) ===
+.subckt TL_85_50u IN OUT GND
+* 2-section pi model, each section 25µm
+C1 IN GND 0.77fF
+R1 IN n1 0.554
+L1 n1 n2 11.15pH
+C2 n2 GND 1.54fF
+R2 n2 n3 0.554
+L2 n3 OUT 11.15pH
+C3 OUT GND 0.77fF
+.ends
+
+** === TL resonator stub (100µm, Z0=85) ===
+.subckt TL_85_100u IN OUT GND
+* 4-section pi model, each section 25µm
+* L_sec = 445.9e-9 * 25e-6 = 11.15pH
+* C_sec = 61.5e-12 * 25e-6 = 1.54fF
+* R_sec = 22.16e3 * 25e-6 = 0.554 Ohm
+C1 IN GND 0.77fF
+R1 IN n1 0.554
+L1 n1 n2 11.15pH
+C2 n2 GND 1.54fF
+R2 n2 n3 0.554
+L2 n3 n4 11.15pH
+C3 n4 GND 1.54fF
+R3 n4 n5 0.554
+L3 n5 n6 11.15pH
+C4 n6 GND 1.54fF
+R4 n6 n7 0.554
+L4 n7 OUT 11.15pH
+C5 OUT GND 0.77fF
+.ends
+
+** === TL resonator stub (260µm, Z0=85) — kept for reference ===
+.subckt TL_85_260u IN OUT GND
+* 6 sections, each 43.3µm
+* L_sec = 445.9e-9 * 43.3e-6 = 19.31pH
+* C_sec = 61.5e-12 * 43.3e-6 = 2.66fF
+* R_sec = 22.16e3 * 43.3e-6 = 0.96 Ohm
+C1 IN GND 1.33fF
+R1 IN n1 0.96
+L1 n1 n2 19.31pH
+C2 n2 GND 2.66fF
+R2 n2 n3 0.96
+L2 n3 n4 19.31pH
+C3 n4 GND 2.66fF
+R3 n4 n5 0.96
+L3 n5 n6 19.31pH
+C4 n6 GND 2.66fF
+R4 n6 n7 0.96
+L4 n7 n8 19.31pH
+C5 n8 GND 2.66fF
+R5 n8 n9 0.96
+L5 n9 n10 19.31pH
+C6 n10 GND 2.66fF
+R6 n10 n11 0.96
+L6 n11 OUT 19.31pH
+C7 OUT GND 1.33fF
+.ends

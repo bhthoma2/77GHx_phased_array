@@ -1,0 +1,9 @@
+* Extracted by KLayout with SG13G2 LVS runset on : 24/07/2026 09:42
+
+.SUBCKT ILFD_77G_XTOR
+Q$1 \$67 \$67 \$50 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$3 \$50 \$51 \$54 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$4 \$48 \$49 \$54 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$5 \$67 \$67 \$48 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+R$9 \$35 \$36 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+.ENDS ILFD_77G_XTOR

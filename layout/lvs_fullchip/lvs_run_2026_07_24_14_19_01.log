@@ -1,0 +1,16 @@
+24-Jul-2026 10:19:02 | INFO    | Your Klayout version is: KLayout 0.30.9
+24-Jul-2026 10:19:02 | INFO    | Running SG13G2 LVS checks on design /home/bthomas3/Videos/77GHz_phased_array/layout/PHASED_ARRAY_77G_XTOR.gds on cell PHASED_ARRAY_77G_XTOR
+24-Jul-2026 10:19:08 | INFO    | ==============================================================================
+24-Jul-2026 10:19:08 | INFO    | Important Summary
+24-Jul-2026 10:19:08 | INFO    | +------------------+--------------------------------------------------------------+
+24-Jul-2026 10:19:08 | INFO    | | Status           | PASS                                                         |
+24-Jul-2026 10:19:08 | INFO    | | Mode             | COMPARE                                                      |
+24-Jul-2026 10:19:08 | INFO    | | Outcome          | Comparison mode: PASS (netlists match).                      |
+24-Jul-2026 10:19:08 | INFO    | | Layout           | PHASED_ARRAY_77G_XTOR.gds                                    |
+24-Jul-2026 10:19:08 | INFO    | | Top Cell         | PHASED_ARRAY_77G_XTOR                                        |
+24-Jul-2026 10:19:08 | INFO    | | Results Dir      | /home/bthomas3/Videos/77GHz_phased_array/layout/lvs_fullchip |
+24-Jul-2026 10:19:08 | INFO    | | Warnings         | 0                                                            |
+24-Jul-2026 10:19:08 | INFO    | | Errors           | 0                                                            |
+24-Jul-2026 10:19:08 | INFO    | | Run Time (s)     | 6.994                                                        |
+24-Jul-2026 10:19:08 | INFO    | +------------------+--------------------------------------------------------------+
+24-Jul-2026 10:19:08 | INFO    | ==============================================================================

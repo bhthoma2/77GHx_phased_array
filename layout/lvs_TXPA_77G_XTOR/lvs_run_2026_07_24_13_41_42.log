@@ -1,0 +1,19 @@
+24-Jul-2026 09:41:42 | INFO    | Your Klayout version is: KLayout 0.30.9
+24-Jul-2026 09:41:42 | WARNING | No netlist was provided and --net_only was not set. LVS comparison is disabled for this run; forcing --net_only behavior.
+24-Jul-2026 09:41:42 | INFO    | Running SG13G2 LVS checks on design /home/bthomas3/Videos/77GHz_phased_array/layout/ALL_BLOCKS_77G.gds on cell TXPA_77G_XTOR
+24-Jul-2026 09:41:45 | INFO    | ==============================================================================
+24-Jul-2026 09:41:45 | INFO    | Important Summary
+24-Jul-2026 09:41:45 | INFO    | +------------------+-------------------------------------------------------------------+
+24-Jul-2026 09:41:45 | INFO    | | Status           | NET_ONLY                                                          |
+24-Jul-2026 09:41:45 | INFO    | | Mode             | NET_ONLY                                                          |
+24-Jul-2026 09:41:45 | INFO    | | Outcome          | NET_ONLY mode: extracted netlist generated from layout only.      |
+24-Jul-2026 09:41:45 | INFO    | | Layout           | ALL_BLOCKS_77G.gds                                                |
+24-Jul-2026 09:41:45 | INFO    | | Top Cell         | TXPA_77G_XTOR                                                     |
+24-Jul-2026 09:41:45 | INFO    | | Results Dir      | /home/bthomas3/Videos/77GHz_phased_array/layout/lvs_TXPA_77G_XTOR |
+24-Jul-2026 09:41:45 | INFO    | | Warnings         | 1                                                                 |
+24-Jul-2026 09:41:45 | INFO    | | Errors           | 0                                                                 |
+24-Jul-2026 09:41:45 | INFO    | | Run Time (s)     | 2.919                                                             |
+24-Jul-2026 09:41:45 | INFO    | +------------------+-------------------------------------------------------------------+
+24-Jul-2026 09:41:45 | WARNING | Key warnings:
+24-Jul-2026 09:41:45 | WARNING |   - No netlist was provided and --net_only was not set. LVS comparison is disabled for this run; forcing --net_only behavior.
+24-Jul-2026 09:41:45 | INFO    | ==============================================================================

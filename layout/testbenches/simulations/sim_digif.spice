@@ -1,0 +1,27 @@
+* CML Output Buffer — Single channel
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+
+VCC vcc 0 DC 3.3
+VDIN din 0 DC 0.9 PULSE(0.7 1.1 0 20p 20p 500p 1n)
+VDINB dinb 0 DC 0.9
+
+XQ1 outp din tail 0 npn13G2l m=2
+XQ2 outn dinb tail 0 npn13G2l m=2
+RL1 vcc outp 50
+RL2 vcc outn 50
+ITAIL tail 0 DC 8m
+
+.control
+tran 5p 3n
+let vdiff = v(outp) - v(outn)
+meas tran swing pp vdiff from=1.5n to=3n
+meas tran trise trig vdiff val=-0.1 rise=2 targ vdiff val=0.1 rise=2
+meas tran tfall trig vdiff val=0.1 fall=2 targ vdiff val=-0.1 fall=2
+echo "=== DIGIF CML BUFFER ==="
+print swing
+print trise
+print tfall
+quit
+.endc
+.end

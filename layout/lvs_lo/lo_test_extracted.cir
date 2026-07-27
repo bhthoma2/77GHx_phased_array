@@ -1,0 +1,18 @@
+* Extracted by KLayout with SG13G2 LVS runset on : 17/07/2026 10:38
+
+.SUBCKT LO_TEST G1 G1$1 G2 G2$1 W
+Q$1 \$29 \$30 \$37 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$2 \$31 \$32 \$37 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$7 G1 G1 \$39 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$13 \$180 G1 \$29 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$14 \$181 G1 \$29 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$15 \$181 G1 \$31 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$16 \$180 G1 \$31 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+R$21 \$9 \$8 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$22 \$38 \$39 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$23 \$231 \$232 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$24 \$234 \$235 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+C$25 \$10 \$38 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$26 G1 W G2 \$1 sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+C$27 G1$1 W G2$1 \$1 sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+.ENDS LO_TEST

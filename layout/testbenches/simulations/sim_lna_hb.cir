@@ -1,0 +1,51 @@
+* LNA Harmonic Balance - 77GHz Differential Cascode LNA
+* Xyce HB simulation
+
+.include /home/bthomas3/Videos/77GHz_phased_array/layout/testbenches/simulations/npn13G2l_xyce.lib
+
+* Supply
+VCC vcc 0 DC 3.3
+
+* Bias
+VCAS vcas 0 DC 2.2
+VBIAS vbias 0 DC 0.85
+
+* Differential cascode LNA
+* Input stage (common emitter)
+Q1 c1p inp e1p 0 npn13G2l_mod
+Q2 c1n inn e1n 0 npn13G2l_mod
+* Emitter degeneration resistors for HB stability
+RE1 e1p tail1 5
+RE2 e1n tail2 5
+ITAIL1 tail1 0 DC 2m
+ITAIL2 tail2 0 DC 2m
+
+* Cascode stage (common base)
+Q3 outp vcas c1p 0 npn13G2l_mod
+Q4 outn vcas c1n 0 npn13G2l_mod
+
+* Load resistors
+RL1 vcc outp 100
+RL2 vcc outn 100
+
+* Bias network for input transistors
+RB1 vbias inp 10k
+RB2 vbias inn 10k
+
+* 77GHz RF input (small signal, -30dBm ~ 7uV into 50ohm)
+VIN_P inp 0 DC 0.85 SIN(0.85 7u 77e9)
+VIN_N inn 0 DC 0.85 SIN(0.85 -7u 77e9)
+
+* Nodesets for convergence
+.NODESET v(c1p)=1.5 v(c1n)=1.5 v(outp)=3.1 v(outn)=3.1
++ v(e1p)=0.2 v(e1n)=0.2 v(tail1)=0.15 v(tail2)=0.15
+
+* HB analysis at 77GHz
+.OPTIONS HBINT NUMFREQ=7 TAHB=2
+.OPTIONS NONLIN MAXSTEP=200 SEARCHMETHOD=2 CONTINUATION=GMIN ABSTOL=1e-6 RELTOL=1e-2
+.HB 77e9
+
+.PRINT HB_FD v(outp) v(outn) v(inp) v(inn)
+.PRINT HB_TD v(outp) v(outn)
+
+.end

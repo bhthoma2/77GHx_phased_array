@@ -1,0 +1,62 @@
+** 77 GHz CML Divide-by-2 Testbench — Full IHP SG13G2 PDK
+.control
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/r3_cmc.osdi
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/psp103_nqs.osdi
+.endc
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+
+.subckt cap_cmim PLUS MINUS w=10e-6 l=10e-6 m=1
+.param Ctot={1.5e-3*w*l*m}
+C1 PLUS MINUS {Ctot}
+.ends cap_cmim
+
+.include DIV2_77G.spice
+
+** === Testbench ===
+VCC VCC 0 2.4
+
+** 77 GHz differential clock (500 mV amplitude)
+VCLKP CLKP 0 SIN(1.2 0.5 77G)
+VCLKN CLKN 0 SIN(1.2 -0.5 77G)
+
+XDIV CLKP CLKN OUTP OUTN VCC 0 DIV2_77G
+
+CL1 OUTP 0 5fF
+CL2 OUTN 0 5fF
+
+.control
+tran 0.1p 2n 0 0.1p
+
+let vdiff_out = v(outp) - v(outn)
+let vdiff_clk = v(clkp) - v(clkn)
+
+meas tran vout_pp pp vdiff_out from=1n to=2n
+meas tran vout_avg avg vdiff_out from=1n to=2n
+meas tran tout1 when vdiff_out=vout_avg rise=5
+meas tran tout2 when vdiff_out=vout_avg rise=6
+let fout = 1/(tout2-tout1)
+
+meas tran tclk1 when vdiff_clk=0 rise=10
+meas tran tclk2 when vdiff_clk=0 rise=11
+let fclk = 1/(tclk2-tclk1)
+
+let div_ratio = fclk/fout
+
+echo ""
+echo "========================================="
+echo "  CML DIVIDE-BY-2 — IHP SG13G2 PDK"
+echo "========================================="
+echo "Input clock frequency:"
+print fclk
+echo "Output frequency:"
+print fout
+echo "Division ratio:"
+print div_ratio
+echo "Output swing (Vpp diff):"
+print vout_pp
+echo "========================================="
+.endc
+.end

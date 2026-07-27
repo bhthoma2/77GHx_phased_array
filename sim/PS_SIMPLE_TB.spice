@@ -1,0 +1,70 @@
+** Simple Phase Shifter Test — TL delay only (no switches)
+.control
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/r3_cmc.osdi
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/psp103_nqs.osdi
+.endc
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+
+** 90° TL delay at 77 GHz (196µm extra path)
+** Reference path: 100µm
+.subckt TL100 IN OUT GND
+C1 IN GND 3.075fF
+R1 IN n1 2.216
+L1 n1 OUT 44.59pH
+C2 OUT GND 3.075fF
+.ends
+
+** Delay path: 296µm (100+196)
+.subckt TL296 IN OUT GND
+C1 IN GND 3.075fF
+R1 IN n1 2.216
+L1 n1 n2 44.59pH
+C2 n2 GND 6.15fF
+R2 n2 n3 2.216
+L2 n3 n4 44.59pH
+C3 n4 GND 6.15fF
+R3 n4 n5 2.216
+L3 n5 OUT 44.59pH
+C4 OUT GND 3.075fF
+.ends
+
+** Testbench: compare phase of REF vs DELAY path
+Vrf rfin 0 SIN(0 50m 77G)
+
+** Reference output
+XTLref rfin refout 0 TL100
+Rref refout 0 200
+
+** Delay output
+XTLdel rfin delout 0 TL296
+Rdel delout 0 200
+
+.control
+tran 0.1p 1n 0 0.1p
+
+meas tran vref_pp pp v(refout) from=0.5n to=1n
+meas tran vdel_pp pp v(delout) from=0.5n to=1n
+
+meas tran tref when v(refout)=0 rise=5
+meas tran tdel when v(delout)=0 rise=5
+let phase_diff = (tdel-tref)*77e9*360
+
+echo ""
+echo "========================================="
+echo "  PHASE SHIFTER TL DELAY TEST"
+echo "========================================="
+echo "Ref output Vpp:"
+print vref_pp
+echo "Delay output Vpp:"
+print vdel_pp
+echo "Time delay:"
+let dt = tdel-tref
+print dt
+echo "Phase shift (degrees):"
+print phase_diff
+echo "========================================="
+.endc
+.end

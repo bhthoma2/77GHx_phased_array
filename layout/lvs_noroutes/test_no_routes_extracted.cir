@@ -1,0 +1,35 @@
+* Extracted by KLayout with SG13G2 LVS runset on : 17/07/2026 11:16
+
+.SUBCKT PHASED_ARRAY_77G_TOP G1 G1$1 G2 G2$1 W
+Q$1 \$57 \$58 \$97 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$2 \$59 \$60 \$97 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$11 \$397 \$396 \$411 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$12 \$397 \$398 \$411 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$21 \$676 \$676 \$397 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$25 \$798 \$773 \$57 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$26 \$798 \$773 \$59 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$41 \$1397 \$1398 \$1437 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$42 \$1399 \$1400 \$1437 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$45 \$1535 \$1536 \$1611 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$46 \$1537 \$1538 \$1611 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$49 G1 \$1613 \$1441 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$50 \$1613 G1 \$1441 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$61 \$2041 \$2042 \$1535 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$62 \$2043 \$2042 \$1537 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$65 \$2107 \$2092 \$1397 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$66 \$2108 \$2109 \$1397 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$67 \$2108 \$2109 \$1399 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$68 \$2107 \$2092 \$1399 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+R$77 \$42 \$45 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$78 \$173 \$172 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$79 \$1331 \$1330 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$80 \$1345 \$1344 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$81 \$1440 \$1441 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$82 \$2530 \$2532 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$83 \$2531 \$2533 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+C$84 \$1299 \$1353 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$85 \$1299 \$1440 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$86 \$1299 \$1352 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$87 G1 W G2 \$1 sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+C$88 G1$1 W G2$1 \$1 sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+.ENDS PHASED_ARRAY_77G_TOP

@@ -1,0 +1,4 @@
+14-Jul-2026 10:30:09 | INFO    | KLayout version detected: 0.30.5
+14-Jul-2026 10:30:09 | INFO    | User-provided DRC rules JSON: /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/klayout/tech/drc/rule_decks/sg13g2_tech_default.json
+14-Jul-2026 10:30:09 | INFO    | Using DRC JSON file: /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/klayout/tech/drc/rule_decks/sg13g2_tech_default.json
+14-Jul-2026 10:30:09 | INFO    | Running IHP-SG13G2 main checks on design /home/bthomas3/Videos/77GHz_phased_array/layout/VCO_77G.gds, topcell: VCO_77G

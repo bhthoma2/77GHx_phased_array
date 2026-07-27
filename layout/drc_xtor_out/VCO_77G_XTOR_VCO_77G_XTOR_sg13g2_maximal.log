@@ -1,0 +1,33 @@
+# Logfile created on 2026-07-14 10:39:37 -0400 by logger.rb/61378
+2026-07-14 10:39:37 -0400: Memory Usage (411968K) : Starting running IHP-SG13G2 Klayout DRC maximum runset on /home/bthomas3/Videos/77GHz_phased_array/layout/VCO_77G_XTOR.gds
+2026-07-14 10:39:37 -0400: Memory Usage (411968K) : Ruby Version for klayout: 2.5.9
+2026-07-14 10:39:37 -0400: Memory Usage (411968K) : Loading database to memory is complete.
+2026-07-14 10:39:37 -0400: Memory Usage (411968K) : IHP-SG13G2 Klayout DRC maximum runset output at: /home/bthomas3/Videos/77GHz_phased_array/layout/drc_xtor_out/VCO_77G_XTOR_VCO_77G_XTOR_sg13g2_maximal.lyrdb
+2026-07-14 10:39:37 -0400: Memory Usage (411968K) : Evaluate switches.
+2026-07-14 10:39:37 -0400: Memory Usage (411968K) : Klayout will use 6 thread(s)
+2026-07-14 10:39:37 -0400: Memory Usage (411968K) : deep mode is enabled for sg13g2_maximal runset.
+2026-07-14 10:39:41 -0400: Memory Usage (429684K) : KLayout DRC run for maximum ruleSet completed in 3.98 seconds
+2026-07-14 10:40:56 -0400: Memory Usage (412100K) : Starting running IHP-SG13G2 Klayout DRC maximum runset on /home/bthomas3/Videos/77GHz_phased_array/layout/VCO_77G_XTOR.gds
+2026-07-14 10:40:56 -0400: Memory Usage (412100K) : Ruby Version for klayout: 2.5.9
+2026-07-14 10:40:56 -0400: Memory Usage (412100K) : Loading database to memory is complete.
+2026-07-14 10:40:56 -0400: Memory Usage (412100K) : IHP-SG13G2 Klayout DRC maximum runset output at: /home/bthomas3/Videos/77GHz_phased_array/layout/drc_xtor_out/VCO_77G_XTOR_VCO_77G_XTOR_sg13g2_maximal.lyrdb
+2026-07-14 10:40:56 -0400: Memory Usage (412100K) : Evaluate switches.
+2026-07-14 10:40:56 -0400: Memory Usage (412100K) : Klayout will use 6 thread(s)
+2026-07-14 10:40:56 -0400: Memory Usage (412100K) : deep mode is enabled for sg13g2_maximal runset.
+2026-07-14 10:41:04 -0400: Memory Usage (428104K) : KLayout DRC run for maximum ruleSet completed in 7.4 seconds
+2026-07-14 10:42:48 -0400: Memory Usage (411840K) : Starting running IHP-SG13G2 Klayout DRC maximum runset on /home/bthomas3/Videos/77GHz_phased_array/layout/VCO_77G_XTOR.gds
+2026-07-14 10:42:48 -0400: Memory Usage (411840K) : Ruby Version for klayout: 2.5.9
+2026-07-14 10:42:48 -0400: Memory Usage (411840K) : Loading database to memory is complete.
+2026-07-14 10:42:48 -0400: Memory Usage (411840K) : IHP-SG13G2 Klayout DRC maximum runset output at: /home/bthomas3/Videos/77GHz_phased_array/layout/drc_xtor_out/VCO_77G_XTOR_VCO_77G_XTOR_sg13g2_maximal.lyrdb
+2026-07-14 10:42:48 -0400: Memory Usage (411840K) : Evaluate switches.
+2026-07-14 10:42:48 -0400: Memory Usage (411840K) : Klayout will use 6 thread(s)
+2026-07-14 10:42:48 -0400: Memory Usage (411840K) : deep mode is enabled for sg13g2_maximal runset.
+2026-07-14 10:42:52 -0400: Memory Usage (429400K) : KLayout DRC run for maximum ruleSet completed in 3.72 seconds
+2026-07-14 10:43:59 -0400: Memory Usage (411556K) : Starting running IHP-SG13G2 Klayout DRC maximum runset on /home/bthomas3/Videos/77GHz_phased_array/layout/VCO_77G_XTOR.gds
+2026-07-14 10:43:59 -0400: Memory Usage (411556K) : Ruby Version for klayout: 2.5.9
+2026-07-14 10:43:59 -0400: Memory Usage (411556K) : Loading database to memory is complete.
+2026-07-14 10:43:59 -0400: Memory Usage (411556K) : IHP-SG13G2 Klayout DRC maximum runset output at: /home/bthomas3/Videos/77GHz_phased_array/layout/drc_xtor_out/VCO_77G_XTOR_VCO_77G_XTOR_sg13g2_maximal.lyrdb
+2026-07-14 10:43:59 -0400: Memory Usage (411556K) : Evaluate switches.
+2026-07-14 10:43:59 -0400: Memory Usage (411556K) : Klayout will use 6 thread(s)
+2026-07-14 10:43:59 -0400: Memory Usage (411556K) : deep mode is enabled for sg13g2_maximal runset.
+2026-07-14 10:44:05 -0400: Memory Usage (428652K) : KLayout DRC run for maximum ruleSet completed in 5.79 seconds

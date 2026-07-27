@@ -1,0 +1,16 @@
+17-Jul-2026 09:52:29 | INFO    | Your Klayout version is: KLayout 0.30.9
+17-Jul-2026 09:52:29 | INFO    | Running SG13G2 LVS checks on design /home/bthomas3/Videos/77GHz_phased_array/layout/ILFD_77G_XTOR.gds on cell ILFD_77GD
+17-Jul-2026 09:52:32 | INFO    | ==============================================================================
+17-Jul-2026 09:52:32 | INFO    | Important Summary
+17-Jul-2026 09:52:32 | INFO    | +------------------+--------------------------------------------------------------+
+17-Jul-2026 09:52:32 | INFO    | | Status           | NET_ONLY                                                     |
+17-Jul-2026 09:52:32 | INFO    | | Mode             | NET_ONLY                                                     |
+17-Jul-2026 09:52:32 | INFO    | | Outcome          | NET_ONLY mode: extracted netlist generated from layout only. |
+17-Jul-2026 09:52:32 | INFO    | | Layout           | ILFD_77G_XTOR.gds                                            |
+17-Jul-2026 09:52:32 | INFO    | | Top Cell         | ILFD_77GD                                                    |
+17-Jul-2026 09:52:32 | INFO    | | Results Dir      | /home/bthomas3/Videos/77GHz_phased_array/layout/lvs_ilfd     |
+17-Jul-2026 09:52:32 | INFO    | | Warnings         | 0                                                            |
+17-Jul-2026 09:52:32 | INFO    | | Errors           | 0                                                            |
+17-Jul-2026 09:52:32 | INFO    | | Run Time (s)     | 2.946                                                        |
+17-Jul-2026 09:52:32 | INFO    | +------------------+--------------------------------------------------------------+
+17-Jul-2026 09:52:32 | INFO    | ==============================================================================

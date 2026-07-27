@@ -1,0 +1,60 @@
+** 77 GHz PLL — Full IHP SG13G2 PDK
+** Architecture:
+**   REF (100 MHz) → PFD → CP → LPF → VCO (77 GHz)
+**                                        ↓
+**   ILFD(÷2) → CML÷2 → CML÷2 → CML÷2 → Prog÷N → PFD
+**   77G→38.5G→19.25G→9.6G→4.8G → ÷48 → 100MHz
+**   Total division: 2×2×2×2×48 = 768 → fVCO = 76.8 GHz
+**
+** This file: behavioral PLL loop model (CP + LPF + VCO KVCO)
+** The ILFD is verified separately (ILFD_77G_TB.spice)
+
+** === Phase-Frequency Detector (ideal behavioral) ===
+.subckt PFD REF DIV UP DN VSS
+** Ideal PFD: UP pulse when REF leads, DN pulse when DIV leads
+** Modeled as voltage-controlled switches
+VUP UP VSS pulse(0 1 0 10p 10p {0.5/100Meg} {1/100Meg})
+VDN DN VSS 0
+.ends PFD
+
+** === Charge Pump ===
+.subckt CP UP DN OUT VCC VSS
+.param Icp=100u
+** UP current source
+Iup VCC net_up {Icp}
+XQup net_up UP net_sw_up VSS npn13G2l Nx=1 le=2.5e-6
+Rup net_sw_up VSS 100
+
+** DN current sink
+Idn net_dn VSS {Icp}
+XQdn OUT DN net_sw_dn VSS npn13G2l Nx=1 le=2.5e-6
+Rdn_bias net_sw_dn net_dn 100
+
+** Output
+Rout net_up OUT 10
+.ends CP
+
+** === Loop Filter (3rd order, Type II) ===
+** BW = 1 MHz, Phase Margin = 60°
+** Kvco = 2 GHz/V, Icp = 100 µA, N = 768
+** C1 = Icp*Kvco/(N*wBW²) ≈ 33 pF
+** R1 = wBW*N/(Icp*Kvco) * (1+PM_factor) ≈ 24 kΩ
+** C2 = C1/10 ≈ 3.3 pF
+** C3 (spur filter) = C2/10 ≈ 330 fF, R2 = 10*R1 ≈ 240k (not critical)
+.subckt LPF IN OUT VSS
+C1 OUT VSS 33pF
+R1 IN OUT 24k
+C2 IN VSS 3.3pF
+C3 IN net_r2 330fF
+R2 net_r2 VSS 240k
+.ends LPF
+
+** === VCO (behavioral for PLL sim — Kvco model) ===
+** Kvco = 2 GHz/V centered at Vtune=1.2V → 77 GHz
+** Output is a frequency-modulated square wave (for divider)
+** In full system: use the real VCO_77G subcircuit
+.subckt VCO_BEHAV VTUNE OUTP OUTN VCC VSS
+** Behavioral: Vout = sin(2*pi*(f0 + Kvco*Vtune)*t)
+** For transient PLL sim, approximate as voltage-controlled oscillator
+Evco OUTP OUTN VOL='0.8*sin(2*3.14159*(77e9 + 2e9*(V(VTUNE)-1.2))*TIME)'
+.ends VCO_BEHAV

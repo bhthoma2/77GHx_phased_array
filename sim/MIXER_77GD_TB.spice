@@ -1,0 +1,140 @@
+** 77 GHz Mixer Testbench - Downconversion to 100 MHz IF
+** LO = 77 GHz, RF = 76.9 GHz, IF = 100 MHz
+** PDK: IHP SG13G2
+** Run with: ngspice -b MIXER_77GD_TB.spice
+
+** =====================================================================
+** SIMPLIFIED MODELS
+** =====================================================================
+
+.subckt npn13G2l C B E S Nx=4 El=2.5u
+.param Nfing={Nx}
+.param Ae={Nfing*0.07e-6*El}
+Q1 C B E S npn13g2_mod area={Ae/0.175e-12}
+.ends
+
+.model npn13g2_mod npn (
++ IS=5e-17 BF=800 NF=1.0 VAF=40
++ IKF=0.04 ISE=5e-15 NE=2
++ BR=10 NR=1 VAR=8
++ IKR=0.01 ISC=2e-16 NC=2
++ RB=5 RE=0.5 RC=3
++ CJE=15f CJC=8f CJS=3f
++ TF=0.45p TR=20p
++ XTF=20 VTF=2 ITF=0.5
++ )
+
+.subckt cap_cmim P N w=10e-6 l=10e-6 m=1
+.param Ctot={1.5e-3*w*l*m}
+C1 P N {Ctot}
+R1 P N 1G
+.ends
+
+.subckt rppd P N w=3e-6 l=18e-6 b=0 m=1
+.param Rtot={300*(l/w)/m}
+R1 P N {Rtot}
+.ends
+
+** =====================================================================
+** INCLUDE MIXER SUBCIRCUIT
+** =====================================================================
+.include MIXER_77GD.spice
+
+** =====================================================================
+** TESTBENCH
+** =====================================================================
+
+** Supply
+VCC VCC 0 2.4
+
+** LO signal: 77 GHz, -6 dBm into 85 Ohm differential
+.param FLO=77G
+.param PLO_DBM=-6
+.param PLO={PWR(10,0.1*PLO_DBM)/1000}
+.param VLO_RMS={SQRT(PLO*85)}
+.param VLO_PP={SQRT(2)*2*VLO_RMS}
+
+VloP LO_srcP 0 DC 0 SIN(0 {VLO_PP/2} {FLO})
+VloN LO_srcN 0 DC 0 SIN(0 {-VLO_PP/2} {FLO})
+
+** LO source impedance + DC block
+RS_LOP LO_srcP LO_acP 42.5
+RS_LON LO_srcN LO_acN 42.5
+Cblock_LOP LO_acP LOP 100fF
+Cblock_LON LO_acN LON 100fF
+
+** RF signal: 76.9 GHz, -30 dBm into 85 Ohm differential (100 MHz IF)
+.param FRF=76.9G
+.param PRF_DBM=-30
+.param PRF={PWR(10,0.1*PRF_DBM)/1000}
+.param VRF_RMS={SQRT(PRF*85)}
+.param VRF_PP={SQRT(2)*2*VRF_RMS}
+
+VrfP RF_srcP 0 DC 0 SIN(0 {VRF_PP/2} {FRF})
+VrfN RF_srcN 0 DC 0 SIN(0 {-VRF_PP/2} {FRF})
+
+** RF source impedance + DC block
+RS_RFP RF_srcP RF_acP 42.5
+RS_RFN RF_srcN RF_acN 42.5
+Cblock_RFP RF_acP RFP 100fF
+Cblock_RFN RF_acN RFN 100fF
+
+** DUT
+XMIX LOP LON RFP RFN IFP IFN VCC 0 MIXER_77GD
+
+** IF load (1 kOhm differential — high impedance baseband load)
+RL_IFP IFP 0 500
+RL_IFN IFN 0 500
+
+** =====================================================================
+** ANALYSIS
+** =====================================================================
+
+.control
+
+** --- DC Operating Point ---
+echo "=== DC Operating Point ==="
+op
+print v(vcc)
+print @vcc[i]
+echo ""
+
+** --- Transient Analysis ---
+** Run long enough to see IF beat at 100 MHz (10ns period)
+echo "=== Transient: LO=77GHz, RF=76.9GHz, IF=100MHz ==="
+tran 0.2p 50n 0 0.2p
+
+let vif = v(ifp) - v(ifn)
+let vlo = v(lop) - v(lon)
+let vrf = v(rfp) - v(rfn)
+
+meas tran vif_pp pp vif from=20n to=50n
+meas tran vrf_pp pp vrf from=20n to=50n
+meas tran vlo_pp pp vlo from=20n to=50n
+
+** Conversion gain = 20*log10(VIF_pp / VRF_pp)
+echo ""
+echo "=== MIXER RESULTS ==="
+echo "IF output (100 MHz) peak-to-peak:"
+print vif_pp
+echo "RF input peak-to-peak:"
+print vrf_pp
+echo "LO drive peak-to-peak:"
+print vlo_pp
+echo ""
+
+** Check IF frequency content
+spec 20n 50n 1024 vif 0 500Meg
+let if_spectrum = db(vif)
+meas sp if_100M find db(vif) at=100Meg
+echo "IF power at 100 MHz (dB):"
+print if_100M
+echo ""
+echo "=============================================="
+echo "  MIXER_77GD SIMULATION COMPLETE"
+echo "=============================================="
+echo ""
+
+.endc
+
+.end

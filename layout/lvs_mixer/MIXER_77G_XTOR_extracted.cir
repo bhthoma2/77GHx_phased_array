@@ -1,0 +1,13 @@
+* Extracted by KLayout with SG13G2 LVS runset on : 23/07/2026 10:47
+
+.SUBCKT MIXER_77GD
+Q$1 \$23 \$17 \$27 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$2 \$24 \$18 \$27 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$9 \$75 \$61 \$23 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$10 \$76 \$66 \$23 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$11 \$76 \$66 \$24 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$12 \$75 \$61 \$24 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+R$17 \$10 \$9 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$18 \$111 \$115 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$19 \$113 \$116 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+.ENDS MIXER_77GD

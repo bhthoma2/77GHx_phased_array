@@ -1,0 +1,59 @@
+** 77 GHz 4-Bit Switched Transmission Line Phase Shifter
+** 4 binary-weighted stages: 22.5°, 45°, 90°, 180°
+** Each stage: SPDT switch selects bypass or delay TL
+** Uses HBT differential pairs as switches
+
+.subckt PHASE_SHIFTER_77G INP INN OUTP OUTN B0 B1 B2 B3 VCC GND
+
+** === Stage 0: 22.5° (LSB) ===
+** Delay TL length for 22.5° at 77 GHz:
+**   phase = 360° × len / lambda = 360° × len × f / vp
+**   22.5 = 360 × len × 77e9 / 1.91e8
+**   len = 22.5 / (360 × 77e9 / 1.91e8) = 155µm extra path
+XSW0 INP INN S0P S0N B0 VCC GND SPDT_STAGE delay=155u
+
+** === Stage 1: 45° ===
+XSW1 S0P S0N S1P S1N B1 VCC GND SPDT_STAGE delay=310u
+
+** === Stage 2: 90° ===
+XSW2 S1P S1N S2P S2N B2 VCC GND SPDT_STAGE delay=620u
+
+** === Stage 3: 180° (MSB) ===
+XSW3 S2P S2N OUTP OUTN B3 VCC GND SPDT_STAGE delay=1240u
+
+.ends PHASE_SHIFTER_77G
+
+** === SPDT Switch Stage ===
+** When CTRL=high: signal passes through delay TL (adds phase)
+** When CTRL=low: signal passes through bypass (reference path)
+** Uses HBT differential pair as current-steering switch
+
+.subckt SPDT_STAGE INP INN OUTP OUTN CTRL VCC GND delay=155u
+
+** Bypass path (through-connection with small TL)
+Rbyp_p INP byp_p 5
+Rbyp_n INN byp_n 5
+
+** Delay path (longer TL for phase shift)
+Rdly_p INP dly_midp 2
+Ldly_p dly_midp dly_p {445.9e-9*delay}
+Cdly_p1 INP GND {61.5e-12*delay/2}
+Cdly_p2 dly_p GND {61.5e-12*delay/2}
+Rdly_n INN dly_midn 2
+Ldly_n dly_midn dly_n {445.9e-9*delay}
+Cdly_n1 INN GND {61.5e-12*delay/2}
+Cdly_n2 dly_n GND {61.5e-12*delay/2}
+
+** Switch: voltage-controlled resistance (simplified model)
+** CTRL high → delay path selected (low R), bypass blocked (high R)
+** CTRL low → bypass selected (low R), delay blocked (high R)
+** Modeled as voltage-controlled switches
+S_byp_p byp_p OUTP CTRL GND sw_off
+S_byp_n byp_n OUTN CTRL GND sw_off
+S_dly_p dly_p OUTP CTRL GND sw_on
+S_dly_n dly_n OUTN CTRL GND sw_on
+
+.model sw_on sw(vt=1.2 vh=0.1 ron=3 roff=10k)
+.model sw_off sw(vt=1.2 vh=0.1 ron=10k roff=3)
+
+.ends SPDT_STAGE

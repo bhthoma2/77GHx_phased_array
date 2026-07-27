@@ -1,0 +1,40 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/layout/PHASED_ARRAY_77G_TOP.sch
+**.subckt PHASED_ARRAY_77G_TOP G1 OUTP G2 G2_1
+*.iopin G1
+*.iopin OUTP
+*.iopin G2
+*.iopin G2_1
+XQ49 OUTP OUTN VCO_DECAP sub! npn13G2l Nx=2 El=1.0
+XQ50 net8 OUTP VCO_DECAP sub! npn13G2l Nx=2 El=1.0
+XR81 VCO_DECAP VCO_DECAP sub! rppd w=0.5e-6 l=0.5e-6 m=1 b=0
+XCVAR1 net9 OUTP G2 sub! sg13_hv_svaricap w=3.74e-6 l=0.3e-6 Nx=1
+XCVAR2 G1 OUTP G2_1 sub! sg13_hv_svaricap w=3.74e-6 l=0.3e-6 Nx=1
+XQ1 TXP_MID OUTP net2 sub! npn13G2l Nx=8 El=1.0
+XQ2 TXN_MID OUTN net2 sub! npn13G2l Nx=8 El=1.0
+XQ25 net1 VCB TXP_MID sub! npn13G2l Nx=8 El=1.0
+XQ26 net1 VCB TXN_MID sub! npn13G2l Nx=8 El=1.0
+XQ45 LNA_MIDP LNA_VCB net3 sub! npn13G2l Nx=4 El=1.0
+XQ46 LNA_MIDN LNA_VCB2 net3 sub! npn13G2l Nx=4 El=1.0
+XQ61 RF_P LNA_INP LNA_MIDP sub! npn13G2l Nx=4 El=1.0
+XQ62 RF_N LNA_INP LNA_MIDN sub! npn13G2l Nx=4 El=1.0
+XQ41 MIX_MIDP RF_P MIX_TAIL sub! npn13G2l Nx=4 El=1.0
+XQ42 MIX_MIDN RF_N MIX_TAIL sub! npn13G2l Nx=4 El=1.0
+XQ65 IFP OUTP MIX_MIDP sub! npn13G2l Nx=2 El=1.0
+XQ66 IFN OUTN MIX_MIDP sub! npn13G2l Nx=2 El=1.0
+XQ67 IFN OUTN MIX_MIDN sub! npn13G2l Nx=2 El=1.0
+XQ68 IFP OUTP MIX_MIDN sub! npn13G2l Nx=2 El=1.0
+XQ21 net6 net7 net4 sub! npn13G2l Nx=2 El=1.0
+XQ22 net7 net6 net4 sub! npn13G2l Nx=2 El=1.0
+XQ11 net4 OUTP net5 sub! npn13G2l Nx=2 El=1.0
+XQ12 net4 OUTN net5 sub! npn13G2l Nx=2 El=1.0
+XR77 BIAS_R77_M BIAS_R77_P sub! rppd w=0.5e-6 l=0.5e-6 m=1 b=0
+XR78 BIAS_R78_M BIAS_R78_P sub! rppd w=0.5e-6 l=0.5e-6 m=1 b=0
+XR79 BIAS_R79_M BIAS_R79_P sub! rppd w=0.5e-6 l=0.5e-6 m=1 b=0
+XR80 BIAS_R80_M BIAS_R80_P sub! rppd w=0.5e-6 l=0.5e-6 m=1 b=0
+XR82 BIAS_R82_M BIAS_R82_P sub! rppd w=0.5e-6 l=0.5e-6 m=1 b=0
+XR83 BIAS_R83_M BIAS_R83_P sub! rppd w=0.5e-6 l=0.5e-6 m=1 b=0
+XC84 OUTP OUTP cap_cmim w=6.99e-6 l=6.99e-6
+XC85 OUTP VCO_DECAP cap_cmim w=6.99e-6 l=6.99e-6
+XC86 OUTP OUTP cap_cmim w=6.99e-6 l=6.99e-6
+**.ends
+.end

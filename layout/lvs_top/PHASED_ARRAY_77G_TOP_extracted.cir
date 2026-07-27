@@ -1,0 +1,36 @@
+* Extracted by KLayout with SG13G2 LVS runset on : 22/07/2026 10:53
+
+.SUBCKT PHASED_ARRAY_77G_TOP G1 G1|W G2 G2$1
+Q$1 \$27987 G1|W \$27986 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$2 \$27988 \$27989 \$27986 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$11 \$31142 G1|W \$4 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$12 \$31142 \$27989 \$4 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$21 \$32950 \$32951 \$31142 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$22 \$32951 \$32950 \$31142 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$25 \$13401 \$33326 \$27987 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$26 \$13401 \$33326 \$27988 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$41 \$76279 \$76280 \$76281 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$42 \$76282 \$76283 \$76281 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$45 \$76665 \$76666 \$76667 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$46 \$76668 \$76669 \$76667 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$49 G1|W \$27989 \$77710 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$50 \$27989 G1|W \$77710 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$61 \$76280 \$80173 \$76665 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$62 \$76283 \$80173 \$76668 \$1 npn13G2l we=70n le=1000n Nx=1 m=4
+Q$65 \$80174 G1|W \$76279 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$66 \$80175 \$27989 \$76279 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$67 \$80175 \$27989 \$76282 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+Q$68 \$80174 G1|W \$76282 \$1 npn13G2l we=70n le=1000n Nx=1 m=2
+R$77 \$26177 \$26176 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$78 \$29044 \$29391 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$79 \$73102 \$73101 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$80 \$74200 \$74557 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$81 \$76284 \$77710 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$82 \$83035 \$83400 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R$83 \$83036 \$83401 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+C$84 G1|W \$74556 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$85 G1|W \$76284 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$86 G1|W \$74555 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$87 G1|W G1|W G2 \$1 sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+C$88 G1 G1|W G2$1 \$1 sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+.ENDS PHASED_ARRAY_77G_TOP

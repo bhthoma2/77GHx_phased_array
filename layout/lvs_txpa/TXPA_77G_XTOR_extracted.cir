@@ -1,0 +1,9 @@
+* Extracted by KLayout with SG13G2 LVS runset on : 23/07/2026 10:47
+
+.SUBCKT TXAMP_77GD
+Q$1 \$22 \$16 \$26 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$2 \$23 \$17 \$26 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$17 \$110 \$102 \$22 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+Q$18 \$111 \$102 \$23 \$1 npn13G2l we=70n le=1000n Nx=1 m=8
+R$33 \$9 \$10 \$1 rppd w=0.5u l=0.5u ps=0u b=0 m=1
+.ENDS TXAMP_77GD

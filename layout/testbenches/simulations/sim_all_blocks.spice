@@ -1,0 +1,101 @@
+* ============================================================
+* Full block simulation suite — IHP SG13G2 77 GHz Radar SoC
+* Run: ngspice -b sim_all_blocks.spice -o sim_results.log
+* ============================================================
+
+.param vcc_val=3.3
+
+* PDK models
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+
+* ==== TEST 1: BIAS / BANDGAP ====
+* Widlar bandgap with mirror-forced equal currents
+* Q3/Q4 mirror forces I1=I2; ΔVBE across RPTAT sets IPTAT
+XQ1 c1 c1 e1 0 npn13G2l
+XQ2 c2 c2 e2 0 npn13G2l m=8
+RPTAT e1 e2 4.5k
+RE1 e2 0 500
+* Current mirror (Q3/Q4 force equal collector currents)
+XQ3 c1 bm em1 0 npn13G2l
+XQ4 c2 bm em2 0 npn13G2l
+REM1 em1 0 100
+REM2 em2 0 100
+* Mirror bias: base driven from c1
+Rbm c1 bm 1k
+* VREF output: sum of VBE + IPTAT*R
+RREF c1 vref_out 2k
+RVREF vcc vref_out 3k
+* Startup
+Rstart vcc c1 20k
+Rstart2 vcc c2 20k
+VCC vcc 0 DC 3.3
+
+.control
+op
+echo "=== BIAS RESULTS ==="
+echo "VREF = $&v(vref_out) V"
+echo "VBE_Q1 = $&v(c1) V"
+echo "I_branch1 = $&@rstart[i] A"
+dc temp -40 125 5
+meas dc vref_27 find v(vref_out) at=27
+meas dc vref_min min v(vref_out)
+meas dc vref_max max v(vref_out)
+let tc_ppm = 1e6*(vref_max-vref_min)/vref_27/165
+echo "VREF @ 27C = $&vref_27 V"
+echo "VREF range = $&vref_min to $&vref_max V"
+echo "TC = $&tc_ppm ppm/C"
+echo ""
+destroy all
+
+* ==== TEST 2: IFA (IF Amplifier) ====
+alter VCC dc=3.3
+reset
+* Diff pair with 500Ω load, 2mA tail
+dc temp 27 27 1
+alter @VCC[dc]=3.3
+ac dec 50 1k 10g
+meas ac ifa_gain_db max vdb(ifa_outp,ifa_outn)
+meas ac ifa_bw when vdb(ifa_outp,ifa_outn)=ifa_gain_db-3 fall=1
+echo "=== IFA RESULTS ==="
+echo "Gain = $&ifa_gain_db dB"
+echo "BW = $&ifa_bw Hz"
+echo ""
+destroy all
+
+* ==== TEST 3: DIGIF (CML buffer) ====
+dc temp 27 27 1
+tran 10p 2n
+meas tran dig_swing pp v(dout) from=1n to=2n
+meas tran dig_rise trig v(dout) val=2.7 rise=2 targ v(dout) val=3.1 rise=2
+echo "=== DIGIF RESULTS ==="
+echo "Swing = $&dig_swing V"
+echo "Rise time = $&dig_rise s"
+echo ""
+quit
+.endc
+
+* ==== IFA subcircuit ====
+.subckt IFA_DIFF inp inn outp outn vcc gnd
+XQ1 outp inp tail gnd npn13G2l m=2
+XQ2 outn inn tail gnd npn13G2l m=2
+RL1 vcc outp 500
+RL2 vcc outn 500
+ITAIL tail gnd DC 2m
+.ends IFA_DIFF
+
+XIFA ifa_inp ifa_inn ifa_outp ifa_outn vcc 0 IFA_DIFF
+VIN_P ifa_inp 0 DC 0.9 AC 0.5m
+VIN_N ifa_inn 0 DC 0.9 AC -0.5m
+
+* ==== CML buffer ====
+XD1 dout din dtail 0 npn13G2l m=2
+XD2 doutn dinb dtail 0 npn13G2l m=2
+RD1 vcc dout 50
+RD2 vcc doutn 50
+IDTAIL dtail 0 DC 4m
+VDIN din 0 DC 0.9 PULSE(0.7 1.1 0 20p 20p 500p 1n)
+VDINB dinb 0 DC 0.9
+
+.end

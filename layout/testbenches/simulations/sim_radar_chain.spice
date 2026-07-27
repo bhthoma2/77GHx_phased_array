@@ -1,0 +1,163 @@
+* ============================================================
+* 77 GHz FMCW Radar — Complete Single-Channel Receive Chain
+* Baseband-equivalent behavioral simulation
+*
+* RF front-end (LNA+Mixer) modeled as equivalent baseband gain:
+*   G_rf = G_lna * G_mixer = 15dB + 5dB = 20dB (voltage gain = 10)
+*
+* Chain: IF_input → IFA → VGA → ADC → DIGIF
+* Plus: BIAS (reference), VCO/TXPA/ILFD (power budget only)
+*
+* Scenario: FMCW radar, target at 10m
+*   Beat freq = 2*BW*R/(c*T) = 2*4G*10/(3e8*1m) = 267kHz → use 1MHz
+*   RX power at antenna: Pt*Gt*Gr*λ²*σ/(4π)³/R⁴
+*     = 10mW*10*10*(3.9mm)²*0.01/(4π)³/(10)⁴ = ~1pW = -90dBm
+*   Vrx = sqrt(2*1e-12*50) = 10nV → after LNA+Mixer(20dB): 100nV IF
+* ============================================================
+
+* === PARAMETERS ===
+.param vcc_nom=3.3
+.param f_beat=1e6
+.param v_if_in=10u
+.param vctrl_vga=1.0
+
+* === SUPPLY ===
+VCC vcc 0 DC {vcc_nom}
+
+* === RF FRONT-END (modeled as equivalent IF input) ===
+* RX signal after LNA (15dB) + Mixer (5dB) = 20dB total
+* 10nV antenna input → 100nV at IF
+* Differential beat signal at 1MHz
+Vif_p if_p if_cm SIN(0 {v_if_in} {f_beat})
+Vif_n if_n if_cm SIN(0 {v_if_in} {f_beat} 0 0 180)
+Vif_cm if_cm 0 DC 0
+
+* === IF AMPLIFIER (2-stage, 40dB gain, 10MHz BW) ===
+* Gain: 100V/V, BW: 10MHz, Vmax: ±0.5V, NF: 8dB
+.subckt IFA_2STAGE inp inn outp outn vcc gnd
+.param g1=5 g2=5 bw=10e6 vmax=0.5
+* Stage 1
+B_s1p s1p gnd V = {vmax}*tanh({g1}/{vmax}*V(inp,inn))
+B_s1n s1n gnd V = -{vmax}*tanh({g1}/{vmax}*V(inp,inn))
+R_s1p s1p s1pf 1
+C_s1p s1pf gnd {1/(6.283*{bw}*1.41)}
+R_s1n s1n s1nf 1
+C_s1n s1nf gnd {1/(6.283*{bw}*1.41)}
+* Stage 2
+B_s2p outp gnd V = {vmax}*tanh({g2}/{vmax}*V(s1pf,s1nf))
+B_s2n outn gnd V = -{vmax}*tanh({g2}/{vmax}*V(s1pf,s1nf))
+R_s2p outp outpf 1
+C_s2p outpf gnd {1/(6.283*{bw}*1.41)}
+R_s2n outn outnf 1
+C_s2n outnf gnd {1/(6.283*{bw}*1.41)}
+I_bias vcc gnd DC 4m
+.ends IFA_2STAGE
+
+XIFA if_p if_n ifa_p ifa_n vcc 0 IFA_2STAGE
+
+* === VGA (0-30dB, controlled by VCTRL) ===
+* Gain = gmax * sigmoid(VCTRL)
+.subckt VGA_CTRL inp inn outp outn vctrl vcc gnd
+.param bw=20e6 gmax=15.85
+B_vgap outp gnd V = {gmax}*(0.5+0.5*tanh(5*(V(vctrl)-0.9)))*V(inp,inn)
+B_vgan outn gnd V = -{gmax}*(0.5+0.5*tanh(5*(V(vctrl)-0.9)))*V(inp,inn)
+R_op outp opf 1
+C_op opf gnd {1/(6.283*{bw})}
+R_on outn onf 1
+C_on onf gnd {1/(6.283*{bw})}
+I_bias vcc gnd DC 2m
+.ends VGA_CTRL
+
+Vvctrl vctrl_node 0 DC {vctrl_vga}
+XVGA ifa_p ifa_n vga_p vga_n vctrl_node vcc 0 VGA_CTRL
+
+* === ADC (12-bit SAR, 20MSPS) ===
+* Quantized output as analog voltage (0-3.3V maps to 0-4095 codes)
+.subckt ADC_12B ainp ainn clk dout vcc gnd
+.param vref=1.2 vcc_val=3.3
+B_adc dout gnd V = {vcc_val}*min(1,max(0,(V(ainp,ainn)/{vref}+0.5)))
+R_del dout dout_d 100
+C_del dout_d gnd 1p
+I_bias vcc gnd DC 15m
+.ends ADC_12B
+
+Vclk clk 0 PULSE(0 3.3 0 1n 1n 24n 50n)
+XADC vga_p vga_n clk dout vcc 0 ADC_12B
+
+* === DIGITAL INTERFACE (CML output buffer) ===
+.subckt DIGIF_CML din dout clk vcc gnd
+.param swing=0.4 vcom=2.9 bw=10e9
+B_out dout gnd V = {vcom}+{swing/2}*tanh(20*(V(din)-1.65))
+R_bw dout doutf 1
+C_bw doutf gnd {1/(6.283*{bw})}
+I_bias vcc gnd DC 72m
+.ends DIGIF_CML
+
+XDIGIF dout dout_cml clk vcc 0 DIGIF_CML
+
+* === POWER BUDGET (current sinks for RF blocks not simulated) ===
+* VCO: 10mA, LNA: 16mA, Mixer: 12mA, TXPA: 60mA, ILFD: 8mA
+I_vco vcc 0 DC 10m
+I_lna vcc 0 DC 16m
+I_mix vcc 0 DC 12m
+I_txpa vcc 0 DC 60m
+I_ilfd vcc 0 DC 8m
+
+* === SIMULATION ===
+* Run 20µs to capture multiple beat cycles at 1MHz
+.tran 10n 20u
+
+.control
+run
+
+* Compute differential signals using let
+let vif_diff = v(if_p) - v(if_n)
+let vifa_diff = v(ifa_p) - v(ifa_n)
+let vvga_diff = v(vga_p) - v(vga_n)
+
+* Get peak-to-peak values in second half (steady state)
+meas tran if_pp pp vif_diff from=10u to=20u
+meas tran ifa_pp pp vifa_diff from=10u to=20u
+meas tran vga_pp pp vvga_diff from=10u to=20u
+meas tran adc_pp pp v(dout) from=10u to=20u
+meas tran adc_avg avg v(dout) from=10u to=20u
+meas tran dig_pp pp v(dout_cml) from=10u to=20u
+meas tran icc avg i(vcc) from=10u to=20u
+
+let g_ifa_db = 20 * log(ifa_pp / if_pp) / log(10)
+let g_vga_db = 20 * log(vga_pp / ifa_pp) / log(10)
+let g_total_db = 20 * log(vga_pp / if_pp) / log(10)
+let pdc_mw = abs(icc) * 3.3 * 1000
+
+echo ""
+echo "========================================================"
+echo "  77GHz FMCW Radar — Complete Signal Chain Results"
+echo "========================================================"
+echo ""
+echo "  Scenario: Target at 10m, beat freq = 1MHz"
+echo "  IF input = 10uV diff (after 20dB RF front-end gain)"
+echo ""
+echo "  --- Signal Levels (Vpp differential) ---"
+echo "  IF input:       $&if_pp V"
+echo "  IFA output:     $&ifa_pp V"
+echo "  VGA output:     $&vga_pp V"
+echo "  ADC output:     $&adc_pp V (0-3.3V = 0-4095 codes)"
+echo "  DIGIF output:   $&dig_pp V (CML swing)"
+echo ""
+echo "  --- Gain ---"
+echo "  IFA gain:       $&g_ifa_db dB"
+echo "  VGA gain:       $&g_vga_db dB (VCTRL=1.0V)"
+echo "  Total BB gain:  $&g_total_db dB"
+echo ""
+echo "  --- Power Budget ---"
+echo "  Total PDC:      $&pdc_mw mW"
+echo "  Breakdown: VCO=33mW LNA=53mW Mix=40mW TXPA=198mW"
+echo "             ILFD=26mW IFA=13mW VGA=7mW ADC=50mW DIG=238mW"
+echo ""
+echo "  --- ADC Performance ---"
+echo "  ADC mid-code:   $&adc_avg V (ideal=1.65V)"
+echo "  ADC swing:      $&adc_pp V"
+echo "========================================================"
+quit
+.endc
+.end

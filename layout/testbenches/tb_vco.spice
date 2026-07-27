@@ -1,0 +1,37 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/layout/testbenches/tb_vco.sch
+* VCO Testbench - netlist generated from tb_vco.sch
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+
+.options gmin=1e-10 reltol=5e-3 abstol=1e-10 vntol=1e-4
+.options itl1=1000 itl2=200 itl4=500
+.options method=gear maxord=3
+.options noopiter
+
+* Power Supply
+VCC VCC 0 DC 3.3
+
+* Tank Inductors
+L1 VCC OUTP 27p
+L2 VCC OUTN 27p
+
+* Varicaps
+CVAR1 OUTP OUTN 15f
+CVAR2 OUTP 0 12f
+CVAR3 OUTN 0 12f
+
+* Cross-Coupled Pair
+XQ49 OUTP OUTN VCO_TAIL 0 npn13G2l m=2 Nx=1 selft=0
+XQ50 OUTN OUTP VCO_TAIL 0 npn13G2l m=2 Nx=1 selft=0
+
+* Tail Current Source
+ITAIL VCO_TAIL 0 DC 5m
+
+* Simulation
+.tran 0.2p 1.5n
+.meas tran freq_osc trig v(outp) val=3.3 rise=40 targ v(outp) val=3.3 rise=41
+.meas tran vswing pp v(outp) from=0.5n to=1.5n
+
+.end

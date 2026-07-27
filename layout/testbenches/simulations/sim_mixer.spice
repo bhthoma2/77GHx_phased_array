@@ -1,0 +1,47 @@
+* Gilbert Cell Mixer PSS - 77GHz RF, 77.01GHz LO, 10MHz IF
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+
+.options reltol=10e-3 abstol=1e-9 vntol=1e-3 itl1=500 itl2=200 itl4=500
+.options gmin=1e-10 method=trap gminsteps=50 srcsteps=50
+
+* gm pair
+XQ1 n1 rfp tail 0 npn13G2l
+XQ2 n2 rfn tail 0 npn13G2l
+ITAIL tail 0 DC 4m
+* LO quad
+XQ3 ifp lop n1 0 npn13G2l
+XQ4 ifn lon n1 0 npn13G2l
+XQ5 ifn lop n2 0 npn13G2l
+XQ6 ifp lon n2 0 npn13G2l
+* Load
+RL1 vcc ifp 500
+RL2 vcc ifn 500
+VCC vcc 0 3.3
+* Sources
+Vrf_p rfp rf_cm SIN(0 2m 77e9)
+Vrf_n rfn rf_cm SIN(0 2m 77e9 0 0 180)
+Vrf_cm rf_cm 0 DC 0.85
+Vlo_p lop lo_cm SIN(0 200m 77.01e9)
+Vlo_n lon lo_cm SIN(0 200m 77.01e9 0 0 180)
+Vlo_cm lo_cm 0 DC 0.85
+
+.tran 5p 200n
+
+.control
+run
+let vif = v(ifp) - v(ifn)
+* Measure in last 100ns
+meas tran vif_max MAX vif from=100n to=200n
+meas tran vif_min MIN vif from=100n to=200n
+let vif_pp = vif_max - vif_min
+echo "=== MIXER RESULTS ==="
+print vif_max vif_min
+let vrf_pp = 4m
+let conv_gain_dB = 20*log(vif_pp/vrf_pp)/log(10)
+print vif_pp
+print conv_gain_dB
+echo "=== END MIXER ==="
+quit
+.endc
+
+.end

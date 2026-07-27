@@ -1,0 +1,32 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/layout/testbenches/tb_txpa.sch
+**.subckt tb_txpa
+XQ1 TXP_MID INP TX_TAIL sub! npn13G2l Nx=1 El=1.0
+XQ2 TXN_MID INN TX_TAIL sub! npn13G2l Nx=1 El=1.0
+XQ25 ANT_TXP VCB TXP_MID sub! npn13G2l Nx=1 El=1.0
+XQ26 ANT_TXN VCB TXN_MID sub! npn13G2l Nx=1 El=1.0
+RL_P VCC ANT_TXP 50
+RL_N VCC ANT_TXN 50
+VCC VCC GND DC 3.3
+ITAIL TX_TAIL GND DC 10m
+VIN_P INP GND DC 0.9 SIN(0.9 0.05 77e9)
+VIN_N INN GND DC 0.9 SIN(0.9 -0.05 77e9)
+VVCB VCB GND DC 2.0
+**** begin user architecture code
+
+
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+.options gmin=1e-10 reltol=5e-3 abstol=1e-10 vntol=1e-4
+.options itl1=1000 itl2=200 itl4=500
+.options method=gear maxord=3
+.options noopiter
+.tran 0.2p 1.5n
+.meas tran vswing_p pp v(ant_txp) from=1n to=1.5n
+.meas tran vswing_n pp v(ant_txn) from=1n to=1.5n
+
+
+**** end user architecture code
+**.ends
+.end
