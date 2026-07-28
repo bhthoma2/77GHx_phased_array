@@ -70,3 +70,7 @@ C {lab_pin.sym} 180 -550 0 1 {name=p8 sig_type=std_logic lab=VCB}
 C {lab_pin.sym} 520 -550 0 0 {name=p9 sig_type=std_logic lab=VCB}
 C {lab_pin.sym} 220 -420 0 0 {name=p10 sig_type=std_logic lab=MIDL}
 C {lab_pin.sym} 480 -420 0 0 {name=p11 sig_type=std_logic lab=MIDR}
+C {lab_pin.sym} 220 -300 0 0 {name=p12 sig_type=std_logic lab=sub!}
+C {lab_pin.sym} 480 -300 0 0 {name=p13 sig_type=std_logic lab=sub!}
+C {lab_pin.sym} 220 -550 0 0 {name=p14 sig_type=std_logic lab=sub!}
+C {lab_pin.sym} 480 -550 0 0 {name=p15 sig_type=std_logic lab=sub!}

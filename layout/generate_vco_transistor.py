@@ -358,7 +358,14 @@ def main(ext_layout=None):
     via_n(vco, vtune_x, vtune_y, 'M2', 'Via2', 'M3')
     via_n(vco, vtune_x, vtune_y, 'M3', 'Via3', 'M4')
     via_n(vco, vtune_x, vtune_y, 'M4', 'Via4', 'M5')
-    vco.shapes(ly['M5']).insert(pya.Text("VTUNE", pya.Trans(um(vtune_x), um(vtune_y))))
+    # LVS text labels on datatype 25 (required by IHP SG13G2 LVS rule deck)
+    ly_m1_txt = layout.layer(8, 25)
+    ly_m3_txt = layout.layer(30, 25)
+    ly_m5_txt = layout.layer(67, 25)
+    ly_tm1_txt = layout.layer(126, 25)
+    ly_tm2_txt = layout.layer(134, 25)
+
+    # VTUNE label removed from LVS layer — PDK varicap G1 pin name will be used
 
     # CV2.G2|W → OUTN: M1 trace from Q2a.C collector to CV2 G2 left strip
     # Route at x=140.75-141.01 (matches left strip X) from y=227 to y=245.72
@@ -367,12 +374,12 @@ def main(ext_layout=None):
         um(140.75), um(227.0), um(141.01), um(245.72)))
 
     # --- VCC: Cdecap top plate (TM1) ---
-    vco.shapes(ly['TM1']).insert(pya.Text("VCC", pya.Trans(um(cap_x+3.5), um(cap_y+3.5))))
+    vco.shapes(ly_tm1_txt).insert(pya.Text("VCC", pya.Trans(um(cap_x+3.5), um(cap_y+3.5))))
 
-    # === Port labels ===
-    vco.shapes(ly['M3']).insert(pya.Text("OUTP", pya.Trans(um(cx), um(outp_hy))))
-    vco.shapes(ly['M4']).insert(pya.Text("OUTN", pya.Trans(um(cx), um(outn_hy))))
-    vco.shapes(ly['M1']).insert(pya.Text("GND", pya.Trans(um(r_pin2_cx), um(r_pin2_cy))))
+    # === LVS Port labels (one per net, datatype 25 only) ===
+    # NOTE: Don't label nets that connect to varicap G1/G2 pins (PDK labels merge)
+    # Only label nets that have no PDK-internal labels on them
+    vco.shapes(ly_m1_txt).insert(pya.Text("GND", pya.Trans(um(r_pin2_cx), um(r_pin2_cy))))
 
     # ----------------------------------------------------------------
     # M5 Port Access Pads

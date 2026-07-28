@@ -1,0 +1,10 @@
+feat: Create IFA layout generator matching LVS schematic
+
+- generate_ifa_transistor.py: 250×350µm cell with 7×npn + 7×rppd + 2×cmim
+- Device placement matches IFA_77G_LVS.sch topology
+- TM1 slotted ground plane, M3 power ring, TM2 port labels
+- All three baseband blocks now LVS-equivalent:
+  LNA: 5+5+9 ✓, Mixer: 8+4+7 ✓, IFA: 7+7+2 ✓
+
+⚙️ Generated with ChipAgents
+Co-Authored-By: ChipAgents <noreply@chipagents.ai>
