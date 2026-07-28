@@ -1,0 +1,10 @@
+wip: IFA layout routing rewrite (M3-based, not yet passing LVS)
+
+- Moved IFA devices to wider spacing (60um between groups)
+- Moved resistors far from transistor region to avoid shorts
+- Rewrote routing to use M3 for inter-row connections
+- Identified root cause: M3 wires crossing on same layer create shorts
+- Next step: implement M3-horizontal + M4-vertical routing architecture
+
+⚙️ Generated with ChipAgents
+Co-Authored-By: ChipAgents <noreply@chipagents.ai>
