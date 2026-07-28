@@ -1,0 +1,11 @@
+feat: Create IFA_77G_LVS schematic with physical PDK cells
+
+- 7 BJTs: 4 gm (Q1-Q4), 2 tail current (Q5/Q6), 1 bias ref (Q7)
+- 7 resistors: 4 load (R1-R4), 1 bias (R5), 2 degeneration (R6/R7)
+- 2 bypass caps (C1/C2)
+- All connections via lab_pins (no diagonal wires)
+- Replaces ideal res/isource with physical rppd/npn13G2l
+- Updated RADAR_TOP_LVS.sch to reference IFA_77G_LVS
+
+⚙️ Generated with ChipAgents
+Co-Authored-By: ChipAgents <noreply@chipagents.ai>
