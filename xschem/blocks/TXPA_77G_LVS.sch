@@ -7,10 +7,10 @@ F {}
 E {}
 T {77 GHz TX PA (TXAMP_77GD) — LVS-Equivalent Schematic} 50 -900 0 0 0.5 0.5 {}
 T {Physical PDK cells only — matches generate_txpa_transistor.py} 50 -860 0 0 0.3 0.3 {layer=7}
-N 220 -270 220 -200 {lab=GND}
-N 480 -270 480 -200 {lab=GND}
-N 350 -200 480 -200 {lab=GND}
-N 350 -200 350 -180 {lab=GND}
+N 220 -270 220 -200 {lab=TAIL}
+N 480 -270 480 -200 {lab=TAIL}
+N 350 -200 480 -200 {lab=TAIL}
+N 350 -200 350 -180 {lab=TAIL}
 N 350 -120 350 -50 {lab=GND}
 N 220 -520 220 -330 {lab=MIDL}
 N 480 -520 480 -330 {lab=MIDR}
@@ -23,7 +23,7 @@ N 520 -300 650 -300 {lab=INN}
 N 220 -750 220 -650 {lab=2V4}
 N 480 -750 480 -650 {lab=2V4}
 N 220 -750 480 -750 {lab=2V4}
-N 220 -200 350 -200 {lab=GND}
+N 220 -200 350 -200 {lab=TAIL}
 C {sg13g2_pr/npn13G2l.sym} 200 -300 0 0 {name=Q1
 model=npn13G2l
 spiceprefix=X

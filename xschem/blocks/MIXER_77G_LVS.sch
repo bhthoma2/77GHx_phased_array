@@ -1,80 +1,61 @@
-v {xschem version=3.4.8RC file_version=1.3}
+v {xschem version=3.4.7 file_version=1.2}
 G {}
 K {}
 V {}
 S {}
-F {}
 E {}
-T {77 GHz Mixer (MIXER_77GD) — LVS-Equivalent Schematic} 50 -900 0 0 0.5 0.5 {}
-T {Physical PDK cells only — matches generate_mixer_transistor.py} 50 -860 0 0 0.3 0.3 {layer=7}
-N 220 -270 220 -200 {lab=GND}
-N 480 -270 480 -200 {lab=GND}
-N 350 -200 480 -200 {lab=GND}
-N 350 -200 350 -50 {lab=GND}
-N 220 -520 220 -330 {lab=ELOL}
-N 480 -520 480 -330 {lab=ELOR}
-N 170 -700 170 -580 {lab=IFP}
-N 280 -700 280 -580 {lab=IFN}
-N 420 -700 420 -580 {lab=IFN}
-N 530 -700 530 -580 {lab=IFP}
-N 200 -800 200 -730 {lab=2V4}
-N 500 -800 500 -730 {lab=2V4}
-N 200 -800 500 -800 {lab=2V4}
-N 50 -300 180 -300 {lab=RFP}
-N 520 -300 650 -300 {lab=RFN}
-N 50 -550 130 -550 {lab=LOP}
-N 570 -550 650 -550 {lab=LON}
-N 220 -200 350 -200 {lab=GND}
-C {sg13g2_pr/npn13G2l.sym} 200 -300 0 0 {name=Q20
+T {77 GHz Mixer — LVS Equivalent} 50 -950 0 0 0.5 0.5 {}
+T {Gilbert cell: Q20/Q21 gm, Q22-Q25 switch, Q26/Q27 bias} 50 -910 0 0 0.3 0.3 {layer=7}
+C {sg13g2_pr/npn13G2l.sym} 250 -300 0 0 {name=Q20
 model=npn13G2l
 spiceprefix=X
 Nx=4
 m=1
 El=2.5
 selft=0}
-C {sg13g2_pr/npn13G2l.sym} 500 -300 0 1 {name=Q21
+C {sg13g2_pr/npn13G2l.sym} 450 -300 0 1 {name=Q21
 model=npn13G2l
 spiceprefix=X
 Nx=4
 m=1
 El=2.5
 selft=0}
-C {sg13g2_pr/npn13G2l.sym} 150 -550 0 0 {name=Q22
+C {sg13g2_pr/npn13G2l.sym} 180 -550 0 0 {name=Q22
 model=npn13G2l
 spiceprefix=X
 Nx=4
 m=1
 El=2.5
 selft=0}
-C {sg13g2_pr/npn13G2l.sym} 300 -550 0 1 {name=Q23
+C {sg13g2_pr/npn13G2l.sym} 320 -550 0 1 {name=Q23
 model=npn13G2l
 spiceprefix=X
 Nx=4
 m=1
 El=2.5
 selft=0}
-C {sg13g2_pr/npn13G2l.sym} 400 -550 0 0 {name=Q24
+C {sg13g2_pr/npn13G2l.sym} 380 -550 0 0 {name=Q24
 model=npn13G2l
 spiceprefix=X
 Nx=4
 m=1
 El=2.5
 selft=0}
-C {sg13g2_pr/npn13G2l.sym} 550 -550 0 1 {name=Q25
+C {sg13g2_pr/npn13G2l.sym} 520 -550 0 1 {name=Q25
 model=npn13G2l
 spiceprefix=X
 Nx=4
 m=1
 El=2.5
 selft=0}
-C {sg13g2_pr/npn13G2l.sym} 650 -200 0 0 {name=Q26
+C {sg13g2_pr/npn13G2l.sym} 700 -200 0 0 {name=Q26
 model=npn13G2l
 spiceprefix=X
 Nx=1
 m=1
 El=2.5
 selft=0}
-C {sg13g2_pr/npn13G2l.sym} 650 -100 0 0 {name=Q27
+C {sg13g2_pr/npn13G2l.sym} 700 -100 0 0 {name=Q27
 model=npn13G2l
 spiceprefix=X
 Nx=1
@@ -95,62 +76,117 @@ w=3.0u
 l=18.23u
 m=2
 b=0}
-C {sg13g2_pr/rppd.sym} 650 -250 0 0 {name=R23
+C {sg13g2_pr/rppd.sym} 700 -300 0 0 {name=R23
 model=rppd
 spiceprefix=X
 w=3.0u
 l=27.48u
 m=1
 b=0}
-C {sg13g2_pr/cap_cmim.sym} 100 -450 0 0 {name=C37
+C {sg13g2_pr/cap_cmim.sym} 100 -480 0 0 {name=C37
 model=cap_cmim
 spiceprefix=X
 W=5.0u
 L=5.0u
 m=1}
-C {sg13g2_pr/cap_cmim.sym} 600 -450 0 0 {name=C38
+C {sg13g2_pr/cap_cmim.sym} 600 -480 0 0 {name=C38
 model=cap_cmim
 spiceprefix=X
 W=5.0u
 L=5.0u
 m=1}
-C {sg13g2_pr/cap_cmim.sym} 100 -250 0 0 {name=C39
+C {sg13g2_pr/cap_cmim.sym} 150 -250 0 0 {name=C39
 model=cap_cmim
 spiceprefix=X
 W=4.0u
 L=4.0u
 m=1}
-C {sg13g2_pr/cap_cmim.sym} 600 -250 0 0 {name=C40
+C {sg13g2_pr/cap_cmim.sym} 550 -250 0 0 {name=C40
 model=cap_cmim
 spiceprefix=X
 W=4.0u
 L=4.0u
 m=1}
-C {sg13g2_pr/cap_cmim.sym} 750 -750 0 0 {name=C41
+C {sg13g2_pr/cap_cmim.sym} 850 -800 0 0 {name=C41
 model=cap_cmim
 spiceprefix=X
 W=30.0u
 L=30.0u
 m=1}
-C {sg13g2_pr/cap_cmim.sym} 750 -700 0 0 {name=C42
+C {sg13g2_pr/cap_cmim.sym} 850 -720 0 0 {name=C42
 model=cap_cmim
 spiceprefix=X
 W=30.0u
 L=30.0u
 m=1}
-C {sg13g2_pr/cap_cmim.sym} 750 -650 0 0 {name=C43
+C {sg13g2_pr/cap_cmim.sym} 850 -640 0 0 {name=C43
 model=cap_cmim
 spiceprefix=X
 W=30.0u
 L=30.0u
 m=1}
-C {iopin.sym} 350 -800 0 0 {name=p1 lab=2V4}
+C {iopin.sym} 350 -860 0 0 {name=p1 lab=2V4}
 C {iopin.sym} 350 -50 0 0 {name=p2 lab=GND}
 C {iopin.sym} 50 -300 0 1 {name=p3 lab=RFP}
 C {iopin.sym} 650 -300 0 0 {name=p4 lab=RFN}
 C {iopin.sym} 50 -550 0 1 {name=p5 lab=LOP}
 C {iopin.sym} 650 -550 0 0 {name=p6 lab=LON}
-C {iopin.sym} 200 -750 0 0 {name=p7 lab=IFP}
-C {iopin.sym} 500 -750 0 0 {name=p8 lab=IFN}
-C {lab_pin.sym} 220 -420 0 0 {name=p9 sig_type=std_logic lab=ELOL}
-C {lab_pin.sym} 480 -420 0 0 {name=p10 sig_type=std_logic lab=ELOR}
+C {iopin.sym} 50 -750 0 1 {name=p7 lab=IFP}
+C {iopin.sym} 650 -750 0 0 {name=p8 lab=IFN}
+N 270 -270 270 -200 {lab=GND}
+N 430 -270 430 -200 {lab=GND}
+N 270 -200 430 -200 {lab=GND}
+N 350 -200 350 -50 {lab=GND}
+N 270 -330 270 -520 {lab=ELOL}
+N 430 -330 430 -520 {lab=ELOR}
+N 200 -520 300 -520 {lab=ELOL}
+N 400 -520 500 -520 {lab=ELOR}
+N 200 -580 200 -670 {lab=IFP}
+N 500 -580 500 -670 {lab=IFN}
+N 200 -730 200 -860 {lab=2V4}
+N 500 -730 500 -860 {lab=2V4}
+N 200 -860 850 -860 {lab=2V4}
+N 200 -670 200 -750 {lab=IFP}
+N 50 -750 200 -750 {lab=IFP}
+N 500 -670 500 -750 {lab=IFN}
+N 500 -750 650 -750 {lab=IFN}
+N 700 -330 700 -860 {lab=2V4}
+N 720 -230 720 -170 {lab=BIAS_E}
+N 720 -70 720 -50 {lab=GND}
+N 350 -50 720 -50 {lab=GND}
+N 720 -130 720 -70 {lab=GND}
+N 700 -270 700 -230 {lab=BIAS}
+N 850 -830 850 -860 {lab=2V4}
+N 850 -770 850 -50 {lab=GND}
+N 850 -690 850 -770 {lab=GND}
+N 850 -610 850 -690 {lab=GND}
+N 720 -50 850 -50 {lab=GND}
+N 50 -300 100 -300 {lab=RFP}
+N 100 -300 100 -280 {lab=RFP}
+N 550 -300 550 -280 {lab=RFN}
+N 550 -300 650 -300 {lab=RFN}
+N 50 -550 100 -550 {lab=LOP}
+N 100 -550 100 -510 {lab=LOP}
+N 600 -550 600 -510 {lab=LON}
+N 600 -550 650 -550 {lab=LON}
+C {lab_pin.sym} 230 -300 0 1 {name=p9 sig_type=std_logic lab=RFP_I}
+C {lab_pin.sym} 470 -300 0 0 {name=p10 sig_type=std_logic lab=RFN_I}
+C {lab_pin.sym} 150 -220 0 0 {name=p11 sig_type=std_logic lab=RFP_I}
+C {lab_pin.sym} 550 -220 0 0 {name=p12 sig_type=std_logic lab=RFN_I}
+C {lab_pin.sym} 100 -280 0 0 {name=p13 sig_type=std_logic lab=RFP}
+C {lab_pin.sym} 100 -510 0 0 {name=p14 sig_type=std_logic lab=LOP_I}
+C {lab_pin.sym} 600 -510 0 0 {name=p15 sig_type=std_logic lab=LON_I}
+C {lab_pin.sym} 100 -450 0 0 {name=p16 sig_type=std_logic lab=LOP_I}
+C {lab_pin.sym} 600 -450 0 0 {name=p17 sig_type=std_logic lab=LON_I}
+C {lab_pin.sym} 160 -550 0 1 {name=p18 sig_type=std_logic lab=LOP_I}
+C {lab_pin.sym} 540 -550 0 0 {name=p19 sig_type=std_logic lab=LON_I}
+C {lab_pin.sym} 340 -550 0 0 {name=p20 sig_type=std_logic lab=LON_I}
+C {lab_pin.sym} 360 -550 0 0 {name=p21 sig_type=std_logic lab=LOP_I}
+C {lab_pin.sym} 300 -580 0 0 {name=p22 sig_type=std_logic lab=IFN}
+C {lab_pin.sym} 400 -580 0 0 {name=p23 sig_type=std_logic lab=IFN}
+C {lab_pin.sym} 500 -580 0 0 {name=p24 sig_type=std_logic lab=IFP}
+C {lab_pin.sym} 680 -200 0 1 {name=p25 sig_type=std_logic lab=BIAS}
+C {lab_pin.sym} 680 -100 0 1 {name=p26 sig_type=std_logic lab=BIAS}
+C {lab_pin.sym} 720 -230 0 0 {name=p27 sig_type=std_logic lab=BIAS}
+C {lab_pin.sym} 270 -520 0 0 {name=p28 sig_type=std_logic lab=ELOL}
+C {lab_pin.sym} 430 -520 0 0 {name=p29 sig_type=std_logic lab=ELOR}

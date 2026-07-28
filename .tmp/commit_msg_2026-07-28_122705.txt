@@ -1,0 +1,11 @@
+fix: Wire VCO, Mixer, TXPA schematics correctly
+
+- VCO: Connect Q1/Q2 collectors to OUTP/OUTN nodes through varactors
+- Mixer: Use lab_pins for non-aligned connections (Gilbert cell topology),
+  connect switching quad emitters to transconductor collectors,
+  wire R21/R22 loads to IF outputs, bias chain Q26/Q27
+- TXPA: Fix R_bias as emitter degeneration (TAIL→GND, not GND→GND)
+- All wires are strictly horizontal/vertical (no diagonals)
+
+⚙️ Generated with ChipAgents
+Co-Authored-By: ChipAgents <noreply@chipagents.ai>
