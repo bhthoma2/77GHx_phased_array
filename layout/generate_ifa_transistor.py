@@ -110,13 +110,14 @@ def main(ext_layout=None):
             q_pins.append(group_pins)
 
     # Resistors - placed far right, away from all transistor routing
+    # Spread Y positions to avoid M5 bridge overlaps (different Y per net)
     r1 = create_rppd(ifa, layout, 200, 330, 3.0, 8.33)   # VCC->out1p
-    r2 = create_rppd(ifa, layout, 215, 330, 3.0, 8.33)   # VCC->out1n
-    r3 = create_rppd(ifa, layout, 230, 330, 3.0, 8.33)   # VCC->OUTP
-    r4 = create_rppd(ifa, layout, 245, 330, 3.0, 8.33)   # VCC->OUTN
+    r2 = create_rppd(ifa, layout, 200, 345, 3.0, 8.33)   # VCC->out1n
+    r3 = create_rppd(ifa, layout, 200, 360, 3.0, 8.33)   # VCC->OUTP
+    r4 = create_rppd(ifa, layout, 200, 375, 3.0, 8.33)   # VCC->OUTN
     r5 = create_rppd(ifa, layout, 200, 50, 3.0, 18.23)   # VCC->BIAS
-    r6 = create_rppd(ifa, layout, 220, 50, 3.0, 5.0)     # BIAS_E->GND
-    r7 = create_rppd(ifa, layout, 240, 50, 3.0, 5.0)     # tail1_e->GND
+    r6 = create_rppd(ifa, layout, 220, 80, 3.0, 5.0)     # BIAS_E->GND
+    r7 = create_rppd(ifa, layout, 220, 100, 3.0, 5.0)    # tail1_e->GND
 
     # Bypass caps - far right
     if cmim_idx is not None:

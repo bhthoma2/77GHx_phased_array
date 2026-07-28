@@ -1,0 +1,4 @@
+feat: add synthesized gate-level netlist for IHP sg13g2_stdcell
+
+Include vibrometer_top_synth.v (1.61 mm^2, 97K cells + SRAM macro)
+so P&R can run without re-synthesis on target machine.

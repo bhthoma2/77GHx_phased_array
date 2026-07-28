@@ -1,0 +1,11 @@
+wip: IFA/LNA/Mixer routing architecture updates
+
+- IFA: M3-horizontal + M4-vertical routing, net count matches (13/13)
+  but tail1/tail2 and out1p/out1n still shorted (via M2 pad proximity)
+- LNA: escape routing helpers added, npn device count matches (5/5)
+- Mixer: escape routing helpers added
+- All blocks need proper M1 escape routing to avoid M2 pad shorts
+- VCO and TXPA remain LVS clean
+
+⚙️ Generated with ChipAgents
+Co-Authored-By: ChipAgents <noreply@chipagents.ai>
