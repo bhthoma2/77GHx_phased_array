@@ -142,7 +142,6 @@ N 430 -330 430 -520 {lab=ELOR}
 N 200 -520 300 -520 {lab=ELOL}
 N 400 -520 500 -520 {lab=ELOR}
 N 200 -580 200 -670 {lab=IFP}
-N 500 -580 500 -670 {lab=IFN}
 N 200 -730 200 -860 {lab=2V4}
 N 500 -730 500 -860 {lab=2V4}
 N 200 -860 850 -860 {lab=2V4}
@@ -151,18 +150,13 @@ N 50 -750 200 -750 {lab=IFP}
 N 500 -670 500 -750 {lab=IFN}
 N 500 -750 650 -750 {lab=IFN}
 N 700 -330 700 -860 {lab=2V4}
-N 720 -230 720 -170 {lab=BIAS_E}
+N 720 -170 720 -130 {lab=BIAS_MID}
 N 720 -70 720 -50 {lab=GND}
 N 350 -50 720 -50 {lab=GND}
-N 720 -130 720 -70 {lab=GND}
 N 700 -270 700 -230 {lab=BIAS}
-N 850 -830 850 -860 {lab=2V4}
-N 850 -770 850 -50 {lab=GND}
-N 850 -690 850 -770 {lab=GND}
-N 850 -610 850 -690 {lab=GND}
 N 720 -50 850 -50 {lab=GND}
-N 50 -300 100 -300 {lab=RFP}
-N 100 -300 100 -280 {lab=RFP}
+N 50 -300 150 -300 {lab=RFP}
+N 150 -300 150 -280 {lab=RFP}
 N 550 -300 550 -280 {lab=RFN}
 N 550 -300 650 -300 {lab=RFN}
 N 50 -550 100 -550 {lab=LOP}
@@ -173,9 +167,7 @@ C {lab_pin.sym} 230 -300 0 1 {name=p9 sig_type=std_logic lab=RFP_I}
 C {lab_pin.sym} 470 -300 0 0 {name=p10 sig_type=std_logic lab=RFN_I}
 C {lab_pin.sym} 150 -220 0 0 {name=p11 sig_type=std_logic lab=RFP_I}
 C {lab_pin.sym} 550 -220 0 0 {name=p12 sig_type=std_logic lab=RFN_I}
-C {lab_pin.sym} 100 -280 0 0 {name=p13 sig_type=std_logic lab=RFP}
-C {lab_pin.sym} 100 -510 0 0 {name=p14 sig_type=std_logic lab=LOP_I}
-C {lab_pin.sym} 600 -510 0 0 {name=p15 sig_type=std_logic lab=LON_I}
+C {lab_pin.sym} 150 -280 0 0 {name=p13 sig_type=std_logic lab=RFP}
 C {lab_pin.sym} 100 -450 0 0 {name=p16 sig_type=std_logic lab=LOP_I}
 C {lab_pin.sym} 600 -450 0 0 {name=p17 sig_type=std_logic lab=LON_I}
 C {lab_pin.sym} 160 -550 0 1 {name=p18 sig_type=std_logic lab=LOP_I}
@@ -185,8 +177,18 @@ C {lab_pin.sym} 360 -550 0 0 {name=p21 sig_type=std_logic lab=LOP_I}
 C {lab_pin.sym} 300 -580 0 0 {name=p22 sig_type=std_logic lab=IFN}
 C {lab_pin.sym} 400 -580 0 0 {name=p23 sig_type=std_logic lab=IFN}
 C {lab_pin.sym} 500 -580 0 0 {name=p24 sig_type=std_logic lab=IFP}
+C {lab_pin.sym} 500 -670 0 0 {name=p30 sig_type=std_logic lab=IFN}
 C {lab_pin.sym} 680 -200 0 1 {name=p25 sig_type=std_logic lab=BIAS}
-C {lab_pin.sym} 680 -100 0 1 {name=p26 sig_type=std_logic lab=BIAS}
+C {lab_pin.sym} 680 -100 0 1 {name=p26 sig_type=std_logic lab=BIAS_MID}
 C {lab_pin.sym} 720 -230 0 0 {name=p27 sig_type=std_logic lab=BIAS}
+C {lab_pin.sym} 720 -130 0 0 {name=p31 sig_type=std_logic lab=BIAS_MID}
 C {lab_pin.sym} 270 -520 0 0 {name=p28 sig_type=std_logic lab=ELOL}
 C {lab_pin.sym} 430 -520 0 0 {name=p29 sig_type=std_logic lab=ELOR}
+C {lab_pin.sym} 850 -830 0 0 {name=p32 sig_type=std_logic lab=2V4}
+C {lab_pin.sym} 850 -770 0 0 {name=p33 sig_type=std_logic lab=GND}
+C {lab_pin.sym} 850 -750 0 0 {name=p34 sig_type=std_logic lab=2V4}
+C {lab_pin.sym} 850 -690 0 0 {name=p35 sig_type=std_logic lab=GND}
+C {lab_pin.sym} 850 -670 0 0 {name=p36 sig_type=std_logic lab=2V4}
+C {lab_pin.sym} 850 -610 0 0 {name=p37 sig_type=std_logic lab=GND}
+C {lab_pin.sym} 100 -510 0 0 {name=p38 sig_type=std_logic lab=LOP}
+C {lab_pin.sym} 600 -510 0 0 {name=p39 sig_type=std_logic lab=LON}

@@ -1,0 +1,11 @@
+fix: Mixer schematic connectivity - caps, bias, Gilbert cell
+
+- Remove wire shorting Q25.C to IFN (should be IFP via lab_pin)
+- Fix Q26/Q27 bias: remove C-E shorts, use diode-connected via lab_pins
+- Fix C37/C38: remove wire shorting both cap pins to same LO net
+- Fix C42/C43: use lab_pins for 2V4/GND instead of continuous GND wire
+- Fix C39 RF coupling: move RFP wire to align with cap c0 pin
+- Add lab_pins for LOP/LON at C37/C38 c0 pins
+
+⚙️ Generated with ChipAgents
+Co-Authored-By: ChipAgents <noreply@chipagents.ai>
