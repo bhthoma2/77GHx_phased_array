@@ -1,0 +1,13 @@
+fix: LNA VCC/GND short from bypass cap M4 overlap + escape routing
+
+- Fixed bypass cap routing: VCC and GND M4 verticals shared x=255,
+  causing VCC=GND short. Separated to x=255 (VCC) and x=259 (GND).
+- Added Q37 escape routing: M1 collector/base pins route left to x=100
+  before via stack, preventing M2 pad shorting to emitter M2.
+- Fixed R30.M/R31.M M3 wire overlap at y=349.85 (VCC/VCB short).
+- R30.M routes via direct M3 vertical to VCC rail at x=185.
+- LNA now: npn 5/5, rppd 5/5, nets 13/21 (caps still need routing)
+- IFA: npn 7/7, rppd 7/7, nets 16/13 (cap pins + minor short)
+
+⚙️ Generated with ChipAgents
+Co-Authored-By: ChipAgents <noreply@chipagents.ai>

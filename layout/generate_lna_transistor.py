@@ -497,23 +497,11 @@ def main(ext_layout=None):
     # ROUTING: Connect resistors, caps, Q37 to internal nets
     # ----------------------------------------------------------------
     # NOTE on create_rppd pin convention:
-    #   'P' = top M1 pad (high Y), 'M' = bottom M1 pad (low Y)
+    #   'P' = top M1 pad (high Y) → LVS extracts as "M"
+    #   'M' = bottom M1 pad (low Y) → LVS extracts as "P"
+    # So: schematic P → code['M'] (bottom), schematic M → code['P'] (top)
 
-    # Helper: M1 pad to M5 via stack
-    def via_m1_to_m5(x, y):
-        via_n(lna, x, y, 'M1', 'Via1', 'M2')
-        via_n(lna, x, y, 'M2', 'Via2', 'M3')
-        via_n(lna, x, y, 'M3', 'Via3', 'M4')
-        via_n(lna, x, y, 'M4', 'Via4', 'M5')
-
-    def via_m1_to_m4(x, y):
-        via_n(lna, x, y, 'M1', 'Via1', 'M2')
-        via_n(lna, x, y, 'M2', 'Via2', 'M3')
-        via_n(lna, x, y, 'M3', 'Via3', 'M4')
-
-    def via_m4_to_m5(x, y):
-        via_n(lna, x, y, 'M4', 'Via4', 'M5')
-
+    # Wire helpers
     def m5_wire(x1, y1, x2, y2, w=0.5):
         lna.shapes(ly['M5']).insert(pya.Box(
             um(min(x1,x2)-w/2), um(min(y1,y2)-w/2),
@@ -529,112 +517,226 @@ def main(ext_layout=None):
             um(min(x1,x2)-w/2), um(min(y1,y2)-w/2),
             um(max(x1,x2)+w/2), um(max(y1,y2)+w/2)))
 
+    def m2_wire(x1, y1, x2, y2, w=0.5):
+        lna.shapes(ly['M2']).insert(pya.Box(
+            um(min(x1,x2)-w/2), um(min(y1,y2)-w/2),
+            um(max(x1,x2)+w/2), um(max(y1,y2)+w/2)))
+
     def m1_wire(x1, y1, x2, y2, w=0.5):
         lna.shapes(ly['M1']).insert(pya.Box(
             um(min(x1,x2)-w/2), um(min(y1,y2)-w/2),
             um(max(x1,x2)+w/2), um(max(y1,y2)+w/2)))
 
-    # --- R29: P=net3 (tail emitter bus), M=GND ---
-    # R29.P connects to TAIL (M4 bus). Bring R29.P up to M4, connect to tail bus.
-    r29_px, r29_py = r29_pins['P']
-    r29_mx, r29_my = r29_pins['M']
-    via_m1_to_m4(r29_px, r29_py)
-    # Connect R29.P to tail bus: tail bus is at tail_y on M4 between tail_vl and tail_vr
-    m4_wire(r29_px, r29_py, r29_px, tail_y)
-    m4_wire(r29_px, tail_y, tail_vl, tail_y)
-    # R29.M = GND: bring to M5 GND plane or ground pad
-    # Use a GND bus at bottom of cell on M5
-    gnd_y = 20.0
-    via_m1_to_m5(r29_mx, r29_my)
-    m5_wire(r29_mx, r29_my, r29_mx, gnd_y)
+    def via_m1_to_m3(x, y):
+        via_n(lna, x, y, 'M1', 'Via1', 'M2')
+        via_n(lna, x, y, 'M2', 'Via2', 'M3')
 
-    # --- R33: P=net12 (Q37.E), M=GND ---
-    r33_px, r33_py = r33_pins['P']
-    r33_mx, r33_my = r33_pins['M']
-    # Q37 emitter at (q37_x + 3.9, q37_y + 3.6) on M2
-    q37_ex = q37_x + pcx
-    q37_ey = q37_y + emi_dy
-    # Connect Q37.E (M2) to R33.P (M1) via M3
-    via_n(lna, q37_ex, q37_ey, 'M2', 'Via2', 'M3')
-    via_m1_to_m4(r33_px, r33_py)
-    via_n(lna, q37_ex, q37_ey, 'M3', 'Via3', 'M4')
-    m4_wire(r33_px, r33_py, q37_ex, r33_py)
-    m4_wire(q37_ex, r33_py, q37_ex, q37_ey)
-    # R33.M = GND
-    via_m1_to_m5(r33_mx, r33_my)
-    m5_wire(r33_mx, r33_my, r33_mx, gnd_y)
+    def via_m2_to_m3(x, y):
+        via_n(lna, x, y, 'M2', 'Via2', 'M3')
 
-    # --- Q37: C=GND, B=GND ---
-    q37_cx = q37_x + pcx
-    q37_cy_col = q37_y + col_dy  # collector on M1
-    q37_by = q37_y + bas_dy      # base on M1
-    # Q37 collector to GND
-    via_m1_to_m5(q37_cx, q37_cy_col)
-    m5_wire(q37_cx, q37_cy_col, q37_cx, gnd_y)
-    # Q37 base to GND
-    via_m1_to_m5(q37_cx, q37_by)
-    m5_wire(q37_cx, q37_by, q37_cx, gnd_y)
+    def via_m1_to_m4(x, y):
+        via_n(lna, x, y, 'M1', 'Via1', 'M2')
+        via_n(lna, x, y, 'M2', 'Via2', 'M3')
+        via_n(lna, x, y, 'M3', 'Via3', 'M4')
 
-    # --- R30: P=2V4, M=B35&36 ---
-    r30_px, r30_py = r30_pins['P']
-    r30_mx, r30_my = r30_pins['M']
-    # R30.P to VCC (2V4) rail on M3 at vcc_y
-    via_m1_to_m4(r30_px, r30_py)
-    via_n(lna, r30_px, r30_py, 'M4', 'Via4', 'M5')
-    # Connect to VCC on M5 (VCC rail is on M3; bring up)
-    # Actually VCC rail is M3 at vcc_y. Let's connect on M3:
-    via_n(lna, r30_px, r30_py, 'M1', 'Via1', 'M2')
-    via_n(lna, r30_px, r30_py, 'M2', 'Via2', 'M3')
-    m3_wire(r30_px, r30_py, r30_px, vcc_y)
-    # R30.M to B35&36 (VCB bus on M5)
-    via_m1_to_m5(r30_mx, r30_my)
-    m5_wire(r30_mx, r30_my, r30_mx, vcb_y)
-    m5_wire(r30_mx, vcb_y, lx, vcb_y)  # connect to VCB M5 bus
-
-    # --- R31: P=B35&36, M=GND ---
-    r31_px, r31_py = r31_pins['P']
-    r31_mx, r31_my = r31_pins['M']
-    via_m1_to_m5(r31_px, r31_py)
-    m5_wire(r31_px, r31_py, r31_px, vcb_y)
-    m5_wire(r31_px, vcb_y, r30_mx, vcb_y)  # to VCB bus
-    # R31.M = GND
-    via_m1_to_m5(r31_mx, r31_my)
-    m5_wire(r31_mx, r31_my, r31_mx, gnd_y)
-
-    # --- R32: P=GND, M=GND (dummy) ---
-    r32_px, r32_py = r32_pins['P']
-    r32_mx, r32_my = r32_pins['M']
-    via_m1_to_m5(r32_px, r32_py)
-    m5_wire(r32_px, r32_py, r32_px, gnd_y)
-    via_m1_to_m5(r32_mx, r32_my)
-    m5_wire(r32_mx, r32_my, r32_mx, gnd_y)
+    def via_m1_to_m5(x, y):
+        via_n(lna, x, y, 'M1', 'Via1', 'M2')
+        via_n(lna, x, y, 'M2', 'Via2', 'M3')
+        via_n(lna, x, y, 'M3', 'Via3', 'M4')
+        via_n(lna, x, y, 'M4', 'Via4', 'M5')
 
     # --- GND bus on M5 at bottom ---
+    gnd_y = 20.0
     lna.shapes(ly['M5']).insert(pya.Box(um(10), um(gnd_y - 3), um(CELL_W - 10), um(gnd_y + 3)))
 
-    # --- Cap routing ---
-    # C53: c0(M5)=net1(Q33.B bus on M4→M5), c1(TM1)=INP
+    # === M4 VERTICAL TRACK ASSIGNMENTS (all at safe X > 166.4, clear of existing M4) ===
+    # Existing M4: INP_B at x=121.2, TAIL verticals at 134.1/165.9, INN_B at 178.8
+    # TAIL horizontal at y=248.6 from x=134.1 to 165.9 (must not cross!)
+    gnd_trk_x = 240.0    # GND (far right, clear of all transistor/cap routing)
+    vcb_trk_x = 244.0    # VCB (B35&36)
+    net12_trk_x = 248.0  # net12 (Q37.E ↔ R33)
+    vcc_trk_x = 252.0    # VCC (2V4)
+
+    # --- GND M4 vertical: from gnd_y to 370 ---
+    # This is safe at x=200 (existing TAIL horizontal only spans x=134.1-165.9)
+    gnd_m4_top = 370.0
+    m4_wire(gnd_trk_x, gnd_y, gnd_trk_x, gnd_m4_top)
+    # Connect GND M4 track to GND M5 bus at bottom
+    via_n(lna, gnd_trk_x, gnd_y, 'M4', 'Via4', 'M5')
+
+    # --- VCB M4 vertical: from vcb_y up to R30.P connection (~370) ---
+    # R30.P connects at r30_py+2, R31.M connects at r31 M pin Y (~349.85)
+    # VCB bus at vcb_y (~296.8). Track spans full range.
+    vcb_m4_bot = vcb_y - 1.0
+    vcb_m4_top = 372.0  # above R30.P route point
+    m4_wire(vcb_trk_x, vcb_m4_bot, vcb_trk_x, vcb_m4_top)
+    # Connect VCB M4 track to VCB M5 bus at vcb_y
+    via_n(lna, vcb_trk_x, vcb_y, 'M4', 'Via4', 'M5')
+    # M5 stub from vcb_trk_x to existing VCB M5 bus (which runs from lx to rx)
+    m5_wire(rx, vcb_y, vcb_trk_x, vcb_y)
+
+    # --- net12 M4 vertical: from R33 area up to Q37.E ---
+    q37_ex = q37_x + pcx     # 113.9
+    q37_ey = q37_y + emi_dy  # 153.6
+    r33_px, r33_py = r33_pins['P']  # top, GND (schematic M)
+    r33_mx, r33_my = r33_pins['M']  # bottom, net12 (schematic P)
+    net12_m4_bot = r33_my - 1.0
+    net12_m4_top = q37_ey + 1.0
+    m4_wire(net12_trk_x, net12_m4_bot, net12_trk_x, net12_m4_top)
+
+    # --- R29 pin extraction ---
+    r29_px, r29_py = r29_pins['P']  # top, GND (schematic M)
+    r29_mx, r29_my = r29_pins['M']  # bottom, tail/net3 (schematic P)
+
+    # --- R29.M (tail): direct M4 vertical to existing TAIL bus (no track extension) ---
+    via_m1_to_m4(r29_mx, r29_my)
+    m4_wire(r29_mx, r29_my, r29_mx, tail_y)
+    # Short M4 horizontal to connect to tail_vl
+    m4_wire(r29_mx, tail_y, tail_vl, tail_y)
+
+    # --- VCC M4 vertical: from R30 area up to vcc_y ---
+    r30_px, r30_py = r30_pins['P']  # top, VCB (schematic M)
+    r30_mx, r30_my = r30_pins['M']  # bottom, VCC (schematic P)
+    vcc_m4_bot = r30_my - 1.0
+    m4_wire(vcc_trk_x, vcc_m4_bot, vcc_trk_x, vcc_y)
+    # Connect VCC M4 track to VCC M3 rail at vcc_y
+    via_n(lna, vcc_trk_x, vcc_y, 'M3', 'Via3', 'M4')
+
+    # ================================================================
+    # Q37 ROUTING: C=GND, B=GND, E=net12
+    # ================================================================
+    q37_cx = q37_x + pcx      # 113.9
+    q37_cy_col = q37_y + col_dy  # 155.425 (collector on M1)
+    q37_by = q37_y + bas_dy      # 151.775 (base on M1)
+
+    # Q37.B and Q37.C: ESCAPE ROUTING to avoid M2 pad shorting to emitter M2
+    # Route M1 LEFT to x=100 before via stack (14um from emitter M2 at x=113.9)
+    q37_esc_x = 100.0
+    # Q37.C: M1 escape left, then via stack at escape point
+    m1_wire(q37_cx, q37_cy_col, q37_esc_x, q37_cy_col)
+    via_m1_to_m3(q37_esc_x, q37_cy_col)
+    m3_wire(q37_esc_x, q37_cy_col, gnd_trk_x, q37_cy_col)
+    via_n(lna, gnd_trk_x, q37_cy_col, 'M3', 'Via3', 'M4')
+    # Q37.B: M1 escape left, then via stack
+    m1_wire(q37_cx, q37_by, q37_esc_x, q37_by)
+    via_m1_to_m3(q37_esc_x, q37_by)
+    m3_wire(q37_esc_x, q37_by, gnd_trk_x, q37_by)
+    via_n(lna, gnd_trk_x, q37_by, 'M3', 'Via3', 'M4')
+
+    # Q37.E (M2) → net12 track
+    via_m2_to_m3(q37_ex, q37_ey)
+    m3_wire(q37_ex, q37_ey, net12_trk_x, q37_ey)
+    via_n(lna, net12_trk_x, q37_ey, 'M3', 'Via3', 'M4')
+
+    # ================================================================
+    # R29 ROUTING: code['M'](bottom)=tail/net3, code['P'](top)=GND
+    # ================================================================
+    # R29.M already routed above (direct M4 to tail bus)
+
+    # R29.P (top) → GND via M3 horizontal to gnd_trk_x
+    via_m1_to_m3(r29_px, r29_py)
+    m3_wire(r29_px, r29_py, gnd_trk_x, r29_py)
+    via_n(lna, gnd_trk_x, r29_py, 'M3', 'Via3', 'M4')
+
+    # ================================================================
+    # R33 ROUTING: code['M'](bottom)=net12/Q37.E, code['P'](top)=GND
+    # ================================================================
+    # R33.M (bottom) → net12 track
+    via_m1_to_m3(r33_mx, r33_my)
+    m3_wire(r33_mx, r33_my, net12_trk_x, r33_my)
+    via_n(lna, net12_trk_x, r33_my, 'M3', 'Via3', 'M4')
+
+    # R33.P (top) → GND track
+    via_m1_to_m3(r33_px, r33_py)
+    m3_wire(r33_px, r33_py, gnd_trk_x, r33_py)
+    via_n(lna, gnd_trk_x, r33_py, 'M3', 'Via3', 'M4')
+
+    # ================================================================
+    # R30 ROUTING: code['M'](bottom)=VCC/2V4, code['P'](top)=VCB/B35&36
+    # ================================================================
+    # R30.M (bottom) → VCC: M1 escape left, then M3 vertical to VCC rail
+    r30_m_esc_x = 185.0
+    m1_wire(r30_mx, r30_my, r30_m_esc_x, r30_my)
+    via_m1_to_m3(r30_m_esc_x, r30_my)
+    m3_wire(r30_m_esc_x, r30_my, r30_m_esc_x, vcc_y)
+
+    # R30.P (top) → VCB track: OFFSET Y to y=370 to avoid crossing GND wires at r30_py
+    r30_p_route_y = r30_py + 2.0  # stagger to avoid crossing R31.P/R32.P GND wires
+    via_n(lna, r30_px, r30_py, 'M1', 'Via1', 'M2')
+    m2_wire(r30_px, r30_py, r30_px, r30_p_route_y)
+    via_n(lna, r30_px, r30_p_route_y, 'M2', 'Via2', 'M3')
+    m3_wire(r30_px, r30_p_route_y, vcb_trk_x, r30_p_route_y)
+    via_n(lna, vcb_trk_x, r30_p_route_y, 'M3', 'Via3', 'M4')
+
+    # ================================================================
+    # R31 ROUTING: code['M'](bottom)=VCB/B35&36, code['P'](top)=GND
+    # ================================================================
+    r31_px, r31_py = r31_pins['P']  # top, GND
+    r31_mx, r31_my = r31_pins['M']  # bottom, VCB
+
+    # R31.M (bottom) → VCB track: offset Y to avoid M3 overlap with R30.M at y=349.85
+    r31_m_route_y = r31_my - 2.5  # 347.35 (clear of R30.M M3 at 349.85)
+    via_n(lna, r31_mx, r31_my, 'M1', 'Via1', 'M2')
+    m2_wire(r31_mx, r31_my, r31_mx, r31_m_route_y)
+    via_n(lna, r31_mx, r31_m_route_y, 'M2', 'Via2', 'M3')
+    m3_wire(r31_mx, r31_m_route_y, vcb_trk_x, r31_m_route_y)
+    via_n(lna, vcb_trk_x, r31_m_route_y, 'M3', 'Via3', 'M4')
+
+    # R31.P (top) → GND track (short M3, only from x=206.5 to 200)
+    via_m1_to_m3(r31_px, r31_py)
+    m3_wire(r31_px, r31_py, gnd_trk_x, r31_py)
+    via_n(lna, gnd_trk_x, r31_py, 'M3', 'Via3', 'M4')
+
+    # ================================================================
+    # R32 ROUTING: code['M'](bottom)=GND, code['P'](top)=GND
+    # ================================================================
+    r32_px, r32_py = r32_pins['P']  # top, GND
+    r32_mx, r32_my = r32_pins['M']  # bottom, GND
+
+    # R32.M (bottom) → GND track: OFFSET Y to avoid R31.M VCB at y=347.35 and R30.M at y=349.85
+    r32_m_route_y = r32_my - 5.0  # 344.85 (clear of both)
+    via_n(lna, r32_mx, r32_my, 'M1', 'Via1', 'M2')
+    m2_wire(r32_mx, r32_my, r32_mx, r32_m_route_y)
+    via_n(lna, r32_mx, r32_m_route_y, 'M2', 'Via2', 'M3')
+    m3_wire(r32_mx, r32_m_route_y, gnd_trk_x, r32_m_route_y)
+    via_n(lna, gnd_trk_x, r32_m_route_y, 'M3', 'Via3', 'M4')
+
+    # R32.P (top) → GND track: same Y as R31.P (both GND, overlap is OK)
+    via_m1_to_m3(r32_px, r32_py)
+    m3_wire(r32_px, r32_py, gnd_trk_x, r32_py)
+    via_n(lna, gnd_trk_x, r32_py, 'M3', 'Via3', 'M4')
+
+    # ================================================================
+    # CAP ROUTING
+    # ================================================================
+    # C53: c0(M5)=net1(Q1.B bus), c1(TM1)=INP
     c53_c0x = c53_x + cmim_c0_dx
     c53_c0y = c53_y + cmim_c0_dy
     # Connect C53.c0 (M5) to Q1 base bus (INP_B on M4 at inp_bus_x)
-    # Bring INP_B M4 bus up to M5 at a point, then wire on M5 to C53.c0
-    inp_b_m5_y = inp_port_y  # already have M5 pad at inp_bus_x
+    inp_b_m5_y = inp_port_y  # M5 pad already at inp_bus_x
     m5_wire(inp_bus_x, inp_b_m5_y, c53_c0x, inp_b_m5_y)
     m5_wire(c53_c0x, inp_b_m5_y, c53_c0x, c53_c0y)
 
-    # C54: c0(M5)=GND, c1(TM1)=net2(Q34.B)
+    # C54: c0(M5)=GND, c1(TM1)=net2(Q2.B)
     c54_c0x = c54_x + cmim_c0_dx
     c54_c0y = c54_y + cmim_c0_dy
-    # c0 to GND
-    m5_wire(c54_c0x, c54_c0y, c54_c0x, gnd_y)
-    # c1(TM1) to Q2 base bus: INN_B M4→M5
-    # c1 on TM1 at same center. Need TM1 wire to INN_B M5.
-    inn_b_m5_y = inp_port_y
-    c54_c1x = c54_x + cmim_c0_dx  # same center
+    # c0 to GND: short M5 stub down to GND M5 bus via M4 track
+    # Use Via4 at c54_c0x to bring M5 down to M4, then M4 to GND track
+    # Actually c0 is already on M5 and GND bus is on M5 at y=20.
+    # But a vertical M5 from c54_c0y(~193.5) down to gnd_y=20 is long and may cross things.
+    # Route: c54 M5 → Via4 → M4 at c54_c0x, M4 down short distance, M4 horizontal to gnd_trk_x,
+    # then on gnd_trk M4 down to GND M5 bus.
+    # Actually simpler: the GND M5 bus is wide (y=17-23). A short M5 stub left to gnd_trk_x,
+    # then gnd_trk_x M4 vertical already connects to it. But c54 is at y~193 which is far.
+    # Let's use a dedicated short M5 connection: c54_c0 → Via4 → M4 → horizontal to gnd_trk_x M4.
+    via_n(lna, c54_c0x, c54_c0y, 'M4', 'Via4', 'M5')
+    m4_wire(c54_c0x, c54_c0y, gnd_trk_x, c54_c0y)
+    via_n(lna, gnd_trk_x, c54_c0y, 'M3', 'Via3', 'M4')  # ensure M4 continuity at junction
+
+    # C54 c1(TM1) to Q2 base bus (INN_B on M4→M5)
+    c54_c1x = c54_x + cmim_c0_dx
     c54_c1y = c54_y + cmim_c0_dy
-    # TM1 wire from c54 to a via stack down to M5, then to INN_B
-    # Actually c1 is on TM1. We need to bring INN_B up to TM1, or bring c1 down.
-    # Use TopVia1 (M5→TM1) at inn_bus_x, inp_port_y
+    inn_b_m5_y = inp_port_y
     via_n(lna, inn_bus_x, inp_port_y, 'M5', 'TopVia1', 'TM1')
     lna.shapes(ly['TM1']).insert(pya.Box(
         um(min(inn_bus_x, c54_c1x)-0.25), um(min(inp_port_y, c54_c1y)-0.25),
@@ -643,25 +745,15 @@ def main(ext_layout=None):
         um(c54_c1x-0.25), um(min(inp_port_y, c54_c1y)-0.25),
         um(c54_c1x+0.25), um(max(inp_port_y, c54_c1y)+0.25)))
 
-    # C55: c0(M5)=OUTP, c1(TM1)=net6(Q35.C)
+    # C55: c0(M5)=OUTP, c1(TM1)=net6(Q3.C)
     c55_c0x = c55_x + cmim_c0_dx
     c55_c0y = c55_y + cmim_c0_dy
-    # Connect c0(M5) to OUTP (which is on M4 at inp_bus_x promoted to M5)
     m5_wire(inp_bus_x, outp_port_y, c55_c0x, outp_port_y)
     m5_wire(c55_c0x, outp_port_y, c55_c0x, c55_c0y)
-    # c1(TM1) = net6 = Q35.C bus on M4. Need via M4→M5→TM1
-    via_n(lna, inp_bus_x, outp_port_y, 'M5', 'TopVia1', 'TM1')
-    # Actually c1 needs to connect to net6 not OUTP. net6 = Q35.C = OUTP_C bus.
-    # Since c0=OUTP and c1=net6, and OUTP IS net6 from the cap's perspective...
-    # Wait: XC55 OUTP net6 cap_cmim → c0=OUTP, c1=net6. But net6=Q35.C.
-    # OUTP is the PORT on net6. So OUTP=net6. c0 and c1 are both on net6!? No.
-    # Actually in the spice: XC55 OUTP net6 → these are two different nets separated by the cap.
-    # OUTP is the external port, net6 is Q35.C. The cap couples them.
-    # So c0(M5)=OUTP port, c1(TM1)=net6=Q35.C collector bus.
-    # The Q35.C bus is on M4 at inp_bus_x. Bring it to TM1:
+    # c1(TM1) = net6 = Q3.C bus on M4 at inp_bus_x
     c55_c1x = c55_x + cmim_c0_dx
     c55_c1y = c55_y + cmim_c0_dy
-    outp_c_via_x = inp_bus_x - 3.0  # offset to avoid shorting c0
+    outp_c_via_x = inp_bus_x - 3.0
     via_m1_to_m5(outp_c_via_x, outp_port_y)
     via_n(lna, outp_c_via_x, outp_port_y, 'M5', 'TopVia1', 'TM1')
     m4_wire(inp_bus_x, outp_port_y, outp_c_via_x, outp_port_y)
@@ -672,15 +764,15 @@ def main(ext_layout=None):
         um(c55_c1x-0.25), um(min(outp_port_y, c55_c1y)-0.25),
         um(c55_c1x+0.25), um(max(outp_port_y, c55_c1y)+0.25)))
 
-    # C56: c0(M5)=2V4, c1(TM1)=net7(Q36.C)
+    # C56: c0(M5)=2V4, c1(TM1)=net7(Q4.C)
     c56_c0x = c56_x + cmim_c0_dx
     c56_c0y = c56_y + cmim_c0_dy
-    # c0 to VCC rail via M5
-    m5_wire(c56_c0x, c56_c0y, c56_c0x, vcc_y)
-    # Connect VCC M3 rail to M5 at c56_c0x
+    # c0 to VCC: short M5 stub up to vcc_y (c56_c0y~333.5, vcc_y=540)
+    # Use M4 vertical instead to avoid long M5
+    via_n(lna, c56_c0x, c56_c0y, 'M4', 'Via4', 'M5')
+    m4_wire(c56_c0x, c56_c0y, c56_c0x, vcc_y)
     via_n(lna, c56_c0x, vcc_y, 'M3', 'Via3', 'M4')
-    via_n(lna, c56_c0x, vcc_y, 'M4', 'Via4', 'M5')
-    # c1(TM1) = net7 = Q36.C = OUTN_C bus on M4 at inn_bus_x
+    # c1(TM1) = net7 = Q4.C = OUTN_C bus on M4 at inn_bus_x
     c56_c1x = c56_x + cmim_c0_dx
     c56_c1y = c56_y + cmim_c0_dy
     outn_c_via_x = inn_bus_x + 3.0
@@ -695,101 +787,57 @@ def main(ext_layout=None):
         um(c56_c1x+0.25), um(max(outp_port_y, c56_c1y)+0.25)))
 
     # C57-C61: VCC bypass chain on M5 (c0) and TM1 (c1)
-    # C57: c0=2V4, c1=net8; C58: c0=net8, c1=net9; ... C61: c0=net11, c1=GND
-    # IMPORTANT: Route VCC/GND connections HORIZONTALLY first to avoid
-    # vertical M5 wires passing through other caps' M5 plates.
-    bypass_route_x = c57_61_x - 5.0  # x=255, clear of cap M5 (259.4-267.6)
+    bypass_route_x = c57_61_x - 5.0  # x=255, clear of cap M5 plates
 
-    # Connect c0 of C57 to VCC: go left on M5 to bypass_route_x, then up to VCC
+    # C57 c0 to VCC: horizontal M5 stub to bypass_route_x, then M4 vertical to vcc_y
     c57_c0x = c57_61_x + cmim_c0_dx
     c57_c0y = c57_61_ys[0] + cmim_c0_dy
     m5_wire(c57_c0x, c57_c0y, bypass_route_x, c57_c0y)
-    m5_wire(bypass_route_x, c57_c0y, bypass_route_x, vcc_y)
+    via_n(lna, bypass_route_x, c57_c0y, 'M4', 'Via4', 'M5')
+    m4_wire(bypass_route_x, c57_c0y, bypass_route_x, vcc_y)
     via_n(lna, bypass_route_x, vcc_y, 'M3', 'Via3', 'M4')
-    via_n(lna, bypass_route_x, vcc_y, 'M4', 'Via4', 'M5')
 
-    # Chain: c1 of Cn connects to c0 of Cn+1 (TM1 to M5 of next)
-    # Route via bypass_route_x to avoid passing through other caps
-    for i in range(4):  # C57-C60, connect c1[i] to c0[i+1]
+    # Chain: c1 of Cn connects to c0 of Cn+1
+    for i in range(4):
         c1x = c57_61_x + cmim_c0_dx
         c1y = c57_61_ys[i] + cmim_c0_dy
         c0_next_x = c57_61_x + cmim_c0_dx
         c0_next_y = c57_61_ys[i+1] + cmim_c0_dy
-        # Use TopVia1 at bypass_route_x between the two caps
         mid_y = (c1y + c0_next_y) / 2
         via_n(lna, bypass_route_x, mid_y, 'M5', 'TopVia1', 'TM1')
-        # TM1 wire from c1 to via
         lna.shapes(ly['TM1']).insert(pya.Box(
             um(min(c1x, bypass_route_x)-0.25), um(min(c1y, mid_y)-0.25),
             um(max(c1x, bypass_route_x)+0.25), um(c1y+0.25)))
         lna.shapes(ly['TM1']).insert(pya.Box(
             um(bypass_route_x-0.25), um(min(c1y, mid_y)-0.25),
             um(bypass_route_x+0.25), um(max(c1y, mid_y)+0.25)))
-        # M5 wire from via to c0_next
         m5_wire(bypass_route_x, mid_y, bypass_route_x, c0_next_y)
         m5_wire(bypass_route_x, c0_next_y, c0_next_x, c0_next_y)
 
-    # C61 c1 to GND: route left then down
+    # C61 c1 to GND (use DIFFERENT X to avoid shorting to VCC M4 at bypass_route_x)
+    bypass_gnd_x = bypass_route_x + 4.0  # 259, separate from VCC at 255
     c61_c1x = c57_61_x + cmim_c0_dx
     c61_c1y = c57_61_ys[4] + cmim_c0_dy
-    via_n(lna, bypass_route_x, c61_c1y, 'M5', 'TopVia1', 'TM1')
+    via_n(lna, bypass_gnd_x, c61_c1y, 'M5', 'TopVia1', 'TM1')
     lna.shapes(ly['TM1']).insert(pya.Box(
-        um(min(c61_c1x, bypass_route_x)-0.25), um(c61_c1y-0.25),
-        um(max(c61_c1x, bypass_route_x)+0.25), um(c61_c1y+0.25)))
-    m5_wire(bypass_route_x, c61_c1y, bypass_route_x, gnd_y)
+        um(min(c61_c1x, bypass_gnd_x)-0.25), um(c61_c1y-0.25),
+        um(max(c61_c1x, bypass_gnd_x)+0.25), um(c61_c1y+0.25)))
+    # Connect bypass GND M5 to GND bus via M4 at separate X
+    via_n(lna, bypass_gnd_x, c61_c1y, 'M4', 'Via4', 'M5')
+    m4_wire(bypass_gnd_x, c61_c1y, bypass_gnd_x, gnd_y)
+    via_n(lna, bypass_gnd_x, gnd_y, 'M4', 'Via4', 'M5')
 
-    # C53 c1 (TM1) = INP port: leave as external TM1 pad
+    # C53 c1 (TM1) = INP port
     c53_c1x = c53_x + cmim_c0_dx
     c53_c1y = c53_y + cmim_c0_dy
-    # INP is already a port label on M5. Need to NOT short c0 and c1.
-    # c0 connects to net1 on M5, c1 on TM1 is the INP port.
-    # Add INP label on TM1
     lna.shapes(ly['TM1']).insert(pya.Text("INP", pya.Trans(um(c53_c1x), um(c53_c1y))))
 
-    # --- OUTP port: separate from net6 ---
-    # OUTP is c0 of C55 on M5. It's a different net from net6 (which is c1 on TM1).
-    # So OUTP port should be at c55_c0x, c55_c0y on M5.
-
-    # --- OUTN port: c0 of C56 is 2V4, not OUTN ---
-    # Wait, looking at schematic again: XC56 2V4 net7 → OUTN doesn't appear!
-    # The task description says OUTN should be there. Let me check ports:
-    # Ports: 2V4 INP INN GND sub! OUTP OUTN, B35&36, BIAS6
-    # OUTP = first pin of C55. OUTN = ... not explicitly connected to a device?
-    # Actually OUTN might just be net7. But the spice shows C56 c0=2V4, not OUTN.
-    # Let me just place port labels matching the subckt.
-
     # === PORT LABELS ===
-    # Place port labels on M5 (or TM1 for through-cap ports)
-    # Clear previous approach - use definitive port positions
-    # 2V4: VCC rail
     lna.shapes(ly['M5']).insert(pya.Text("2V4", pya.Trans(um(cx), um(vcc_y))))
-    # GND: GND bus
     lna.shapes(ly['M5']).insert(pya.Text("GND", pya.Trans(um(cx), um(gnd_y))))
-    # INP: on TM1 at C53 c1
-    # (already added above)
-    # INN: on M5 connecting to Q2 bases (since C54 c1=net2 on TM1, and port INN...
-    # Actually INN is not in the device netlist! The .subckt line has INN but no device connects to it.
-    # This likely means INN connects to net2 directly (maybe through C54 differently).
-    # For now, add INN on TM1 at C54 c1 position:
     lna.shapes(ly['TM1']).insert(pya.Text("INN", pya.Trans(um(c54_c1x), um(c54_c1y))))
-    # OUTP: on M5 at C55 c0
     lna.shapes(ly['M5']).insert(pya.Text("OUTP", pya.Trans(um(c55_c0x), um(c55_c0y))))
-    # OUTN: on M5... C56 c0=2V4. OUTN must be somewhere else.
-    # Looking at the schematic, OUTN likely = net7 after the cap. But spice shows no OUTN device connection.
-    # For LVS, if OUTN is a port on net7, and net7 = Q36.C, then OUTN should label net7.
-    # Actually the task says ".subckt LNA_77G_XTOR 2V4 INP INN GND sub! OUTP OUTN"
-    # But looking at spice: OUTP appears in C55. OUTN doesn't appear anywhere!
-    # Unless the commented subckt definition implies OUTN = some net. Let me just skip OUTN port for now.
-    # Actually re-reading: the task says C56: "actually OUTN" - so maybe the spice is wrong and c0 should be OUTN.
-    # But since we're matching the spice golden, c0=2V4. So C56 c0 connects to VCC.
-    # OUTN could be a floating port or equal to net7. For LVS matching, we need OUTN in layout = OUTN in spice.
-    # Since OUTN doesn't appear in the netlist, it might be an unused port. Skip for now.
-    # B35&36:
     lna.shapes(ly['M5']).insert(pya.Text("B35&36", pya.Trans(um(cx), um(vcb_port_y))))
-    # BIAS6: Q37 area - but BIAS6 isn't in the spice netlist either...
-    # Only ports in the spice: 2V4, INP, INN, GND, sub!, OUTP, OUTN, B35&36, BIAS6
-    # BIAS6 isn't connected to anything in the netlist. It might be net12.
-    # Actually looking again: BIAS6 is an iopin but never used. Skip or add as floating.
 
     if ext_layout is None:
         output = "/home/bthomas3/Videos/77GHz_phased_array/layout/LNA_77G_XTOR.gds"
