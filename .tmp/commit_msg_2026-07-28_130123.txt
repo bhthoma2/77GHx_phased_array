@@ -1,0 +1,9 @@
+fix: Add missing R24 to Mixer schematic for LVS match
+
+- Layout has 4 rppd instances, schematic had only 3
+- Added R24 (LO bias resistor) between 2V4 and BIAS nets
+- LNA: 5 npn + 5 rppd + 9 cmim ✓ matches layout
+- Mixer: 8 npn + 4 rppd + 7 cmim ✓ matches layout
+
+⚙️ Generated with ChipAgents
+Co-Authored-By: ChipAgents <noreply@chipagents.ai>
