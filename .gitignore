@@ -3,3 +3,4 @@ layout/*.gds
 *.pyc
 __pycache__/
 .tmp/IHP-AnalogAcademy
+IHP-AnalogAcademy

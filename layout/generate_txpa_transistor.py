@@ -389,19 +389,32 @@ def main(ext_layout=None):
     # VCC rail
     pa.shapes(ly['M3']).insert(pya.Box(um(10), um(cy + 325), um(CELL_W - 10), um(cy + 335)))
 
-    # Port labels
+    # ----------------------------------------------------------------
+    # Bias resistor wiring (R_bias → VCB net)
+    # Connect rppd Pin1 to VCB bus via M1→M5 stack
+    # ----------------------------------------------------------------
+    rbias_x = cx - 0.45 + 0.25  # rppd pin1 center X
+    rbias_y = cy - 90 + 0.78    # rppd pin1 center Y
+    via_n(pa, rbias_x, rbias_y, 'M1', 'Via1', 'M2')
+    via_n(pa, rbias_x, rbias_y, 'M2', 'Via2', 'M3')
+    via_n(pa, rbias_x, rbias_y, 'M3', 'Via3', 'M4')
+    via_n(pa, rbias_x, rbias_y, 'M4', 'Via4', 'M5')
+
+    # Port labels (matched to xschem TXPA_77G.sch for LVS)
     pa.shapes(ly['TM2']).insert(pya.Text("INP", pya.Trans(um(inp_x), um(cy - 220))))
     pa.shapes(ly['TM2']).insert(pya.Text("INN", pya.Trans(um(inn_x), um(cy - 220))))
     pa.shapes(ly['TM2']).insert(pya.Text("OUTP", pya.Trans(um(inp_x), um(cy + 335))))
     pa.shapes(ly['TM2']).insert(pya.Text("OUTN", pya.Trans(um(inn_x), um(cy + 335))))
-    pa.shapes(ly['M3']).insert(pya.Text("VCC", pya.Trans(um(cx), um(cy + 330))))
+    pa.shapes(ly['M3']).insert(pya.Text("2V4", pya.Trans(um(cx), um(cy + 330))))
+    pa.shapes(ly['M5']).insert(pya.Text("GND", pya.Trans(um(cx), um(cy - 130))))
+    pa.shapes(ly['M5']).insert(pya.Text("VCB", pya.Trans(um(rbias_x), um(rbias_y))))
 
     if ext_layout is None:
         output = "/home/bthomas3/Videos/77GHz_phased_array/layout/TXPA_77G_XTOR.gds"
         layout.write(output)
         print(f"\nTX PA layout: {output}")
         print(f"Cell size: {CELL_W} x {CELL_H} um")
-        print(f"Devices: 32x npn13G2L + 1x rppd")
+        print(f"Devices: 32x npn13G2L + 1x rppd (bias wired)")
 
 
 if __name__ == "__main__":

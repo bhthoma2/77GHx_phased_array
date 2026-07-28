@@ -1,0 +1,21 @@
+17-Jul-2026 10:12:06 | INFO    | Your Klayout version is: KLayout 0.30.9
+17-Jul-2026 10:12:06 | INFO    | Running SG13G2 LVS checks on design /home/bthomas3/Videos/77GHz_phased_array/layout/.tmp/test_no_routes.gds on cell TEST_TOP
+17-Jul-2026 10:12:09 | ERROR   | KLayout run failed with exit code 1.
+17-Jul-2026 10:12:09 | ERROR   | KLayout stderr: ERROR: Unable to open file: /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/klayout/tech/lvs/.tmp//sg13g2.lvs (errno=2)
+17-Jul-2026 10:12:09 | INFO    | ==============================================================================
+17-Jul-2026 10:12:09 | INFO    | Important Summary
+17-Jul-2026 10:12:09 | INFO    | +------------------+---------------------------------------------------------------+
+17-Jul-2026 10:12:09 | INFO    | | Status           | NET_ONLY                                                      |
+17-Jul-2026 10:12:09 | INFO    | | Mode             | NET_ONLY                                                      |
+17-Jul-2026 10:12:09 | INFO    | | Outcome          | NET_ONLY mode: extracted netlist generated from layout only.  |
+17-Jul-2026 10:12:09 | INFO    | | Layout           | test_no_routes.gds                                            |
+17-Jul-2026 10:12:09 | INFO    | | Top Cell         | TEST_TOP                                                      |
+17-Jul-2026 10:12:09 | INFO    | | Results Dir      | /home/bthomas3/Videos/77GHz_phased_array/layout/.tmp/lvs_test |
+17-Jul-2026 10:12:09 | INFO    | | Warnings         | 0                                                             |
+17-Jul-2026 10:12:09 | INFO    | | Errors           | 2                                                             |
+17-Jul-2026 10:12:09 | INFO    | | Run Time (s)     | 3.214                                                         |
+17-Jul-2026 10:12:09 | INFO    | +------------------+---------------------------------------------------------------+
+17-Jul-2026 10:12:09 | ERROR   | Key errors:
+17-Jul-2026 10:12:09 | ERROR   |   - KLayout run failed with exit code 1.
+17-Jul-2026 10:12:09 | ERROR   |   - KLayout stderr: ERROR: Unable to open file: /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/klayout/tech/lvs/.tmp//sg13g2.lvs (errno=2)
+17-Jul-2026 10:12:09 | INFO    | ==============================================================================

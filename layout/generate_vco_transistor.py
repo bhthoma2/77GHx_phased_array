@@ -5,10 +5,12 @@ Uses actual IHP SG13G2 PDK cells from sg13g2_pr.gds
 Schematic:
   Q1a,Q1b (left pair): C→OUTP, B→OUTN, E→TAIL
   Q2a,Q2b (right pair): C→OUTN, B→OUTP, E→TAIL
-  R: TAIL↔VSS
+  R: TAIL↔GND (physical implementation of ITAIL current source)
   CV1: OUTP↔VTUNE (gate=VTUNE, top/bot=OUTP)
   CV2: OUTN↔VTUNE (gate=VTUNE, top/bot=OUTN)
-  Cdecap: VCC(TM1)↔VSS(M5)
+  Cdecap: VCC(TM1)↔GND(M5)
+  TL_tank_P: CPW stub OUTP→VCC (physical implementation of L1, 27pH)
+  TL_tank_N: CPW stub OUTN→VCC (physical implementation of L2, 27pH)
 
 PDK cell pin locations (from L63/0 TEXT labels, relative to cell origin):
   npn13G2L (7.8x7.2µm):
@@ -370,7 +372,7 @@ def main(ext_layout=None):
     # === Port labels ===
     vco.shapes(ly['M3']).insert(pya.Text("OUTP", pya.Trans(um(cx), um(outp_hy))))
     vco.shapes(ly['M4']).insert(pya.Text("OUTN", pya.Trans(um(cx), um(outn_hy))))
-    vco.shapes(ly['M1']).insert(pya.Text("VSS", pya.Trans(um(r_pin2_cx), um(r_pin2_cy))))
+    vco.shapes(ly['M1']).insert(pya.Text("GND", pya.Trans(um(r_pin2_cx), um(r_pin2_cy))))
 
     # ----------------------------------------------------------------
     # M5 Port Access Pads
@@ -391,13 +393,48 @@ def main(ext_layout=None):
     # TAIL: skip M5 port (TAIL is internal, connects to tail resistor only)
     # Cannot route TAIL to M5 at y=219 without shorting to OUTP M3 / OUTN M4 buses
 
+    # ----------------------------------------------------------------
+    # CPW Tank Stubs (physical implementation of L1/L2 = 27pH each)
+    # TL_tank_P: from OUTP collector bus upward to VCC
+    # TL_tank_N: from OUTN collector bus upward to VCC
+    # ----------------------------------------------------------------
+    tank_stub_len = STUB_LEN  # 135 µm ~ 27 pH at 77 GHz
+    tank_x_p = outp_vr - 10.0  # left of OUTP port pad
+    tank_x_n = outn_vr + 10.0  # right of OUTN port pad
+    tank_start_y = outp_hy + 5.0  # start above port pads
+
+    # Tank stub P (L1: OUTP → VCC)
+    create_cpw(vco, ly['TM2'], ly['TM1'], tank_x_p, tank_start_y, tank_stub_len, 'up')
+    create_via_stack(vco, ly, tank_x_p, tank_start_y, 'M3', 'TM2')
+    vco.shapes(ly['M3']).insert(pya.Box(
+        um(outp_vr - 0.25), um(outp_hy - 0.25),
+        um(tank_x_p + 0.25), um(outp_hy + 0.25)))
+
+    # Tank stub N (L2: OUTN → VCC)
+    create_cpw(vco, ly['TM2'], ly['TM1'], tank_x_n, tank_start_y, tank_stub_len, 'up')
+    create_via_stack(vco, ly, tank_x_n, tank_start_y, 'M4', 'TM2')
+    vco.shapes(ly['M4']).insert(pya.Box(
+        um(outn_vr - 0.25), um(outn_hy - 0.25),
+        um(tank_x_n + 0.25), um(outn_hy + 0.25)))
+
+    # VCC connection at top of both stubs
+    vcc_tap_y = tank_start_y + tank_stub_len
+    create_via_stack(vco, ly, tank_x_p, vcc_tap_y, 'TM2', 'TM2')
+    create_via_stack(vco, ly, tank_x_n, vcc_tap_y, 'TM2', 'TM2')
+    vco.shapes(ly['TM2']).insert(pya.Text("VCC", pya.Trans(um(tank_x_p), um(vcc_tap_y))))
+    vco.shapes(ly['TM2']).insert(pya.Text("VCC", pya.Trans(um(tank_x_n), um(vcc_tap_y))))
+
+    # GND port: via stack from rppd pin2 up to M5
+    create_via_stack(vco, ly, r_pin2_cx, r_pin2_cy, 'M1', 'M5')
+    vco.shapes(ly['M5']).insert(pya.Text("GND", pya.Trans(um(r_pin2_cx), um(r_pin2_cy))))
+
     # Save
     if ext_layout is None:
         output = "/home/bthomas3/Videos/77GHz_phased_array/layout/VCO_77G_XTOR.gds"
         layout.write(output)
         print(f"\nVCO layout with routing: {output}")
-        print(f"Devices: 4× npn13G2L + 2× SVaricap + 1× rppd + 1× cmim")
-        print(f"Nets routed: OUTP, OUTN, TAIL, VSS, VTUNE, VCC")
+        print(f"Devices: 4× npn13G2L + 2× SVaricap + 1× rppd + 1× cmim + 2× CPW tank stubs")
+        print(f"Nets routed: OUTP, OUTN, TAIL, GND, VTUNE, VCC")
 
 
 if __name__ == "__main__":

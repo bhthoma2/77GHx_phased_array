@@ -409,14 +409,51 @@ def main(ext_layout=None):
     lna.shapes(ly['M5']).insert(pya.Box(
         um(lx - 0.25), um(vcb_port_y - 0.25), um(cx + port_pad/2), um(vcb_port_y + 0.25)))
 
-    # Port labels
+    # ----------------------------------------------------------------
+    # Additional devices for LVS (matching RXAMP_77GD.sch)
+    # ----------------------------------------------------------------
+    # Q37: Bias transistor (Nx=1)
+    if npn_idx is not None:
+        lna.insert(pya.CellInstArray(npn_idx, pya.Trans(um(cx - 40), um(cy - 80))))
+
+    # R29: Emitter degeneration (rsil, w=7, l=38.8, m=4) — placed below tail node
+    if rppd_idx is not None:
+        lna.insert(pya.CellInstArray(rppd_idx, pya.Trans(um(cx - 0.45), um(cy - 50))))
+        # R30: Bias resistor for B35&36
+        lna.insert(pya.CellInstArray(rppd_idx, pya.Trans(um(cx + 20), um(cy + 70))))
+        # R31: Bias resistor (GND)
+        lna.insert(pya.CellInstArray(rppd_idx, pya.Trans(um(cx + 30), um(cy + 70))))
+        # R32: Input bias (BIAS6)
+        lna.insert(pya.CellInstArray(rppd_idx, pya.Trans(um(cx - 40), um(cy - 70))))
+
+    # C55/C56: Output AC coupling caps (4x4µm cmim)
+    if cmim_idx is not None:
+        lna.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(cx - 55), um(cy + 80))))
+        lna.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(cx + 47), um(cy + 80))))
+        # C57-C61: Decoupling caps (large cmim, placed in right region)
+        for i in range(5):
+            lna.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(CELL_W - 40), um(50 + i * 20))))
+
+    # BIAS6 port
+    bias6_x = cx - 40 + 3.9
+    bias6_y = cy - 80 + 1.775
+    via_n(lna, bias6_x, bias6_y, 'M1', 'Via1', 'M2')
+    via_n(lna, bias6_x, bias6_y, 'M2', 'Via2', 'M3')
+    via_n(lna, bias6_x, bias6_y, 'M3', 'Via3', 'M4')
+    via_n(lna, bias6_x, bias6_y, 'M4', 'Via4', 'M5')
+    lna.shapes(ly['M5']).insert(pya.Box(
+        um(bias6_x - port_pad/2), um(bias6_y - port_pad/2),
+        um(bias6_x + port_pad/2), um(bias6_y + port_pad/2)))
+
+    # Port labels (matched to xschem RXAMP_77GD.sch for LVS)
     lna.shapes(ly['M5']).insert(pya.Text("INP", pya.Trans(um(inp_bus_x), um(inp_port_y))))
     lna.shapes(ly['M5']).insert(pya.Text("INN", pya.Trans(um(inn_bus_x), um(inp_port_y))))
     lna.shapes(ly['M5']).insert(pya.Text("OUTP", pya.Trans(um(inp_bus_x), um(outp_port_y))))
     lna.shapes(ly['M5']).insert(pya.Text("OUTN", pya.Trans(um(inn_bus_x), um(outp_port_y))))
-    lna.shapes(ly['M5']).insert(pya.Text("VCC", pya.Trans(um(cx), um(vcc_y))))
-    lna.shapes(ly['M5']).insert(pya.Text("TAIL", pya.Trans(um(tail_port_x), um(tail_port_y))))
-    lna.shapes(ly['M5']).insert(pya.Text("VCB", pya.Trans(um(cx), um(vcb_port_y))))
+    lna.shapes(ly['M5']).insert(pya.Text("2V4", pya.Trans(um(cx), um(vcc_y))))
+    lna.shapes(ly['M5']).insert(pya.Text("GND", pya.Trans(um(tail_port_x), um(tail_port_y))))
+    lna.shapes(ly['M5']).insert(pya.Text("B35&36", pya.Trans(um(cx), um(vcb_port_y))))
+    lna.shapes(ly['M5']).insert(pya.Text("BIAS6", pya.Trans(um(bias6_x), um(bias6_y))))
 
     if ext_layout is None:
         output = "/home/bthomas3/Videos/77GHz_phased_array/layout/LNA_77G_XTOR.gds"

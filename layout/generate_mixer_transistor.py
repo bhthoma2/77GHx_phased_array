@@ -93,6 +93,7 @@ def main(ext_layout=None):
 
     npn_idx = layout.cell_by_name("npn13G2L") if layout.has_cell("npn13G2L") else None
     rppd_idx = layout.cell_by_name("rppd") if layout.has_cell("rppd") else None
+    cmim_idx = layout.cell_by_name("cmim") if layout.has_cell("cmim") else None
 
     mixer = layout.create_cell("MIXER_77GD")
     cx = CELL_W / 2
@@ -484,19 +485,49 @@ def main(ext_layout=None):
     # VCC rail
     mixer.shapes(ly['M3']).insert(pya.Box(um(10), um(cy + 130), um(CELL_W - 10), um(cy + 140)))
 
-    # Port labels
-    mixer.shapes(ly['TM2']).insert(pya.Text("RF_P", pya.Trans(um(inp_x), um(cy - 210))))
-    mixer.shapes(ly['TM2']).insert(pya.Text("RF_N", pya.Trans(um(inn_x), um(cy - 210))))
-    mixer.shapes(ly['TM2']).insert(pya.Text("LO_P", pya.Trans(um(inp_x), um(cy + 125))))
-    mixer.shapes(ly['TM2']).insert(pya.Text("LO_N", pya.Trans(um(inn_x), um(cy + 125))))
-    mixer.shapes(ly['M3']).insert(pya.Text("VCC", pya.Trans(um(cx), um(cy + 135))))
+    # ----------------------------------------------------------------
+    # Additional devices for LVS (matching MIXER_77GD.sch)
+    # ----------------------------------------------------------------
+    # Q26: LO bias diode-connected BJT
+    if npn_idx is not None:
+        mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(cx - 30), um(cy + 90))))
+        # Q27: RF bias diode-connected BJT
+        mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(cx + 22), um(cy - 90))))
+
+    # R23: LO bias resistor (rppd)
+    if rppd_idx is not None:
+        mixer.insert(pya.CellInstArray(rppd_idx, pya.Trans(um(cx - 30), um(cy + 105))))
+
+    # C37-C43: Bypass and decoupling caps (cmim)
+    if cmim_idx is not None:
+        # C37/C38: LO input bypass
+        mixer.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(cx - 45), um(cy + 70))))
+        mixer.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(cx + 37), um(cy + 70))))
+        # C39/C40: RF input bypass
+        mixer.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(cx - 45), um(cy - 70))))
+        mixer.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(cx + 37), um(cy - 70))))
+        # C41-C43: Supply decoupling (placed near VCC rail)
+        for i in range(3):
+            mixer.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(20 + i * 30), um(cy + 150))))
+
+    # Port labels (matched to xschem MIXER_77GD.sch for LVS)
+    mixer.shapes(ly['TM2']).insert(pya.Text("RFP", pya.Trans(um(inp_x), um(cy - 210))))
+    mixer.shapes(ly['TM2']).insert(pya.Text("RFN", pya.Trans(um(inn_x), um(cy - 210))))
+    mixer.shapes(ly['TM2']).insert(pya.Text("LOP", pya.Trans(um(inp_x), um(cy + 125))))
+    mixer.shapes(ly['TM2']).insert(pya.Text("LON", pya.Trans(um(inn_x), um(cy + 125))))
+    mixer.shapes(ly['M3']).insert(pya.Text("2V4", pya.Trans(um(cx), um(cy + 135))))
+
+    # IF port labels on M5
+    mixer.shapes(ly['M5']).insert(pya.Text("IFP", pya.Trans(um(inp_x - 10), um(cy + 100))))
+    mixer.shapes(ly['M5']).insert(pya.Text("IFN", pya.Trans(um(inn_x + 10), um(cy + 100))))
+    mixer.shapes(ly['M5']).insert(pya.Text("GND", pya.Trans(um(cx), um(cy - 120))))
 
     if ext_layout is None:
         output = "/home/bthomas3/Videos/77GHz_phased_array/layout/MIXER_77G_XTOR.gds"
         layout.write(output)
         print(f"\nMixer layout: {output}")
         print(f"Cell size: {CELL_W} x {CELL_H} um")
-        print(f"Devices: 16x npn13G2L + 3x rppd")
+        print(f"Devices: 18x npn13G2L + 4x rppd + 7x cmim")
 
 
 if __name__ == "__main__":

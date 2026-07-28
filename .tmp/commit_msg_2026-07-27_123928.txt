@@ -1,0 +1,14 @@
+feat: 77GHz phased array vibrometer for autonomous landmine detection
+
+- 4-MAC DSP engine: 64-pt range FFT + 6-channel beamformer + peak detector
+- 128-pt slow-time FFT for acoustic-seismic vibrometry (Doppler extraction)
+- IHP SG13G2 SRAM macro integration (RM_IHPSG13_1P_1024x32_c2_bm_bist)
+- Motion compensation from nhpoole (IIR notch, CORDIC, deconvolution kernel)
+- IMU analog signal chain (BJT input amp, Gm-C BPF, SAR ADC) for IHP SG13G2
+- SPI serializer for radar output
+- Yosys synthesis to IHP sg13g2_stdcell (1.61 mm^2)
+- RF front-end layout generators (VCO, LNA, Mixer, PA, ILFD)
+- Digital P&R scripts (OpenROAD) ready for execution
+- Full-chip GDS assembly script
+
+Target: IHP SG13G2 130nm SiGe BiCMOS, 200 MHz digital clock

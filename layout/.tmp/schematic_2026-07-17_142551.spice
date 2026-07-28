@@ -1,0 +1,64 @@
+* 77 GHz Phased Array Vibrometer — Full Chip Schematic
+* IHP SG13G2 130nm SiGe BiCMOS
+*
+* Net naming:
+*   OUTP = VCO differential output positive (global net G1 in extraction)
+*   OUTN = VCO differential output negative
+*   VSS  = substrate ground ($1)
+
+.SUBCKT PHASED_ARRAY_77G_TOP
+
+* ===== VCO: Cross-coupled LC oscillator =====
+* Q1: C=OUTP, B=OUTN, E=VCO_TAIL
+* Q2: C=OUTN, B=OUTP, E=VCO_TAIL
+Q1 OUTP OUTN VCO_TAIL VSS npn13G2l we=70n le=1000n Nx=1 m=2
+Q2 OUTN OUTP VCO_TAIL VSS npn13G2l we=70n le=1000n Nx=1 m=2
+R_VCO_TAIL VCO_TAIL_R VCO_TAIL VSS rppd w=0.5u l=0.5u ps=0u b=0 m=1
+C_VCO1 VCO_CMIM VCO_C1 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C_VCO2 VCO_CMIM VCO_TAIL_R cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C_VCO3 VCO_CMIM VCO_C3 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C_VAR1 OUTP W_VAR1 VTUNE1 VSS sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+C_VAR2 OUTP_V2 W_VAR2 VTUNE2 VSS sg13_hv_svaricap w=3.74u l=0.3u Nx=1
+
+* ===== TXPA: Differential Cascode Power Amplifier =====
+* Driver: Q_TXP1 (INP=OUTP), Q_TXN1 (INN=OUTN)
+* Cascode: Q_TXP2 (above driver P), Q_TXN2 (above driver N)
+Q_TXP1 TXP_MID OUTP TX_TAIL VSS npn13G2l we=70n le=1000n Nx=1 m=8
+Q_TXN1 TXN_MID OUTN TX_TAIL VSS npn13G2l we=70n le=1000n Nx=1 m=8
+Q_TXP2 OUTP TX_VCB TXP_MID VSS npn13G2l we=70n le=1000n Nx=1 m=8
+Q_TXN2 OUTP TX_VCB TXN_MID VSS npn13G2l we=70n le=1000n Nx=1 m=8
+R_TX R_TX1 R_TX2 VSS rppd w=0.5u l=0.5u ps=0u b=0 m=1
+
+* ===== LNA: Differential Cascode Low-Noise Amplifier =====
+* Transconductance: Q_LNAP1, Q_LNAN1
+* Cascode: Q_LNAP2, Q_LNAN2
+Q_LNAP2 LNA_OUTP LNA_VCB LNA_MIDL VSS npn13G2l we=70n le=1000n Nx=1 m=4
+Q_LNAN2 LNA_OUTN LNA_VCN LNA_MIDR VSS npn13G2l we=70n le=1000n Nx=1 m=4
+Q_LNAP1 LNA_MIDL LNA_INP LNA_OUTP2 VSS npn13G2l we=70n le=1000n Nx=1 m=4
+Q_LNAN1 LNA_MIDR LNA_INN LNA_OUTN2 VSS npn13G2l we=70n le=1000n Nx=1 m=4
+R_LNA1 R_LNA1A R_LNA1B VSS rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R_LNA2 R_LNA2A R_LNA2B VSS rppd w=0.5u l=0.5u ps=0u b=0 m=1
+
+* ===== MIXER: Gilbert Cell =====
+* Transconductance pair
+Q_MXG1 MX_MIDP MX_RFP MX_TAIL VSS npn13G2l we=70n le=1000n Nx=1 m=4
+Q_MXG2 MX_MIDN MX_RFN MX_TAIL VSS npn13G2l we=70n le=1000n Nx=1 m=4
+* Switching quad (LO driven)
+Q_MXS1 MX_IFP OUTP MX_MIDP VSS npn13G2l we=70n le=1000n Nx=1 m=2
+Q_MXS2 MX_IFN OUTN MX_MIDP VSS npn13G2l we=70n le=1000n Nx=1 m=2
+Q_MXS3 MX_IFN OUTN MX_MIDN VSS npn13G2l we=70n le=1000n Nx=1 m=2
+Q_MXS4 MX_IFP OUTP MX_MIDN VSS npn13G2l we=70n le=1000n Nx=1 m=2
+* Load resistors
+R_MX1 R_MX1A R_MX1B VSS rppd w=0.5u l=0.5u ps=0u b=0 m=1
+R_MX2 R_MX2A R_MX2B VSS rppd w=0.5u l=0.5u ps=0u b=0 m=1
+
+* ===== ILFD: Injection-Locked Frequency Divider =====
+* Oscillator cross-coupled pair
+Q_ILFP ILFD_OUTP ILFD_OUTN ILFD_MID VSS npn13G2l we=70n le=1000n Nx=1 m=2
+Q_ILFN ILFD_OUTN ILFD_OUTP ILFD_MID VSS npn13G2l we=70n le=1000n Nx=1 m=2
+* Injection pair
+Q_INJP ILFD_MID OUTP ILFD_INJ_E VSS npn13G2l we=70n le=1000n Nx=1 m=2
+Q_INJN ILFD_MID OUTN ILFD_INJ_E VSS npn13G2l we=70n le=1000n Nx=1 m=2
+R_ILFD R_ILFDA R_ILFDB VSS rppd w=0.5u l=0.5u ps=0u b=0 m=1
+
+.ENDS PHASED_ARRAY_77G_TOP

@@ -1,0 +1,86 @@
+Warning: redefinition of .subckt cap_cmim, ignored
+
+Note: No compatibility mode selected!
+
+
+Circuit: ** 77 ghz vco — corner: hbt_bcs  temp: -40
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vcc                                          0
+vtune                                      1.2
+outp                              -1.34835e-31
+outn                              -1.34835e-31
+xvco.net_tail                     -4.73855e-31
+xvco.xq1.s1                        6.53104e-29
+xvco.xq1.t                          8.5542e-27
+xvco.xq2.s1                        6.53104e-29
+xvco.xq2.t                          8.5542e-27
+xvco.xtlres1.n1                   -1.34835e-31
+xvco.xtlres1.n2                   -1.34835e-31
+xvco.xtlres1.n3                   -1.34835e-31
+xvco.xtlres1.n4                   -1.34835e-31
+xvco.xtlres1.n5                   -1.34835e-31
+xvco.res1_end                     -1.34835e-31
+xvco.xtlres2.n1                   -1.34835e-31
+xvco.xtlres2.n2                   -1.34835e-31
+xvco.xtlres2.n3                   -1.34835e-31
+xvco.xtlres2.n4                   -1.34835e-31
+xvco.xtlres2.n5                   -1.34835e-31
+xvco.res2_end                     -1.34835e-31
+xvco.net_var1                              1.2
+xvco.net_var2                              1.2
+xvco.xtlchk1.n1                   -3.37087e-32
+xvco.xtlchk1.n2                   -3.37087e-32
+xvco.xtlchk1.n3                   -6.74174e-32
+xvco.xtlchk1.n4                   -6.74174e-32
+xvco.xtlchk1.n5                   -1.01126e-31
+xvco.xtlchk1.n6                   -1.01126e-31
+xvco.xtlchk1.n7                   -1.34835e-31
+xvco.xtlchk2.n1                   -3.37087e-32
+xvco.xtlchk2.n2                   -3.37087e-32
+xvco.xtlchk2.n3                   -6.74174e-32
+xvco.xtlchk2.n4                   -6.74174e-32
+xvco.xtlchk2.n5                   -1.01126e-31
+xvco.xtlchk2.n6                   -1.01126e-31
+xvco.xtlchk2.n7                   -1.34835e-31
+l.xvco.xtlchk2.l4#branch           5.79188e-32
+l.xvco.xtlchk2.l3#branch           5.79188e-32
+l.xvco.xtlchk2.l2#branch           5.79188e-32
+l.xvco.xtlchk2.l1#branch           5.79188e-32
+l.xvco.xtlchk1.l4#branch           5.79188e-32
+l.xvco.xtlchk1.l3#branch           5.79188e-32
+l.xvco.xtlchk1.l2#branch           5.79188e-32
+l.xvco.xtlchk1.l1#branch           5.79188e-32
+l.xvco.xtlres2.l3#branch                     0
+l.xvco.xtlres2.l2#branch          -2.18953e-47
+l.xvco.xtlres2.l1#branch          -1.09476e-47
+l.xvco.xtlres1.l3#branch                     0
+l.xvco.xtlres1.l2#branch                     0
+l.xvco.xtlres1.l1#branch          -2.18953e-47
+vtune#branch                                 0
+vcc#branch                        -1.15838e-31
+
+ Reference value :  4.97350e-10 Reference value :  1.08255e-09 Reference value :  1.64635e-09 Reference value :  2.21025e-09 Reference value :  2.71775e-09 Reference value :  3.22275e-09 Reference value :  3.76255e-09 Reference value :  4.26605e-09 Reference value :  4.81815e-09
+No. of Data Rows : 50020
+vosc_pp             =  1.75635e+00 from=  4.00000e-09 to=  5.00000e-09
+t1                  =  1.19608e-10
+t2                  =  1.32475e-10
+
+=========================================
+  VCO RESULTS  corner=hbt_bcs  temp=27
+=========================================
+Oscillation frequency:
+fosc = 7.771940e+10
+Output swing (Vpp diff):
+vosc_pp = 1.756351e+00
+=========================================
+
+Note: Simulation executed from .control section 
