@@ -1,4 +1,3 @@
-digital_pnr/build/
 layout/*.gds
 *.pyc
 __pycache__/
