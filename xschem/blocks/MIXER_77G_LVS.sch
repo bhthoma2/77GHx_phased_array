@@ -83,6 +83,13 @@ w=3.0u
 l=27.48u
 m=1
 b=0}
+C {sg13g2_pr/rppd.sym} 700 -400 0 0 {name=R24
+model=rppd
+spiceprefix=X
+w=3.0u
+l=27.48u
+m=1
+b=0}
 C {sg13g2_pr/cap_cmim.sym} 100 -480 0 0 {name=C37
 model=cap_cmim
 spiceprefix=X
@@ -181,6 +188,8 @@ C {lab_pin.sym} 500 -670 0 0 {name=p30 sig_type=std_logic lab=IFN}
 C {lab_pin.sym} 680 -200 0 1 {name=p25 sig_type=std_logic lab=BIAS}
 C {lab_pin.sym} 680 -100 0 1 {name=p26 sig_type=std_logic lab=BIAS_MID}
 C {lab_pin.sym} 720 -230 0 0 {name=p27 sig_type=std_logic lab=BIAS}
+C {lab_pin.sym} 700 -430 0 0 {name=p40 sig_type=std_logic lab=2V4}
+C {lab_pin.sym} 700 -370 0 0 {name=p41 sig_type=std_logic lab=BIAS}
 C {lab_pin.sym} 720 -130 0 0 {name=p31 sig_type=std_logic lab=BIAS_MID}
 C {lab_pin.sym} 270 -520 0 0 {name=p28 sig_type=std_logic lab=ELOL}
 C {lab_pin.sym} 430 -520 0 0 {name=p29 sig_type=std_logic lab=ELOR}
