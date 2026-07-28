@@ -1,0 +1,31 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/LNA_77G_LVS.sch
+**.subckt LNA_77G_XTOR 2V4 INP INN GND sub! OUTP OUTN
+*.iopin 2V4
+*.iopin GND
+*.iopin INP
+*.iopin INN
+*.iopin OUTP
+*.iopin OUTN
+*.iopin B35&36
+*.iopin BIAS6
+XQ33 net4 net1 net3 net13 npn13G2l Nx=4 El=2.5
+XQ34 net5 net2 net3 net14 npn13G2l Nx=4 El=2.5
+XQ35 net6 B35&36 net4 net15 npn13G2l Nx=4 El=2.5
+XQ36 net7 B35&36 net5 net16 npn13G2l Nx=4 El=2.5
+XQ37 GND GND net12 GND npn13G2l Nx=1 El=2.5
+XR29 net3 GND sub! rppd w=7.0u l=38.8u m=4 b=0
+XR30 2V4 B35&36 sub! rppd w=3.0u l=18.23u m=2 b=0
+XR31 B35&36 GND sub! rppd w=3.0u l=18.23u m=1 b=0
+XR32 GND GND sub! rppd w=3.0u l=18.23u m=2 b=0
+XR33 net12 GND sub! rppd w=2.5u l=10.53u m=14 b=0
+XC53 net1 INP cap_cmim w=7.0e-6 l=7.0e-6
+XC54 GND net2 cap_cmim w=7.0e-6 l=7.0e-6
+XC55 OUTP net6 cap_cmim w=7.0e-6 l=7.0e-6
+XC56 2V4 net7 cap_cmim w=7.0e-6 l=7.0e-6
+XC57 2V4 net8 cap_cmim w=7.0e-6 l=7.0e-6
+XC58 net8 net9 cap_cmim w=7.0e-6 l=7.0e-6
+XC59 net9 net10 cap_cmim w=7.0e-6 l=7.0e-6
+XC60 net10 net11 cap_cmim w=7.0e-6 l=7.0e-6
+XC61 net11 GND cap_cmim w=7.0e-6 l=7.0e-6
+**.ends
+.end

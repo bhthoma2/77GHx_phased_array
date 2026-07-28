@@ -1,0 +1,21 @@
+* Extracted by KLayout with SG13G2 LVS runset on : 28/07/2026 15:18
+
+.SUBCKT TXPA_77G_XTOR
+Q$1 \$132 \$131 \$99 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$2 \$133 \$134 \$99 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$3 \$132 \$131 \$99 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$4 \$133 \$134 \$99 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$5 \$132 \$131 \$99 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$6 \$133 \$134 \$99 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$7 \$132 \$131 \$99 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$8 \$133 \$134 \$99 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$9 \$238 \$219 \$132 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$10 \$238 \$219 \$133 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$11 \$238 \$219 \$132 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$12 \$238 \$219 \$133 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$13 \$238 \$219 \$132 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$14 \$238 \$219 \$133 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$15 \$238 \$219 \$132 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$16 \$238 \$219 \$133 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+R$17 \$99 \$113 \$1 rppd w=3u l=10u ps=0u b=0 m=1
+.ENDS TXPA_77G_XTOR

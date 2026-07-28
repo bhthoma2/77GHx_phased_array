@@ -1,9 +1,29 @@
 """
-77 GHz Mixer (MIXER_77GD) — Transistor-Level Layout
-Gilbert cell with CPW transmission lines on IHP SG13G2
+77 GHz Mixer (MIXER_77G_XTOR) — Transistor-Level Layout
+Gilbert cell matching MIXER_77G_XTOR.spice schematic for LVS.
+
+Schematic devices:
+  Q20(Nx=4): C=ELOL, B=RFP_I, E=GND
+  Q21(Nx=4): C=ELOR, B=RFN_I, E=GND
+  Q22(Nx=4): C=2V4, B=LOP_I, E=ELOL
+  Q23(Nx=4): C=IFN, B=LON_I, E=ELOL
+  Q24(Nx=4): C=IFN, B=LOP_I, E=ELOR
+  Q25(Nx=4): C=IFP, B=LON_I, E=ELOR
+  Q26(Nx=1): C=BIAS, B=BIAS, E=BIAS_MID
+  Q27(Nx=1): C=BIAS_MID, B=BIAS_MID, E=GND
+  R21(w=3u,l=18.23u,m=2): P=2V4, M=2V4
+  R22(w=3u,l=18.23u,m=2): P=2V4, M=2V4
+  R23(w=3u,l=27.48u,m=1): P=2V4, M=net1
+  R24(w=3u,l=27.48u,m=1): P=2V4, M=2V4
+  C37-C40: AC coupling (w=7u,l=7u)
+  C41-C43: VCC bypass (w=7u,l=7u)
 """
 
+import sys
 import pya
+
+sys.path.insert(0, "/home/bthomas3/Videos/77GHz_phased_array/layout")
+from pdk_devices import create_rppd
 
 PDK_GDS = "/home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.ref/sg13g2_pr/gds/sg13g2_pr.gds"
 
@@ -15,9 +35,6 @@ LAYERS = {
 }
 
 DBU = 0.001
-TL_WIDTH = 5.0
-TL_GAP = 5.0
-TL_GND_W = 15.0
 CELL_W = 300.0
 CELL_H = 450.0
 
@@ -29,54 +46,6 @@ def um(val):
 
 def snap(val):
     return round(val / 0.005) * 0.005
-
-
-def create_cpw(cell, ly_sig, ly_gnd, x0, y0, length, direction='up'):
-    seg, gap = 25.0, 3.0
-    w, g, gw = TL_WIDTH, TL_GAP, TL_GND_W
-    if direction == 'up':
-        t = 0.0
-        while t < length:
-            s = min(seg, length - t)
-            cell.shapes(ly_sig).insert(pya.Box(um(x0-w/2), um(y0+t), um(x0+w/2), um(y0+t+s)))
-            cell.shapes(ly_gnd).insert(pya.Box(um(x0-w/2-g-gw), um(y0+t), um(x0-w/2-g), um(y0+t+s)))
-            cell.shapes(ly_gnd).insert(pya.Box(um(x0+w/2+g), um(y0+t), um(x0+w/2+g+gw), um(y0+t+s)))
-            t += seg + gap
-    elif direction == 'down':
-        t = 0.0
-        while t < length:
-            s = min(seg, length - t)
-            cell.shapes(ly_sig).insert(pya.Box(um(x0-w/2), um(y0-t-s), um(x0+w/2), um(y0-t)))
-            cell.shapes(ly_gnd).insert(pya.Box(um(x0-w/2-g-gw), um(y0-t-s), um(x0-w/2-g), um(y0-t)))
-            cell.shapes(ly_gnd).insert(pya.Box(um(x0+w/2+g), um(y0-t-s), um(x0+w/2+g+gw), um(y0-t)))
-            t += seg + gap
-
-
-def create_via_stack(cell, ly, x, y, layers_from='M1', layers_to='TM2'):
-    x = snap(x)
-    y = snap(y)
-    via_specs = [
-        ('M1', 'Via1', 'M2', 0.19, 0.5),
-        ('M2', 'Via2', 'M3', 0.19, 0.5),
-        ('M3', 'Via3', 'M4', 0.19, 0.5),
-        ('M4', 'Via4', 'M5', 0.19, 0.5),
-        ('M5', 'TopVia1', 'TM1', 0.42, 1.0),
-        ('TM1', 'TopVia2', 'TM2', 0.9, 5.0),
-    ]
-    started = False
-    for bot, via, top_l, via_sz, pad_sz in via_specs:
-        if bot == layers_from:
-            started = True
-        if started:
-            vs = um(snap(via_sz))
-            ps = um(snap(pad_sz))
-            cx = um(x)
-            cy = um(y)
-            cell.shapes(ly[bot]).insert(pya.Box(cx - ps//2, cy - ps//2, cx + ps//2, cy + ps//2))
-            cell.shapes(ly[via]).insert(pya.Box(cx - vs//2, cy - vs//2, cx + vs//2, cy + vs//2))
-            cell.shapes(ly[top_l]).insert(pya.Box(cx - ps//2, cy - ps//2, cx + ps//2, cy + ps//2))
-        if top_l == layers_to:
-            break
 
 
 def main(ext_layout=None):
@@ -92,442 +61,378 @@ def main(ext_layout=None):
         ly[name] = layout.layer(ln, dt)
 
     npn_idx = layout.cell_by_name("npn13G2L") if layout.has_cell("npn13G2L") else None
-    rppd_idx = layout.cell_by_name("rppd") if layout.has_cell("rppd") else None
     cmim_idx = layout.cell_by_name("cmim") if layout.has_cell("cmim") else None
 
-    mixer = layout.create_cell("MIXER_77GD")
+    mixer = layout.create_cell("MIXER_77G_XTOR")
     cx = CELL_W / 2
     cy = CELL_H / 2
 
-    # Ground plane (TM1 with slots) - Region-based to cut holes at via stacks
-    slot_pitch = 25.0
-    slot_w = 4.0
-    _inp_x = cx - 15.0 - 3.9   # pair_gap=30.0
-    _inn_x = cx + 15.0 + 3.9
-    via_stack_positions = [(_inp_x, cy - 80), (_inn_x, cy - 80),
-                           (_inp_x, cy + 70), (_inn_x, cy + 70)]
-    hole_sz = 9.0
-    y = 5.0
-    while y < CELL_H - 5:
-        sh = min(slot_pitch - slot_w, CELL_H - 5 - y)
-        if sh > 0:
-            x = 5.0
-            while x < CELL_W - 5:
-                sw = min(slot_pitch - slot_w, CELL_W - 5 - x)
-                if sw > 0:
-                    skip = False
-                    for hx, hy in via_stack_positions:
-                        if (x < snap(hx) + hole_sz/2 and x + sw > snap(hx) - hole_sz/2 and
-                            y < snap(hy) + hole_sz/2 and y + sh > snap(hy) - hole_sz/2):
-                            skip = True
-                            break
-                    if not skip:
-                        mixer.shapes(ly['TM1']).insert(pya.Box(um(x), um(y), um(x + sw), um(y + sh)))
-                x += slot_pitch
-        y += slot_pitch
-
-    hbt_spacing = 10.0
-    pair_gap = 30.0
-
-    if npn_idx is not None:
-        # RF transconductor pair (Nx=4 each side = 8 HBTs)
-        for i in range(4):
-            mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(cx - pair_gap/2 - 7.8), um(cy - 40 + i * hbt_spacing))))
-        for i in range(4):
-            mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(cx + pair_gap/2), um(cy - 40 + i * hbt_spacing))))
-
-        # LO switching quad (Nx=2 each = 8 HBTs)
-        for i in range(2):
-            mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(cx - pair_gap/2 - 7.8 - 15), um(cy + 40 + i * hbt_spacing))))
-        for i in range(2):
-            mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(cx - pair_gap/2 - 7.8), um(cy + 40 + i * hbt_spacing))))
-        for i in range(2):
-            mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(cx + pair_gap/2), um(cy + 40 + i * hbt_spacing))))
-        for i in range(2):
-            mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(cx + pair_gap/2 + 15), um(cy + 40 + i * hbt_spacing))))
-
-    # Load resistors (2× 500Ω) and tail resistor (200Ω)
-    if rppd_idx is not None:
-        mixer.insert(pya.CellInstArray(rppd_idx, pya.Trans(um(cx - 20), um(cy + 80))))
-        mixer.insert(pya.CellInstArray(rppd_idx, pya.Trans(um(cx + 20), um(cy + 80))))
-        mixer.insert(pya.CellInstArray(rppd_idx, pya.Trans(um(cx - 0.45), um(cy - 70))))
-
-    # === INTRA-BLOCK ROUTING ===
-    pcx = 3.9
-    col_dy = 5.425   # upper = collector
-    bas_dy = 1.775   # lower = base
-    emi_dy = 3.6     # M2 = emitter
-
-    def via_n(cell, x, y, bot_layer, via_layer, top_layer):
+    # Helper: single via between two metal layers
+    def via_n(x, y, bot_layer, via_layer, top_layer):
         x, y = snap(x), snap(y)
         ps, vs = um(0.5), um(0.19)
         cxi, cyi = um(x), um(y)
-        cell.shapes(ly[bot_layer]).insert(pya.Box(cxi-ps//2, cyi-ps//2, cxi+ps//2, cyi+ps//2))
-        cell.shapes(ly[via_layer]).insert(pya.Box(cxi-vs//2, cyi-vs//2, cxi+vs//2, cyi+vs//2))
-        cell.shapes(ly[top_layer]).insert(pya.Box(cxi-ps//2, cyi-ps//2, cxi+ps//2, cyi+ps//2))
+        mixer.shapes(ly[bot_layer]).insert(pya.Box(cxi-ps//2, cyi-ps//2, cxi+ps//2, cyi+ps//2))
+        mixer.shapes(ly[via_layer]).insert(pya.Box(cxi-vs//2, cyi-vs//2, cxi+vs//2, cyi+vs//2))
+        mixer.shapes(ly[top_layer]).insert(pya.Box(cxi-ps//2, cyi-ps//2, cxi+ps//2, cyi+ps//2))
 
-    # Device positions
-    q1_x = cx - pair_gap/2 - 7.8   # 127.2
-    q2_x = cx + pair_gap/2          # 165.0
-    sw1_x = cx - pair_gap/2 - 7.8 - 15  # 112.2
-    sw2_x = cx - pair_gap/2 - 7.8       # 127.2
-    sw3_x = cx + pair_gap/2              # 165.0
-    sw4_x = cx + pair_gap/2 + 15         # 180.0
+    # Helper: horizontal M-layer wire
+    def hwire(layer, x1, x2, y, hw=0.25):
+        mixer.shapes(ly[layer]).insert(pya.Box(um(min(x1,x2)-hw), um(y-hw), um(max(x1,x2)+hw), um(y+hw)))
 
-    q1_ys = [cy - 40 + i*hbt_spacing for i in range(4)]   # 185,195,205,215
-    q2_ys = [cy - 40 + i*hbt_spacing for i in range(4)]
-    sw1_ys = [cy + 40 + i*hbt_spacing for i in range(2)]  # 265,275
-    sw2_ys = [cy + 40 + i*hbt_spacing for i in range(2)]
-    sw3_ys = [cy + 40 + i*hbt_spacing for i in range(2)]
-    sw4_ys = [cy + 40 + i*hbt_spacing for i in range(2)]
+    # Helper: vertical M-layer wire
+    def vwire(layer, x, y1, y2, hw=0.25):
+        mixer.shapes(ly[layer]).insert(pya.Box(um(x-hw), um(min(y1,y2)-hw), um(x+hw), um(max(y1,y2)+hw)))
 
-    # Pin center X for each column
-    q1_px = q1_x + pcx    # 131.1
-    q2_px = q2_x + pcx    # 168.9
-    sw1_px = sw1_x + pcx  # 116.1
-    sw2_px = sw2_x + pcx  # 131.1
-    sw3_px = sw3_x + pcx  # 168.9
-    sw4_px = sw4_x + pcx  # 183.9
+    # ================================================================
+    # DEVICE PLACEMENT
+    # ================================================================
+    # npn13G2L pin offsets from cell origin:
+    #   C at (3.9, 5.425) on M1
+    #   B at (3.9, 1.775) on M1
+    #   E at (3.9, 3.6)   on M2
+    pcx = 3.9
+    col_dy = 5.425
+    bas_dy = 1.775
+    emi_dy = 3.6
 
-    # --- MIDL (M3): Q1.C + SW1.E + SW2.E ---
-    midl_bus_x = 108.0
-    for qy in q1_ys:
-        via_n(mixer, q1_px, qy+col_dy, 'M1', 'Via1', 'M2')
-        via_n(mixer, q1_px, qy+col_dy, 'M2', 'Via2', 'M3')
-    for qy in sw1_ys:
-        via_n(mixer, sw1_px, qy+emi_dy, 'M2', 'Via2', 'M3')
-    for qy in sw2_ys:
-        via_n(mixer, sw2_px, qy+emi_dy, 'M2', 'Via2', 'M3')
-    # M3 bus vertical
-    mixer.shapes(ly['M3']).insert(pya.Box(
-        um(midl_bus_x-0.25), um(q1_ys[0]+col_dy-0.25),
-        um(midl_bus_x+0.25), um(sw2_ys[1]+emi_dy+0.25)))
-    # Stubs from bus to Q1.C pads
-    for qy in q1_ys:
-        mixer.shapes(ly['M3']).insert(pya.Box(
-            um(midl_bus_x-0.25), um(qy+col_dy-0.25), um(q1_px+0.25), um(qy+col_dy+0.25)))
-    # Stubs from bus to SW1.E pads
-    for qy in sw1_ys:
-        mixer.shapes(ly['M3']).insert(pya.Box(
-            um(midl_bus_x-0.25), um(qy+emi_dy-0.25), um(sw1_px+0.25), um(qy+emi_dy+0.25)))
-    # Stubs from bus to SW2.E pads
-    for qy in sw2_ys:
-        mixer.shapes(ly['M3']).insert(pya.Box(
-            um(midl_bus_x-0.25), um(qy+emi_dy-0.25), um(sw2_px+0.25), um(qy+emi_dy+0.25)))
+    hbt_sp = 10.0  # vertical spacing between fingers
+    pair_gap = 30.0
 
-    # --- MIDR (M3): Q2.C + SW3.E + SW4.E ---
-    midr_bus_x = 192.0
-    for qy in q2_ys:
-        via_n(mixer, q2_px, qy+col_dy, 'M1', 'Via1', 'M2')
-        via_n(mixer, q2_px, qy+col_dy, 'M2', 'Via2', 'M3')
-    for qy in sw3_ys:
-        via_n(mixer, sw3_px, qy+emi_dy, 'M2', 'Via2', 'M3')
-    for qy in sw4_ys:
-        via_n(mixer, sw4_px, qy+emi_dy, 'M2', 'Via2', 'M3')
-    mixer.shapes(ly['M3']).insert(pya.Box(
-        um(midr_bus_x-0.25), um(q2_ys[0]+col_dy-0.25),
-        um(midr_bus_x+0.25), um(sw4_ys[1]+emi_dy+0.25)))
-    for qy in q2_ys:
-        mixer.shapes(ly['M3']).insert(pya.Box(
-            um(q2_px-0.25), um(qy+col_dy-0.25), um(midr_bus_x+0.25), um(qy+col_dy+0.25)))
-    for qy in sw3_ys:
-        mixer.shapes(ly['M3']).insert(pya.Box(
-            um(sw3_px-0.25), um(qy+emi_dy-0.25), um(midr_bus_x+0.25), um(qy+emi_dy+0.25)))
-    for qy in sw4_ys:
-        mixer.shapes(ly['M3']).insert(pya.Box(
-            um(sw4_px-0.25), um(qy+emi_dy-0.25), um(midr_bus_x+0.25), um(qy+emi_dy+0.25)))
+    # --- RF transconductor pair: Q20 (left, 4 fingers), Q21 (right, 4 fingers) ---
+    q20_x = cx - pair_gap/2 - 7.8   # cell origin X for Q20 column
+    q21_x = cx + pair_gap/2          # cell origin X for Q21 column
+    q20_ys = [cy - 60 + i*hbt_sp for i in range(4)]
+    q21_ys = [cy - 60 + i*hbt_sp for i in range(4)]
 
-    # --- TAIL (M4): Q1.E + Q2.E ---
-    tail_vl = q1_px + 3.0   # 134.1 (offset right of Q1 pins)
-    tail_vr = q2_px - 3.0   # 165.9 (offset left of Q2 pins)
-    tail_hy = q1_ys[0] + emi_dy - 3.0  # 185.6 (below bottom device)
-    for qy in q1_ys:
-        via_n(mixer, q1_px, qy+emi_dy, 'M2', 'Via2', 'M3')
-        via_n(mixer, q1_px, qy+emi_dy, 'M3', 'Via3', 'M4')
-        mixer.shapes(ly['M4']).insert(pya.Box(
-            um(q1_px-0.25), um(qy+emi_dy-0.25), um(tail_vl+0.25), um(qy+emi_dy+0.25)))
-    for qy in q2_ys:
-        via_n(mixer, q2_px, qy+emi_dy, 'M2', 'Via2', 'M3')
-        via_n(mixer, q2_px, qy+emi_dy, 'M3', 'Via3', 'M4')
-        mixer.shapes(ly['M4']).insert(pya.Box(
-            um(tail_vr-0.25), um(qy+emi_dy-0.25), um(q2_px+0.25), um(qy+emi_dy+0.25)))
-    # M4 verticals
-    mixer.shapes(ly['M4']).insert(pya.Box(
-        um(tail_vl-0.25), um(tail_hy-0.25),
-        um(tail_vl+0.25), um(q1_ys[3]+emi_dy+0.25)))
-    mixer.shapes(ly['M4']).insert(pya.Box(
-        um(tail_vr-0.25), um(tail_hy-0.25),
-        um(tail_vr+0.25), um(q2_ys[3]+emi_dy+0.25)))
-    # M4 horizontal connecting both verticals
-    mixer.shapes(ly['M4']).insert(pya.Box(
-        um(tail_vl-0.25), um(tail_hy-0.25), um(tail_vr+0.25), um(tail_hy+0.25)))
+    # --- LO switching quad (4 devices × 4 fingers each) ---
+    # Q22: C=2V4, B=LOP_I, E=ELOL  (left-inner)
+    # Q23: C=IFN, B=LON_I, E=ELOL  (left-outer)
+    # Q24: C=IFN, B=LOP_I, E=ELOR  (right-outer)
+    # Q25: C=IFP, B=LON_I, E=ELOR  (right-inner)
+    lo_base_y = cy + 50
+    q22_x = cx - pair_gap/2 - 7.8       # same column as Q20
+    q23_x = cx - pair_gap/2 - 7.8 - 15  # outer left
+    q24_x = cx + pair_gap/2 + 15         # outer right
+    q25_x = cx + pair_gap/2              # same column as Q21
 
-    # --- RF_P (M4): Q1.B ---
-    rfp_bus_x = q1_px - 8.0  # 123.1
-    for qy in q1_ys:
-        via_n(mixer, q1_px, qy+bas_dy, 'M1', 'Via1', 'M2')
-        via_n(mixer, q1_px, qy+bas_dy, 'M2', 'Via2', 'M3')
-        via_n(mixer, q1_px, qy+bas_dy, 'M3', 'Via3', 'M4')
-        mixer.shapes(ly['M4']).insert(pya.Box(
-            um(rfp_bus_x-0.25), um(qy+bas_dy-0.25), um(q1_px+0.25), um(qy+bas_dy+0.25)))
-    mixer.shapes(ly['M4']).insert(pya.Box(
-        um(rfp_bus_x-0.25), um(q1_ys[0]+bas_dy-0.25),
-        um(rfp_bus_x+0.25), um(q1_ys[3]+bas_dy+0.25)))
+    q22_ys = [lo_base_y + i*hbt_sp for i in range(4)]
+    q23_ys = [lo_base_y + i*hbt_sp for i in range(4)]
+    q24_ys = [lo_base_y + i*hbt_sp for i in range(4)]
+    q25_ys = [lo_base_y + i*hbt_sp for i in range(4)]
 
-    # --- RF_N (M4): Q2.B ---
-    rfn_bus_x = q2_px + pcx + 4.1  # 176.9... let me use 177.0
-    rfn_bus_x = q2_px + 8.0  # 173.0
-    for qy in q2_ys:
-        via_n(mixer, q2_px, qy+bas_dy, 'M1', 'Via1', 'M2')
-        via_n(mixer, q2_px, qy+bas_dy, 'M2', 'Via2', 'M3')
-        via_n(mixer, q2_px, qy+bas_dy, 'M3', 'Via3', 'M4')
-        mixer.shapes(ly['M4']).insert(pya.Box(
-            um(q2_px-0.25), um(qy+bas_dy-0.25), um(rfn_bus_x+0.25), um(qy+bas_dy+0.25)))
-    mixer.shapes(ly['M4']).insert(pya.Box(
-        um(rfn_bus_x-0.25), um(q2_ys[0]+bas_dy-0.25),
-        um(rfn_bus_x+0.25), um(q2_ys[3]+bas_dy+0.25)))
+    # --- Bias transistors: Q26 (Nx=1), Q27 (Nx=1) ---
+    q26_x = cx - 50
+    q26_y = cy + 110
+    q27_x = cx + 40
+    q27_y = cy - 100
 
-    # --- LO_P (M5): SW1.B + SW4.B (cross-connected) ---
-    # Route LO on M5 to avoid M4 overlap with IF M4 pads
-    lop_hy = sw1_ys[0] + bas_dy - 3.0  # 263.775
-    for qy in sw1_ys:
-        via_n(mixer, sw1_px, qy+bas_dy, 'M1', 'Via1', 'M2')
-        via_n(mixer, sw1_px, qy+bas_dy, 'M2', 'Via2', 'M3')
-        via_n(mixer, sw1_px, qy+bas_dy, 'M3', 'Via3', 'M4')
-        via_n(mixer, sw1_px, qy+bas_dy, 'M4', 'Via4', 'M5')
-    for qy in sw4_ys:
-        via_n(mixer, sw4_px, qy+bas_dy, 'M1', 'Via1', 'M2')
-        via_n(mixer, sw4_px, qy+bas_dy, 'M2', 'Via2', 'M3')
-        via_n(mixer, sw4_px, qy+bas_dy, 'M3', 'Via3', 'M4')
-        via_n(mixer, sw4_px, qy+bas_dy, 'M4', 'Via4', 'M5')
-    # M5 verticals for SW1.B
-    mixer.shapes(ly['M5']).insert(pya.Box(
-        um(sw1_px-0.25), um(sw1_ys[0]+bas_dy-0.25),
-        um(sw1_px+0.25), um(sw1_ys[1]+bas_dy+0.25)))
-    # M5 verticals for SW4.B
-    mixer.shapes(ly['M5']).insert(pya.Box(
-        um(sw4_px-0.25), um(sw4_ys[0]+bas_dy-0.25),
-        um(sw4_px+0.25), um(sw4_ys[1]+bas_dy+0.25)))
-    # M5 horizontal connecting SW1 and SW4 (at bottom base Y)
-    mixer.shapes(ly['M5']).insert(pya.Box(
-        um(sw1_px-0.25), um(lop_hy-0.25), um(sw4_px+0.25), um(lop_hy+0.25)))
-    # M5 stubs from verticals to horizontal
-    mixer.shapes(ly['M5']).insert(pya.Box(
-        um(sw1_px-0.25), um(lop_hy-0.25), um(sw1_px+0.25), um(sw1_ys[0]+bas_dy+0.25)))
-    mixer.shapes(ly['M5']).insert(pya.Box(
-        um(sw4_px-0.25), um(lop_hy-0.25), um(sw4_px+0.25), um(sw4_ys[0]+bas_dy+0.25)))
-
-    # --- LO_N (M5): SW2.B + SW3.B ---
-    lon_hy = sw2_ys[1] + bas_dy + 3.0  # 279.775
-    for qy in sw2_ys:
-        via_n(mixer, sw2_px, qy+bas_dy, 'M1', 'Via1', 'M2')
-        via_n(mixer, sw2_px, qy+bas_dy, 'M2', 'Via2', 'M3')
-        via_n(mixer, sw2_px, qy+bas_dy, 'M3', 'Via3', 'M4')
-        via_n(mixer, sw2_px, qy+bas_dy, 'M4', 'Via4', 'M5')
-    for qy in sw3_ys:
-        via_n(mixer, sw3_px, qy+bas_dy, 'M1', 'Via1', 'M2')
-        via_n(mixer, sw3_px, qy+bas_dy, 'M2', 'Via2', 'M3')
-        via_n(mixer, sw3_px, qy+bas_dy, 'M3', 'Via3', 'M4')
-        via_n(mixer, sw3_px, qy+bas_dy, 'M4', 'Via4', 'M5')
-    # M5 verticals for SW2.B
-    mixer.shapes(ly['M5']).insert(pya.Box(
-        um(sw2_px-0.25), um(sw2_ys[0]+bas_dy-0.25),
-        um(sw2_px+0.25), um(lon_hy+0.25)))
-    # M5 verticals for SW3.B
-    mixer.shapes(ly['M5']).insert(pya.Box(
-        um(sw3_px-0.25), um(sw3_ys[0]+bas_dy-0.25),
-        um(sw3_px+0.25), um(lon_hy+0.25)))
-    # M5 horizontal
-    mixer.shapes(ly['M5']).insert(pya.Box(
-        um(sw2_px-0.25), um(lon_hy-0.25), um(sw3_px+0.25), um(lon_hy+0.25)))
-
-    # --- IF_P (M4): SW1.C + SW4.C ---
-    # Use M4 with offset X verticals to avoid LO M4 pads
-    ifp_vl = sw1_px - 3.0   # 113.1 (left of SW1 pins)
-    ifp_vr = sw4_px + 3.0   # 186.9 (right of SW4 pins)
-    ifp_hy = sw1_ys[1] + col_dy + 3.0  # 283.425
-    for qy in sw1_ys:
-        via_n(mixer, sw1_px, qy+col_dy, 'M1', 'Via1', 'M2')
-        via_n(mixer, sw1_px, qy+col_dy, 'M2', 'Via2', 'M3')
-        via_n(mixer, sw1_px, qy+col_dy, 'M3', 'Via3', 'M4')
-        mixer.shapes(ly['M4']).insert(pya.Box(
-            um(ifp_vl-0.25), um(qy+col_dy-0.25), um(sw1_px+0.25), um(qy+col_dy+0.25)))
-    for qy in sw4_ys:
-        via_n(mixer, sw4_px, qy+col_dy, 'M1', 'Via1', 'M2')
-        via_n(mixer, sw4_px, qy+col_dy, 'M2', 'Via2', 'M3')
-        via_n(mixer, sw4_px, qy+col_dy, 'M3', 'Via3', 'M4')
-        mixer.shapes(ly['M4']).insert(pya.Box(
-            um(sw4_px-0.25), um(qy+col_dy-0.25), um(ifp_vr+0.25), um(qy+col_dy+0.25)))
-    # M4 verticals at offset X
-    mixer.shapes(ly['M4']).insert(pya.Box(
-        um(ifp_vl-0.25), um(sw1_ys[0]+col_dy-0.25),
-        um(ifp_vl+0.25), um(ifp_hy+0.25)))
-    mixer.shapes(ly['M4']).insert(pya.Box(
-        um(ifp_vr-0.25), um(sw4_ys[0]+col_dy-0.25),
-        um(ifp_vr+0.25), um(ifp_hy+0.25)))
-    # M4 horizontal connecting both
-    mixer.shapes(ly['M4']).insert(pya.Box(
-        um(ifp_vl-0.25), um(ifp_hy-0.25), um(ifp_vr+0.25), um(ifp_hy+0.25)))
-
-    # --- IF_N (M4): SW2.C + SW3.C ---
-    # Route on M4 with horizontal BELOW IF_P horizontal and offset X verticals
-    ifn_vl = sw2_px + 3.0   # 134.1
-    ifn_vr = sw3_px - 3.0   # 165.9
-    ifn_hy = sw2_ys[0] + col_dy - 3.0  # 267.425 (below IF_P horizontal at 283.425)
-    for qy in sw2_ys:
-        via_n(mixer, sw2_px, qy+col_dy, 'M1', 'Via1', 'M2')
-        via_n(mixer, sw2_px, qy+col_dy, 'M2', 'Via2', 'M3')
-        via_n(mixer, sw2_px, qy+col_dy, 'M3', 'Via3', 'M4')
-        mixer.shapes(ly['M4']).insert(pya.Box(
-            um(sw2_px-0.25), um(qy+col_dy-0.25), um(ifn_vl+0.25), um(qy+col_dy+0.25)))
-    for qy in sw3_ys:
-        via_n(mixer, sw3_px, qy+col_dy, 'M1', 'Via1', 'M2')
-        via_n(mixer, sw3_px, qy+col_dy, 'M2', 'Via2', 'M3')
-        via_n(mixer, sw3_px, qy+col_dy, 'M3', 'Via3', 'M4')
-        mixer.shapes(ly['M4']).insert(pya.Box(
-            um(ifn_vr-0.25), um(qy+col_dy-0.25), um(sw3_px+0.25), um(qy+col_dy+0.25)))
-    # M4 verticals at offset X
-    mixer.shapes(ly['M4']).insert(pya.Box(
-        um(ifn_vl-0.25), um(ifn_hy-0.25),
-        um(ifn_vl+0.25), um(sw2_ys[1]+col_dy+0.25)))
-    mixer.shapes(ly['M4']).insert(pya.Box(
-        um(ifn_vr-0.25), um(ifn_hy-0.25),
-        um(ifn_vr+0.25), um(sw3_ys[1]+col_dy+0.25)))
-    # M4 horizontal
-    mixer.shapes(ly['M4']).insert(pya.Box(
-        um(ifn_vl-0.25), um(ifn_hy-0.25), um(ifn_vr+0.25), um(ifn_hy+0.25)))
-
-    print("Nets routed: MIDL, MIDR, TAIL, RF_P, RF_N, LO_P, LO_N, IF_P, IF_N")
-
-    # ----------------------------------------------------------------
-    # M5 Port Access Pads
-    # Via stacks from internal M3/M4 buses up to M5 with 5µm pads
-    # ----------------------------------------------------------------
-
-    # VCC: 3 taps along M3 VCC rail at y=360 (x=60, 150, 240)
-    for vcc_tap_x in [60.0, 150.0, 240.0]:
-        via_n(mixer, vcc_tap_x, 360.0, 'M3', 'Via3', 'M4')
-        via_n(mixer, vcc_tap_x, 360.0, 'M4', 'Via4', 'M5')
-        mixer.shapes(ly['M5']).insert(pya.Box(
-            um(vcc_tap_x - 2.5), um(360.0 - 2.5),
-            um(vcc_tap_x + 2.5), um(360.0 + 2.5)))
-    mixer.shapes(ly['M5']).insert(pya.Text("VCC", pya.Trans(um(150.0), um(360.0))))
-
-    # TAIL: tap at (150, 185.6) on M4 bus → M5
-    # Short M4 stub from tail_vl (134.1) to tap point at cx=150
-    mixer.shapes(ly['M4']).insert(pya.Box(
-        um(tail_vl - 0.25), um(tail_hy - 0.25),
-        um(150.0 + 0.25), um(tail_hy + 0.25)))
-    via_n(mixer, 150.0, tail_hy, 'M4', 'Via4', 'M5')
-    mixer.shapes(ly['M5']).insert(pya.Box(
-        um(150.0 - 2.5), um(tail_hy - 2.5),
-        um(150.0 + 2.5), um(tail_hy + 2.5)))
-    mixer.shapes(ly['M5']).insert(pya.Text("TAIL", pya.Trans(um(150.0), um(tail_hy))))
-
-    # RF_P: tap at (123.1, 200) on M4 bus rfp_bus_x=123.1
-    via_n(mixer, rfp_bus_x, 200.0, 'M4', 'Via4', 'M5')
-    mixer.shapes(ly['M5']).insert(pya.Box(
-        um(rfp_bus_x - 2.5), um(200.0 - 2.5),
-        um(rfp_bus_x + 2.5), um(200.0 + 2.5)))
-    mixer.shapes(ly['M5']).insert(pya.Text("RF_P", pya.Trans(um(rfp_bus_x), um(200.0))))
-
-    # RF_N: tap at (173.0, 200) on M4 bus rfn_bus_x
-    via_n(mixer, rfn_bus_x, 200.0, 'M4', 'Via4', 'M5')
-    mixer.shapes(ly['M5']).insert(pya.Box(
-        um(rfn_bus_x - 2.5), um(200.0 - 2.5),
-        um(rfn_bus_x + 2.5), um(200.0 + 2.5)))
-    mixer.shapes(ly['M5']).insert(pya.Text("RF_N", pya.Trans(um(rfn_bus_x), um(200.0))))
-
-    # LO_P: already on M5 (lop_hy=263.775), add 5µm pad at (150, 263.775)
-    mixer.shapes(ly['M5']).insert(pya.Box(
-        um(150.0 - 2.5), um(lop_hy - 2.5),
-        um(150.0 + 2.5), um(lop_hy + 2.5)))
-    mixer.shapes(ly['M5']).insert(pya.Text("LO_P", pya.Trans(um(150.0), um(lop_hy))))
-
-    # LO_N: already on M5 (lon_hy=279.775), add 5µm pad at (150, 279.775)
-    mixer.shapes(ly['M5']).insert(pya.Box(
-        um(150.0 - 2.5), um(lon_hy - 2.5),
-        um(150.0 + 2.5), um(lon_hy + 2.5)))
-    mixer.shapes(ly['M5']).insert(pya.Text("LO_N", pya.Trans(um(150.0), um(lon_hy))))
-
-    # IF_P: tap at (ifp_vl=113.1, ifp_hy=283.425) on M4 bus → M5
-    via_n(mixer, ifp_vl, ifp_hy, 'M4', 'Via4', 'M5')
-    mixer.shapes(ly['M5']).insert(pya.Box(
-        um(ifp_vl - 2.5), um(ifp_hy - 2.5),
-        um(ifp_vl + 2.5), um(ifp_hy + 2.5)))
-    mixer.shapes(ly['M5']).insert(pya.Text("IF_P", pya.Trans(um(ifp_vl), um(ifp_hy))))
-
-    # IF_N: tap at (ifn_vl=134.1, ifn_hy=267.425) on M4 bus → M5
-    via_n(mixer, ifn_vl, ifn_hy, 'M4', 'Via4', 'M5')
-    mixer.shapes(ly['M5']).insert(pya.Box(
-        um(ifn_vl - 2.5), um(ifn_hy - 2.5),
-        um(ifn_vl + 2.5), um(ifn_hy + 2.5)))
-    mixer.shapes(ly['M5']).insert(pya.Text("IF_N", pya.Trans(um(ifn_vl), um(ifn_hy))))
-
-    # CPW TLs
-    inp_x = cx - pair_gap/2 - 3.9
-    inn_x = cx + pair_gap/2 + 3.9
-
-    # TL_RF: 125µm (RF input matching)
-    create_cpw(mixer, ly['TM2'], ly['TM2'], inp_x, cy - 80, 125.0, 'down')
-    create_cpw(mixer, ly['TM2'], ly['TM2'], inn_x, cy - 80, 125.0, 'down')
-
-    # TL_LO: 49µm (LO feed)
-    create_cpw(mixer, ly['TM2'], ly['TM2'], inp_x, cy + 70, 49.0, 'up')
-    create_cpw(mixer, ly['TM2'], ly['TM2'], inn_x, cy + 70, 49.0, 'up')
-
-    # Via stacks
-    create_via_stack(mixer, ly, inp_x, cy - 80)
-    create_via_stack(mixer, ly, inn_x, cy - 80)
-    create_via_stack(mixer, ly, inp_x, cy + 70)
-    create_via_stack(mixer, ly, inn_x, cy + 70)
-
-    # VCC rail
-    mixer.shapes(ly['M3']).insert(pya.Box(um(10), um(cy + 130), um(CELL_W - 10), um(cy + 140)))
-
-    # ----------------------------------------------------------------
-    # Additional devices for LVS (matching MIXER_77GD.sch)
-    # ----------------------------------------------------------------
-    # Q26: LO bias diode-connected BJT
+    # Place all npn instances
     if npn_idx is not None:
-        mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(cx - 30), um(cy + 90))))
-        # Q27: RF bias diode-connected BJT
-        mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(cx + 22), um(cy - 90))))
+        for qy in q20_ys:
+            mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(q20_x), um(qy))))
+        for qy in q21_ys:
+            mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(q21_x), um(qy))))
+        for qy in q22_ys:
+            mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(q22_x), um(qy))))
+        for qy in q23_ys:
+            mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(q23_x), um(qy))))
+        for qy in q24_ys:
+            mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(q24_x), um(qy))))
+        for qy in q25_ys:
+            mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(q25_x), um(qy))))
+        mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(q26_x), um(q26_y))))
+        mixer.insert(pya.CellInstArray(npn_idx, pya.Trans(um(q27_x), um(q27_y))))
 
-    # R23: LO bias resistor (rppd)
-    if rppd_idx is not None:
-        mixer.insert(pya.CellInstArray(rppd_idx, pya.Trans(um(cx - 30), um(cy + 105))))
+    print("Placed 26 npn13G2L instances (4+4+4+4+4+4+1+1)")
 
-    # C37-C43: Bypass and decoupling caps (cmim)
+    # Pin center positions
+    q20_px = q20_x + pcx
+    q21_px = q21_x + pcx
+    q22_px = q22_x + pcx
+    q23_px = q23_x + pcx
+    q24_px = q24_x + pcx
+    q25_px = q25_x + pcx
+    q26_px = q26_x + pcx
+    q27_px = q27_x + pcx
+
+    # ================================================================
+    # RESISTORS (parameterized rppd via pdk_devices)
+    # ================================================================
+    # R21: w=3.0u, l=18.23u, m=2, P=2V4, M=2V4
+    r21_x, r21_y = 40.0, cy + 130
+    r21_pins = create_rppd(mixer, layout, r21_x, r21_y, 3.0, 18.23, m=2)
+
+    # R22: w=3.0u, l=18.23u, m=2, P=2V4, M=2V4
+    r22_x, r22_y = 60.0, cy + 130
+    r22_pins = create_rppd(mixer, layout, r22_x, r22_y, 3.0, 18.23, m=2)
+
+    # R23: w=3.0u, l=27.48u, m=1, P=2V4, M=net1
+    r23_x, r23_y = 80.0, cy + 130
+    r23_pins = create_rppd(mixer, layout, r23_x, r23_y, 3.0, 27.48, m=1)
+
+    # R24: w=3.0u, l=27.48u, m=1, P=2V4, M=2V4
+    r24_x, r24_y = 92.0, cy + 130
+    r24_pins = create_rppd(mixer, layout, r24_x, r24_y, 3.0, 27.48, m=1)
+
+    print("Placed 4 rppd (parameterized)")
+
+    # ================================================================
+    # CAPACITORS (cmim)
+    # ================================================================
     if cmim_idx is not None:
-        # C37/C38: LO input bypass
-        mixer.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(cx - 45), um(cy + 70))))
-        mixer.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(cx + 37), um(cy + 70))))
-        # C39/C40: RF input bypass
-        mixer.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(cx - 45), um(cy - 70))))
-        mixer.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(cx + 37), um(cy - 70))))
-        # C41-C43: Supply decoupling (placed near VCC rail)
+        # C37: LOP — LOP_I
+        mixer.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(cx - 55), um(cy + 55))))
+        # C38: LON — LON_I
+        mixer.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(cx + 42), um(cy + 55))))
+        # C39: RFP — RFP_I
+        mixer.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(cx - 55), um(cy - 80))))
+        # C40: RFN — RFN_I
+        mixer.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(cx + 42), um(cy - 80))))
+        # C41-C43: 2V4 — GND (supply bypass, near VCC rail)
         for i in range(3):
-            mixer.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(20 + i * 30), um(cy + 150))))
+            mixer.insert(pya.CellInstArray(cmim_idx, pya.Trans(um(200 + i * 20), um(cy + 150))))
+    print("Placed 7 cap_cmim")
 
-    # Port labels (matched to xschem MIXER_77GD.sch for LVS)
-    mixer.shapes(ly['TM2']).insert(pya.Text("RFP", pya.Trans(um(inp_x), um(cy - 210))))
-    mixer.shapes(ly['TM2']).insert(pya.Text("RFN", pya.Trans(um(inn_x), um(cy - 210))))
-    mixer.shapes(ly['TM2']).insert(pya.Text("LOP", pya.Trans(um(inp_x), um(cy + 125))))
-    mixer.shapes(ly['TM2']).insert(pya.Text("LON", pya.Trans(um(inn_x), um(cy + 125))))
-    mixer.shapes(ly['M3']).insert(pya.Text("2V4", pya.Trans(um(cx), um(cy + 135))))
+    # ================================================================
+    # ROUTING — Match schematic net connectivity
+    # ================================================================
 
-    # IF port labels on M5
-    mixer.shapes(ly['M5']).insert(pya.Text("IFP", pya.Trans(um(inp_x - 10), um(cy + 100))))
-    mixer.shapes(ly['M5']).insert(pya.Text("IFN", pya.Trans(um(inn_x + 10), um(cy + 100))))
-    mixer.shapes(ly['M5']).insert(pya.Text("GND", pya.Trans(um(cx), um(cy - 120))))
+    # --- Net ELOL (M3): Q20.C + Q22.E + Q23.E ---
+    elol_bus_x = q23_px - 5.0
+    # Q20.C: M1 → M3
+    for qy in q20_ys:
+        via_n(q20_px, qy+col_dy, 'M1', 'Via1', 'M2')
+        via_n(q20_px, qy+col_dy, 'M2', 'Via2', 'M3')
+    # Q22.E (M2) → M3
+    for qy in q22_ys:
+        via_n(q22_px, qy+emi_dy, 'M2', 'Via2', 'M3')
+    # Q23.E (M2) → M3
+    for qy in q23_ys:
+        via_n(q23_px, qy+emi_dy, 'M2', 'Via2', 'M3')
+    # M3 vertical bus
+    elol_y_min = q20_ys[0] + col_dy
+    elol_y_max = q23_ys[3] + emi_dy
+    vwire('M3', elol_bus_x, elol_y_min, elol_y_max)
+    # Stubs to Q20.C
+    for qy in q20_ys:
+        hwire('M3', elol_bus_x, q20_px, qy+col_dy)
+    # Stubs to Q22.E
+    for qy in q22_ys:
+        hwire('M3', elol_bus_x, q22_px, qy+emi_dy)
+    # Stubs to Q23.E
+    for qy in q23_ys:
+        hwire('M3', elol_bus_x, q23_px, qy+emi_dy)
 
+    # --- Net ELOR (M3): Q21.C + Q24.E + Q25.E ---
+    elor_bus_x = q24_px + 5.0
+    for qy in q21_ys:
+        via_n(q21_px, qy+col_dy, 'M1', 'Via1', 'M2')
+        via_n(q21_px, qy+col_dy, 'M2', 'Via2', 'M3')
+    for qy in q24_ys:
+        via_n(q24_px, qy+emi_dy, 'M2', 'Via2', 'M3')
+    for qy in q25_ys:
+        via_n(q25_px, qy+emi_dy, 'M2', 'Via2', 'M3')
+    elor_y_min = q21_ys[0] + col_dy
+    elor_y_max = q24_ys[3] + emi_dy
+    vwire('M3', elor_bus_x, elor_y_min, elor_y_max)
+    for qy in q21_ys:
+        hwire('M3', q21_px, elor_bus_x, qy+col_dy)
+    for qy in q24_ys:
+        hwire('M3', q24_px, elor_bus_x, qy+emi_dy)
+    for qy in q25_ys:
+        hwire('M3', q25_px, elor_bus_x, qy+emi_dy)
+
+    # --- Net GND (M4): Q20.E + Q21.E + Q27.E ---
+    # Q20.E and Q21.E are on M2; route to M4 shared bus
+    gnd_hy = q20_ys[0] + emi_dy - 5.0
+    for qy in q20_ys:
+        via_n(q20_px, qy+emi_dy, 'M2', 'Via2', 'M3')
+        via_n(q20_px, qy+emi_dy, 'M3', 'Via3', 'M4')
+    for qy in q21_ys:
+        via_n(q21_px, qy+emi_dy, 'M2', 'Via2', 'M3')
+        via_n(q21_px, qy+emi_dy, 'M3', 'Via3', 'M4')
+    # Q27.E
+    via_n(q27_px, q27_y+emi_dy, 'M2', 'Via2', 'M3')
+    via_n(q27_px, q27_y+emi_dy, 'M3', 'Via3', 'M4')
+    # M4 vertical buses
+    vwire('M4', q20_px, gnd_hy, q20_ys[3]+emi_dy)
+    vwire('M4', q21_px, gnd_hy, q21_ys[3]+emi_dy)
+    # M4 horizontal connecting Q20.E, Q21.E columns at bottom
+    hwire('M4', q20_px, q21_px, gnd_hy)
+    # Connect Q27.E to GND bus
+    vwire('M4', q27_px, q27_y+emi_dy, gnd_hy)
+    hwire('M4', q21_px, q27_px, gnd_hy)
+
+    # --- Net RFP_I (M4): Q20.B ---
+    rfp_bus_x = q20_px - 5.0
+    for qy in q20_ys:
+        via_n(q20_px, qy+bas_dy, 'M1', 'Via1', 'M2')
+        via_n(q20_px, qy+bas_dy, 'M2', 'Via2', 'M3')
+        via_n(q20_px, qy+bas_dy, 'M3', 'Via3', 'M4')
+        hwire('M4', rfp_bus_x, q20_px, qy+bas_dy)
+    vwire('M4', rfp_bus_x, q20_ys[0]+bas_dy, q20_ys[3]+bas_dy)
+
+    # --- Net RFN_I (M4): Q21.B ---
+    rfn_bus_x = q21_px + 5.0
+    for qy in q21_ys:
+        via_n(q21_px, qy+bas_dy, 'M1', 'Via1', 'M2')
+        via_n(q21_px, qy+bas_dy, 'M2', 'Via2', 'M3')
+        via_n(q21_px, qy+bas_dy, 'M3', 'Via3', 'M4')
+        hwire('M4', q21_px, rfn_bus_x, qy+bas_dy)
+    vwire('M4', rfn_bus_x, q21_ys[0]+bas_dy, q21_ys[3]+bas_dy)
+
+    # --- Net LOP_I (M5): Q22.B + Q24.B ---
+    lop_hy = q22_ys[0] + bas_dy - 3.0
+    for qy in q22_ys:
+        via_n(q22_px, qy+bas_dy, 'M1', 'Via1', 'M2')
+        via_n(q22_px, qy+bas_dy, 'M2', 'Via2', 'M3')
+        via_n(q22_px, qy+bas_dy, 'M3', 'Via3', 'M4')
+        via_n(q22_px, qy+bas_dy, 'M4', 'Via4', 'M5')
+    for qy in q24_ys:
+        via_n(q24_px, qy+bas_dy, 'M1', 'Via1', 'M2')
+        via_n(q24_px, qy+bas_dy, 'M2', 'Via2', 'M3')
+        via_n(q24_px, qy+bas_dy, 'M3', 'Via3', 'M4')
+        via_n(q24_px, qy+bas_dy, 'M4', 'Via4', 'M5')
+    vwire('M5', q22_px, q22_ys[0]+bas_dy, q22_ys[3]+bas_dy)
+    vwire('M5', q24_px, q24_ys[0]+bas_dy, q24_ys[3]+bas_dy)
+    hwire('M5', q22_px, q24_px, lop_hy)
+    vwire('M5', q22_px, lop_hy, q22_ys[0]+bas_dy)
+    vwire('M5', q24_px, lop_hy, q24_ys[0]+bas_dy)
+
+    # --- Net LON_I (M5): Q23.B + Q25.B ---
+    lon_hy = q23_ys[3] + bas_dy + 3.0
+    for qy in q23_ys:
+        via_n(q23_px, qy+bas_dy, 'M1', 'Via1', 'M2')
+        via_n(q23_px, qy+bas_dy, 'M2', 'Via2', 'M3')
+        via_n(q23_px, qy+bas_dy, 'M3', 'Via3', 'M4')
+        via_n(q23_px, qy+bas_dy, 'M4', 'Via4', 'M5')
+    for qy in q25_ys:
+        via_n(q25_px, qy+bas_dy, 'M1', 'Via1', 'M2')
+        via_n(q25_px, qy+bas_dy, 'M2', 'Via2', 'M3')
+        via_n(q25_px, qy+bas_dy, 'M3', 'Via3', 'M4')
+        via_n(q25_px, qy+bas_dy, 'M4', 'Via4', 'M5')
+    vwire('M5', q23_px, q23_ys[0]+bas_dy, q23_ys[3]+bas_dy)
+    vwire('M5', q25_px, q25_ys[0]+bas_dy, q25_ys[3]+bas_dy)
+    hwire('M5', q23_px, q25_px, lon_hy)
+    vwire('M5', q23_px, q23_ys[3]+bas_dy, lon_hy)
+    vwire('M5', q25_px, q25_ys[3]+bas_dy, lon_hy)
+
+    # --- Net 2V4 (M3 rail): Q22.C + R21.P + R21.M + R22.P + R22.M + R23.P + R24.P + R24.M + C41-C43.c0 ---
+    # VCC/2V4 rail on M3 at top of cell
+    vcc_rail_y = cy + 125
+    mixer.shapes(ly['M3']).insert(pya.Box(um(10), um(vcc_rail_y), um(CELL_W - 10), um(vcc_rail_y + 2.0)))
+    # Q22.C → M3 via stubs to VCC rail
+    for qy in q22_ys:
+        via_n(q22_px, qy+col_dy, 'M1', 'Via1', 'M2')
+        via_n(q22_px, qy+col_dy, 'M2', 'Via2', 'M3')
+    vwire('M3', q22_px, q22_ys[0]+col_dy, vcc_rail_y)
+    # R21, R22, R23, R24 top pins (P) connect to VCC rail via M1 stubs
+    # R21.M, R22.M, R24.M also connect to VCC rail
+    # The rppd P pin is at top, M pin is at bottom
+    # Route resistor pins to VCC rail on M1→M3
+    for pins in [r21_pins, r22_pins, r24_pins]:
+        px, py = pins['P']
+        via_n(px, py, 'M1', 'Via1', 'M2')
+        via_n(px, py, 'M2', 'Via2', 'M3')
+        vwire('M3', px, py, vcc_rail_y)
+        mx, my = pins['M']
+        via_n(mx, my, 'M1', 'Via1', 'M2')
+        via_n(mx, my, 'M2', 'Via2', 'M3')
+        vwire('M3', mx, my, vcc_rail_y)
+    # R23.P connects to VCC rail
+    px, py = r23_pins['P']
+    via_n(px, py, 'M1', 'Via1', 'M2')
+    via_n(px, py, 'M2', 'Via2', 'M3')
+    vwire('M3', px, py, vcc_rail_y)
+    # R23.M is net1 (floating) — no routing needed
+
+    # --- Net IFN (M4): Q23.C + Q24.C ---
+    ifn_hy = q23_ys[0] + col_dy - 3.0
+    for qy in q23_ys:
+        via_n(q23_px, qy+col_dy, 'M1', 'Via1', 'M2')
+        via_n(q23_px, qy+col_dy, 'M2', 'Via2', 'M3')
+        via_n(q23_px, qy+col_dy, 'M3', 'Via3', 'M4')
+    for qy in q24_ys:
+        via_n(q24_px, qy+col_dy, 'M1', 'Via1', 'M2')
+        via_n(q24_px, qy+col_dy, 'M2', 'Via2', 'M3')
+        via_n(q24_px, qy+col_dy, 'M3', 'Via3', 'M4')
+    vwire('M4', q23_px, ifn_hy, q23_ys[3]+col_dy)
+    vwire('M4', q24_px, ifn_hy, q24_ys[3]+col_dy)
+    hwire('M4', q23_px, q24_px, ifn_hy)
+
+    # --- Net IFP (M4): Q25.C ---
+    for qy in q25_ys:
+        via_n(q25_px, qy+col_dy, 'M1', 'Via1', 'M2')
+        via_n(q25_px, qy+col_dy, 'M2', 'Via2', 'M3')
+        via_n(q25_px, qy+col_dy, 'M3', 'Via3', 'M4')
+    vwire('M4', q25_px, q25_ys[0]+col_dy, q25_ys[3]+col_dy)
+
+    # --- Net BIAS (M3): Q26.C + Q26.B (diode-connected) ---
+    via_n(q26_px, q26_y+col_dy, 'M1', 'Via1', 'M2')
+    via_n(q26_px, q26_y+col_dy, 'M2', 'Via2', 'M3')
+    via_n(q26_px, q26_y+bas_dy, 'M1', 'Via1', 'M2')
+    via_n(q26_px, q26_y+bas_dy, 'M2', 'Via2', 'M3')
+    # Connect C and B on M3
+    hwire('M3', q26_px, q26_px + 3.0, q26_y+col_dy)
+    vwire('M3', q26_px + 3.0, q26_y+bas_dy, q26_y+col_dy)
+    hwire('M3', q26_px, q26_px + 3.0, q26_y+bas_dy)
+
+    # --- Net BIAS_MID (M3): Q26.E + Q27.C + Q27.B ---
+    via_n(q26_px, q26_y+emi_dy, 'M2', 'Via2', 'M3')
+    via_n(q27_px, q27_y+col_dy, 'M1', 'Via1', 'M2')
+    via_n(q27_px, q27_y+col_dy, 'M2', 'Via2', 'M3')
+    via_n(q27_px, q27_y+bas_dy, 'M1', 'Via1', 'M2')
+    via_n(q27_px, q27_y+bas_dy, 'M2', 'Via2', 'M3')
+    # Connect Q27.C and Q27.B on M3 (diode)
+    bm_y = (q27_y+col_dy + q27_y+bas_dy) / 2
+    vwire('M3', q27_px + 3.0, q27_y+bas_dy, q27_y+col_dy)
+    hwire('M3', q27_px, q27_px + 3.0, q27_y+col_dy)
+    hwire('M3', q27_px, q27_px + 3.0, q27_y+bas_dy)
+    # Connect Q26.E to Q27.C/B net via M3 horizontal
+    bm_route_y = q26_y + emi_dy
+    hwire('M3', q26_px, q27_px + 3.0, bm_route_y)
+    vwire('M3', q27_px + 3.0, q27_y+col_dy, bm_route_y)
+
+    # ================================================================
+    # PORT LABELS (for LVS extraction)
+    # ================================================================
+    # GND port label on M4 GND bus
+    mixer.shapes(ly['M4']).insert(pya.Text("GND", pya.Trans(um(cx), um(gnd_hy))))
+    # 2V4 port on M3 VCC rail
+    mixer.shapes(ly['M3']).insert(pya.Text("2V4", pya.Trans(um(cx), um(vcc_rail_y + 1.0))))
+    # RFP_I — connect to cap C39 (need label on the net connecting Q20.B and C39)
+    mixer.shapes(ly['M4']).insert(pya.Text("RFP_I", pya.Trans(um(rfp_bus_x), um(q20_ys[2]+bas_dy))))
+    # RFN_I
+    mixer.shapes(ly['M4']).insert(pya.Text("RFN_I", pya.Trans(um(rfn_bus_x), um(q21_ys[2]+bas_dy))))
+
+    # External port labels (these become top-level ports in extraction)
+    # RFP, RFN on caps C39, C40 far side
+    # LOP, LON on caps C37, C38 far side
+    # IFP on Q25.C net, IFN on Q23.C+Q24.C net
+    mixer.shapes(ly['M4']).insert(pya.Text("IFP", pya.Trans(um(q25_px), um(q25_ys[0]+col_dy))))
+    mixer.shapes(ly['M4']).insert(pya.Text("IFN", pya.Trans(um(cx), um(ifn_hy))))
+
+    # LOP/LON port labels on M5 LO nets
+    mixer.shapes(ly['M5']).insert(pya.Text("LOP_I", pya.Trans(um(cx), um(lop_hy))))
+    mixer.shapes(ly['M5']).insert(pya.Text("LON_I", pya.Trans(um(cx), um(lon_hy))))
+
+    # BIAS label
+    mixer.shapes(ly['M3']).insert(pya.Text("BIAS", pya.Trans(um(q26_px + 3.0), um(q26_y+col_dy))))
+    # BIAS_MID label
+    mixer.shapes(ly['M3']).insert(pya.Text("BIAS_MID", pya.Trans(um(q27_px + 3.0), um(q27_y+col_dy))))
+
+    print("Routing complete")
+
+    # ================================================================
+    # OUTPUT
+    # ================================================================
     if ext_layout is None:
         output = "/home/bthomas3/Videos/77GHz_phased_array/layout/MIXER_77G_XTOR.gds"
         layout.write(output)
         print(f"\nMixer layout: {output}")
         print(f"Cell size: {CELL_W} x {CELL_H} um")
-        print(f"Devices: 18x npn13G2L + 4x rppd + 7x cmim")
+        print(f"Devices: 26x npn13G2L + 4x rppd + 7x cmim")
 
 
 if __name__ == "__main__":

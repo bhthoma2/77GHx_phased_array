@@ -1,0 +1,16 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/TXPA_77G_LVS.sch
+**.subckt TXPA_77G_XTOR VCC INP INN VBIAS_CB GND sub! OUTP OUTN
+*.iopin 2V4
+*.iopin GND
+*.iopin INP
+*.iopin INN
+*.iopin OUTP
+*.iopin OUTN
+*.iopin VCB
+XQ1 MIDL INP net1 sub! npn13G2l Nx=4 El=2.5
+XQ2 MIDR INN net1 sub! npn13G2l Nx=4 El=2.5
+XQ3 2V4 VCB MIDL sub! npn13G2l Nx=4 El=2.5
+XQ4 2V4 VCB MIDR sub! npn13G2l Nx=4 El=2.5
+XR_bias net1 GND sub! rppd w=3.0u l=10.0u m=1 b=0
+**.ends
+.end

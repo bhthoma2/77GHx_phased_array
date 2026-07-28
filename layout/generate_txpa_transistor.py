@@ -125,27 +125,32 @@ def main(ext_layout=None):
                 x += slot_pitch
         y += slot_pitch
 
-    # HBTs: 4× Nx=8 = 32 instances total (differential cascode)
+    # HBTs: 4× Nx=4 = 16 instances total (differential cascode)
     hbt_spacing = 10.0
     pair_gap = 35.0
+    NX = 4
 
     if npn_idx is not None:
-        # Input pair Q1 (left, 8 instances)
-        for i in range(8):
+        # Input pair Q1 (left, Nx=4 instances)
+        for i in range(NX):
             pa.insert(pya.CellInstArray(npn_idx, pya.Trans(um(cx - pair_gap/2 - 7.8), um(cy - 60 + i * hbt_spacing))))
-        # Input pair Q2 (right, 8 instances)
-        for i in range(8):
+        # Input pair Q2 (right, Nx=4 instances)
+        for i in range(NX):
             pa.insert(pya.CellInstArray(npn_idx, pya.Trans(um(cx + pair_gap/2), um(cy - 60 + i * hbt_spacing))))
-        # Cascode Q3 (left, 8 instances)
-        for i in range(8):
+        # Cascode Q3 (left, Nx=4 instances)
+        for i in range(NX):
             pa.insert(pya.CellInstArray(npn_idx, pya.Trans(um(cx - pair_gap/2 - 7.8), um(cy + 30 + i * hbt_spacing))))
-        # Cascode Q4 (right, 8 instances)
-        for i in range(8):
+        # Cascode Q4 (right, Nx=4 instances)
+        for i in range(NX):
             pa.insert(pya.CellInstArray(npn_idx, pya.Trans(um(cx + pair_gap/2), um(cy + 30 + i * hbt_spacing))))
 
-    # Bias resistor (1kΩ)
-    if rppd_idx is not None:
-        pa.insert(pya.CellInstArray(rppd_idx, pya.Trans(um(cx - 0.45), um(cy - 90))))
+    # Bias resistor R_bias: w=3.0u l=10.0u (from schematic)
+    import sys
+    sys.path.insert(0, "/home/bthomas3/Videos/77GHz_phased_array/layout")
+    from pdk_devices import create_rppd
+    r_x = cx - 2.0
+    r_y = cy - 95.0
+    r_pins = create_rppd(pa, layout, r_x, r_y, 3.0, 10.0, m=1)
 
     # === INTRA-BLOCK ROUTING ===
     pcx = 3.9
@@ -166,10 +171,10 @@ def main(ext_layout=None):
     lx = q1_x + pcx   # 153.6 (left pin center X)
     rx = q2_x + pcx   # 196.4 (right pin center X)
 
-    q1_ys = [cy - 60 + i*hbt_spacing for i in range(8)]  # 215..285
-    q2_ys = [cy - 60 + i*hbt_spacing for i in range(8)]
-    q3_ys = [cy + 30 + i*hbt_spacing for i in range(8)]  # 305..375
-    q4_ys = [cy + 30 + i*hbt_spacing for i in range(8)]
+    q1_ys = [cy - 60 + i*hbt_spacing for i in range(NX)]
+    q2_ys = [cy - 60 + i*hbt_spacing for i in range(NX)]
+    q3_ys = [cy + 30 + i*hbt_spacing for i in range(NX)]
+    q4_ys = [cy + 30 + i*hbt_spacing for i in range(NX)]
 
     # --- MIDL (M3): Q1.C + Q3.E ---
     midl_bus_x = q1_x - 4.0  # 145.7
@@ -181,7 +186,7 @@ def main(ext_layout=None):
     mixer_shapes = ly['M3']
     pa.shapes(mixer_shapes).insert(pya.Box(
         um(midl_bus_x-0.25), um(q1_ys[0]+col_dy-0.25),
-        um(midl_bus_x+0.25), um(q3_ys[7]+emi_dy+0.25)))
+        um(midl_bus_x+0.25), um(q3_ys[-1]+emi_dy+0.25)))
     for qy in q1_ys:
         pa.shapes(mixer_shapes).insert(pya.Box(
             um(midl_bus_x-0.25), um(qy+col_dy-0.25), um(lx+0.25), um(qy+col_dy+0.25)))
@@ -198,7 +203,7 @@ def main(ext_layout=None):
         via_n(pa, rx, qy+emi_dy, 'M2', 'Via2', 'M3')
     pa.shapes(mixer_shapes).insert(pya.Box(
         um(midr_bus_x-0.25), um(q2_ys[0]+col_dy-0.25),
-        um(midr_bus_x+0.25), um(q4_ys[7]+emi_dy+0.25)))
+        um(midr_bus_x+0.25), um(q4_ys[-1]+emi_dy+0.25)))
     for qy in q2_ys:
         pa.shapes(mixer_shapes).insert(pya.Box(
             um(rx-0.25), um(qy+col_dy-0.25), um(midr_bus_x+0.25), um(qy+col_dy+0.25)))
@@ -221,9 +226,9 @@ def main(ext_layout=None):
         pa.shapes(ly['M4']).insert(pya.Box(
             um(tail_vr-0.25), um(qy+emi_dy-0.25), um(rx+0.25), um(qy+emi_dy+0.25)))
     pa.shapes(ly['M4']).insert(pya.Box(
-        um(tail_vl-0.25), um(tail_hy-0.25), um(tail_vl+0.25), um(q1_ys[7]+emi_dy+0.25)))
+        um(tail_vl-0.25), um(tail_hy-0.25), um(tail_vl+0.25), um(q1_ys[-1]+emi_dy+0.25)))
     pa.shapes(ly['M4']).insert(pya.Box(
-        um(tail_vr-0.25), um(tail_hy-0.25), um(tail_vr+0.25), um(q2_ys[7]+emi_dy+0.25)))
+        um(tail_vr-0.25), um(tail_hy-0.25), um(tail_vr+0.25), um(q2_ys[-1]+emi_dy+0.25)))
     pa.shapes(ly['M4']).insert(pya.Box(
         um(tail_vl-0.25), um(tail_hy-0.25), um(tail_vr+0.25), um(tail_hy+0.25)))
 
@@ -237,7 +242,7 @@ def main(ext_layout=None):
             um(inp_bus_x-0.25), um(qy+bas_dy-0.25), um(lx+0.25), um(qy+bas_dy+0.25)))
     pa.shapes(ly['M4']).insert(pya.Box(
         um(inp_bus_x-0.25), um(q1_ys[0]+bas_dy-0.25),
-        um(inp_bus_x+0.25), um(q1_ys[7]+bas_dy+0.25)))
+        um(inp_bus_x+0.25), um(q1_ys[-1]+bas_dy+0.25)))
 
     # --- INN_B (M4): Q2.B ---
     inn_bus_x = q2_x + 7.8 + 6.0  # 206.3
@@ -249,7 +254,7 @@ def main(ext_layout=None):
             um(rx-0.25), um(qy+bas_dy-0.25), um(inn_bus_x+0.25), um(qy+bas_dy+0.25)))
     pa.shapes(ly['M4']).insert(pya.Box(
         um(inn_bus_x-0.25), um(q2_ys[0]+bas_dy-0.25),
-        um(inn_bus_x+0.25), um(q2_ys[7]+bas_dy+0.25)))
+        um(inn_bus_x+0.25), um(q2_ys[-1]+bas_dy+0.25)))
 
     # --- OUTP_C (M4): Q3.C ---
     outp_bus_x = inp_bus_x  # 143.7 (reuse same X, different Y range)
@@ -261,7 +266,7 @@ def main(ext_layout=None):
             um(outp_bus_x-0.25), um(qy+col_dy-0.25), um(lx+0.25), um(qy+col_dy+0.25)))
     pa.shapes(ly['M4']).insert(pya.Box(
         um(outp_bus_x-0.25), um(q3_ys[0]+col_dy-0.25),
-        um(outp_bus_x+0.25), um(q3_ys[7]+col_dy+0.25)))
+        um(outp_bus_x+0.25), um(q3_ys[-1]+col_dy+0.25)))
 
     # --- OUTN_C (M4): Q4.C ---
     outn_bus_x = inn_bus_x  # 206.3
@@ -273,7 +278,7 @@ def main(ext_layout=None):
             um(rx-0.25), um(qy+col_dy-0.25), um(outn_bus_x+0.25), um(qy+col_dy+0.25)))
     pa.shapes(ly['M4']).insert(pya.Box(
         um(outn_bus_x-0.25), um(q4_ys[0]+col_dy-0.25),
-        um(outn_bus_x+0.25), um(q4_ys[7]+col_dy+0.25)))
+        um(outn_bus_x+0.25), um(q4_ys[-1]+col_dy+0.25)))
 
     # --- VCB (M5): Q3.B + Q4.B (shared cascode bias) ---
     vcb_hy = q3_ys[0] + bas_dy - 3.0  # 304.775
@@ -288,9 +293,9 @@ def main(ext_layout=None):
         via_n(pa, rx, qy+bas_dy, 'M3', 'Via3', 'M4')
         via_n(pa, rx, qy+bas_dy, 'M4', 'Via4', 'M5')
     pa.shapes(ly['M5']).insert(pya.Box(
-        um(lx-0.25), um(q3_ys[0]+bas_dy-0.25), um(lx+0.25), um(q3_ys[7]+bas_dy+0.25)))
+        um(lx-0.25), um(q3_ys[0]+bas_dy-0.25), um(lx+0.25), um(q3_ys[-1]+bas_dy+0.25)))
     pa.shapes(ly['M5']).insert(pya.Box(
-        um(rx-0.25), um(q4_ys[0]+bas_dy-0.25), um(rx+0.25), um(q4_ys[7]+bas_dy+0.25)))
+        um(rx-0.25), um(q4_ys[0]+bas_dy-0.25), um(rx+0.25), um(q4_ys[-1]+bas_dy+0.25)))
     pa.shapes(ly['M5']).insert(pya.Box(
         um(lx-0.25), um(vcb_hy-0.25), um(rx+0.25), um(vcb_hy+0.25)))
     pa.shapes(ly['M5']).insert(pya.Box(
@@ -298,7 +303,30 @@ def main(ext_layout=None):
     pa.shapes(ly['M5']).insert(pya.Box(
         um(rx-0.25), um(vcb_hy-0.25), um(rx+0.25), um(q4_ys[0]+bas_dy+0.25)))
 
-    print("Nets routed: MIDL, MIDR, TAIL, INP_B, INN_B, OUTP_C, OUTN_C, VCB")
+    # --- TAIL to R_bias.P: route rppd bottom pin (extracts as P) up to TAIL M4 bus ---
+    rp_x = r_pins['M'][0]
+    rp_y = r_pins['M'][1]
+    # Via stack from rppd Pin P (M1) up to M4
+    via_n(pa, rp_x, rp_y, 'M1', 'Via1', 'M2')
+    via_n(pa, rp_x, rp_y, 'M2', 'Via2', 'M3')
+    via_n(pa, rp_x, rp_y, 'M3', 'Via3', 'M4')
+    # M4 vertical trace from rppd up to tail_hy
+    pa.shapes(ly['M4']).insert(pya.Box(
+        um(rp_x - 0.25), um(rp_y - 0.25),
+        um(rp_x + 0.25), um(tail_hy + 0.25)))
+
+    # --- VCC: connect Q3.C (OUTP) and Q4.C (OUTN) via M5 ---
+    vcc_y = q3_ys[-1] + col_dy + 3.0
+    pa.shapes(ly['M5']).insert(pya.Box(
+        um(outp_bus_x - 0.25), um(vcc_y - 0.25),
+        um(outn_bus_x + 0.25), um(vcc_y + 0.25)))
+    for bx in [outp_bus_x, outn_bus_x]:
+        via_n(pa, bx, vcc_y, 'M4', 'Via4', 'M5')
+        pa.shapes(ly['M4']).insert(pya.Box(
+            um(bx - 0.25), um(q3_ys[-1] + col_dy - 0.25),
+            um(bx + 0.25), um(vcc_y + 0.25)))
+
+    print("Nets routed: MIDL, MIDR, TAIL, INP_B, INN_B, OUTP_C, OUTN_C, VCB, R_bias, VCC")
 
     # ----------------------------------------------------------------
     # M5 Port Access Pads
@@ -414,7 +442,7 @@ def main(ext_layout=None):
         layout.write(output)
         print(f"\nTX PA layout: {output}")
         print(f"Cell size: {CELL_W} x {CELL_H} um")
-        print(f"Devices: 32x npn13G2L + 1x rppd (bias wired)")
+        print(f"Devices: 16x npn13G2L (4×Nx=4) + 1x rppd w=3.0u l=10.0u")
 
 
 if __name__ == "__main__":

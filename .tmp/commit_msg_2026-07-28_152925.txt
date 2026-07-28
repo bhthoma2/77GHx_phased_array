@@ -1,0 +1,10 @@
+feat: TXPA passes structural LVS, add parameterized rppd generator
+
+- Created layout/pdk_devices.py with create_rppd() for correct w/l values
+- Fixed TXPA generator: 4×Nx=4 fingers (was 8), rppd w=3.0u l=10.0u
+- Added TAIL-to-rppd routing and VCC collector tie in TXPA
+- TXPA now passes structural LVS (devices, connectivity, params all match)
+- Updated run_lvs.py: combines parallel devices, tolerant param comparison
+
+⚙️ Generated with ChipAgents
+Co-Authored-By: ChipAgents <noreply@chipagents.ai>

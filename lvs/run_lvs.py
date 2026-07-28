@@ -119,6 +119,37 @@ def compare_netlists(layout_file, schem_file, sub_net="sub!"):
     errors = []
     warnings = []
 
+    # Combine parallel layout devices (same type + same nets = multi-finger)
+    def combine_parallel(devices):
+        """Merge devices with identical type and net connections into one with higher m."""
+        combined = []
+        seen = {}
+        for d in devices:
+            key = (d["type"], tuple(d["nets"]))
+            if key in seen:
+                idx = seen[key]
+                old_m = int(combined[idx]["params"].get("m", "1"))
+                combined[idx]["params"]["m"] = str(old_m + int(d["params"].get("m", "1")))
+            else:
+                seen[key] = len(combined)
+                combined.append(dict(d))
+                combined[-1]["params"] = dict(d["params"])
+        return combined
+
+    l_devices = combine_parallel(l_devices)
+    s_devices = combine_parallel(s_devices)
+
+    # Normalize Nx into m for comparison (Nx=4 equivalent to m=4 with Nx=1)
+    def normalize_multiplier(devices):
+        for d in devices:
+            nx = int(d["params"].get("Nx", "1"))
+            m = int(d["params"].get("m", "1"))
+            d["params"]["_total_m"] = str(nx * m)
+        return devices
+
+    l_devices = normalize_multiplier(l_devices)
+    s_devices = normalize_multiplier(s_devices)
+
     # Compare device counts by type
     l_types = defaultdict(int)
     s_types = defaultdict(int)
@@ -128,7 +159,7 @@ def compare_netlists(layout_file, schem_file, sub_net="sub!"):
         s_types[d["type"]] += 1
 
     all_types = set(list(l_types.keys()) + list(s_types.keys()))
-    print("\n  Device Count Comparison:")
+    print("\n  Device Count Comparison (after combining parallel devices):")
     print("  {:<25s} {:>8s} {:>8s} {:>8s}".format("Type", "Layout", "Schem", "Match"))
     print("  " + "-" * 55)
     for t in sorted(all_types):
@@ -194,9 +225,35 @@ def compare_netlists(layout_file, schem_file, sub_net="sub!"):
             errors.append("Net connectivity mismatch ({} layout-only, {} schem-only)".format(
                 len(only_layout), len(only_schem)))
 
-    # Compare key parameters (w, l, m, Nx)
-    key_params = ["w", "l", "m", "Nx"]
-    print("\n  Parameter Comparison (key params: {}):".format(", ".join(key_params)))
+    # Compare key parameters (w, l, total multiplier)
+    def parse_eng(val):
+        """Parse engineering notation to float for comparison."""
+        suffixes = {'f': 1e-15, 'p': 1e-12, 'n': 1e-9, 'u': 1e-6, 'm': 1e-3}
+        if not val:
+            return None
+        try:
+            return float(val)
+        except ValueError:
+            for s, mult in suffixes.items():
+                if val.endswith(s):
+                    try:
+                        return float(val[:-1]) * mult
+                    except ValueError:
+                        pass
+        return None
+
+    def params_equal(lv, sv):
+        """Compare params with tolerance for engineering notation."""
+        if lv == sv:
+            return True
+        lf = parse_eng(lv)
+        sf = parse_eng(sv)
+        if lf is not None and sf is not None:
+            return abs(lf - sf) / max(abs(lf), abs(sf), 1e-30) < 0.02
+        return False
+
+    key_params = ["w", "l", "_total_m"]
+    print("\n  Parameter Comparison (w, l, total multiplier):")
     param_ok = True
     for lt, st in zip(sorted(l_devices, key=lambda x: x["type"]),
                       sorted(s_devices, key=lambda x: x["type"])):
@@ -205,8 +262,9 @@ def compare_netlists(layout_file, schem_file, sub_net="sub!"):
         for k in key_params:
             lv = lt["params"].get(k)
             sv = st["params"].get(k)
-            if lv and sv and lv != sv:
-                msg = "  {} param '{}': layout={}, schem={}".format(lt["type"], k, lv, sv)
+            if lv and sv and not params_equal(lv, sv):
+                label = "m×Nx" if k == "_total_m" else k
+                msg = "{} param '{}': layout={}, schem={}".format(lt["type"], label, lv, sv)
                 print("  ✗ " + msg)
                 param_ok = False
     if param_ok:

@@ -1,4 +1,4 @@
-* Extracted by KLayout with SG13G2 LVS runset on : 28/07/2026 14:41
+* Extracted by KLayout with SG13G2 LVS runset on : 28/07/2026 14:52
 
 .SUBCKT VCO_77G_XTOR G1 G1|G2 GND VCC W W$1
 Q$1 G1|G2 G1|G2 \$6 \$1 npn13G2l we=70n le=1000n Nx=1 m=4

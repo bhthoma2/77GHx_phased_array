@@ -1,0 +1,43 @@
+* Extracted by KLayout with SG13G2 LVS runset on : 28/07/2026 15:24
+
+.SUBCKT MIXER_77G_XTOR
+Q$1 \$65 \$65 \$5 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$2 \$65 \$5 \$5 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$3 \$20 \$5 \$5 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$4 \$65 \$5 \$5 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$5 \$20 \$5 \$5 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$6 \$65 \$5 \$5 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$7 \$20 \$5 \$5 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$8 \$65 \$5 \$5 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$9 \$20 \$5 \$5 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$10 \$65 \$65 \$65 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$11 \$65 \$65 \$65 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$12 \$65 \$65 \$20 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$13 \$65 \$65 \$20 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$14 \$65 \$65 \$65 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$15 \$65 \$65 \$65 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$16 \$65 \$65 \$20 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$17 \$65 \$65 \$20 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$18 \$65 \$65 \$65 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$19 \$65 \$65 \$65 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$20 \$65 \$65 \$20 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$21 \$65 \$65 \$20 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$22 \$65 \$65 \$65 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$23 \$65 \$65 \$65 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$24 \$65 \$65 \$20 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$25 \$65 \$65 \$20 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$26 \$65 \$65 \$65 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+R$27 \$65 \$65 \$1 rppd w=3u l=18.23u ps=0u b=0 m=1
+R$28 \$151 \$154 \$1 rppd w=3u l=18.23u ps=0u b=0 m=1
+R$29 \$65 \$65 \$1 rppd w=3u l=18.23u ps=0u b=0 m=1
+R$30 \$152 \$155 \$1 rppd w=3u l=18.23u ps=0u b=0 m=1
+R$31 \$153 \$65 \$1 rppd w=3u l=27.48u ps=0u b=0 m=1
+R$32 \$65 \$65 \$1 rppd w=3u l=27.48u ps=0u b=0 m=1
+C$33 \$159 \$158 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$34 \$161 \$160 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$35 \$9 \$8 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$36 \$7 \$6 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$37 \$77 \$76 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$38 \$75 \$74 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$39 \$157 \$156 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+.ENDS MIXER_77G_XTOR

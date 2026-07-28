@@ -1,0 +1,27 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/IFA_77G_LVS.sch
+**.subckt IFA_77G_XTOR VCC INP INN GND sub! OUTP OUTN
+*.iopin INP
+*.iopin INN
+*.iopin OUTP
+*.iopin OUTN
+*.iopin VCC
+*.iopin GND
+*.iopin sub!
+XQ1 out1p INP tail1 sub! npn13G2l Nx=2 El=2.5
+XQ2 out1n INN tail1 sub! npn13G2l Nx=2 El=2.5
+XQ3 OUTP out1p tail2 sub! npn13G2l Nx=2 El=2.5
+XQ4 OUTN out1n tail2 sub! npn13G2l Nx=2 El=2.5
+XQ5 tail1 BIAS tail1_e sub! npn13G2l Nx=2 El=2.5
+XQ6 tail2 BIAS GND sub! npn13G2l Nx=2 El=2.5
+XQ7 BIAS BIAS BIAS_E sub! npn13G2l Nx=1 El=2.5
+XR1 VCC out1p sub! rppd w=3.0u l=8.33u m=1 b=0
+XR2 VCC out1n sub! rppd w=3.0u l=8.33u m=1 b=0
+XR3 VCC OUTP sub! rppd w=3.0u l=8.33u m=1 b=0
+XR4 VCC OUTN sub! rppd w=3.0u l=8.33u m=1 b=0
+XR5 VCC BIAS sub! rppd w=3.0u l=18.23u m=1 b=0
+XR6 BIAS_E GND sub! rppd w=3.0u l=5.0u m=1 b=0
+XR7 tail1_e GND sub! rppd w=3.0u l=5.0u m=1 b=0
+XC1 VCC GND cap_cmim w=7.0e-6 l=7.0e-6
+XC2 VCC GND cap_cmim w=7.0e-6 l=7.0e-6
+**.ends
+.end

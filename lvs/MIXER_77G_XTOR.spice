@@ -1,0 +1,31 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/MIXER_77G_LVS.sch
+**.subckt MIXER_77G_XTOR VCC RF_P RF_N LO_P LO_N GND sub! IF_P IF_N
+*.iopin 2V4
+*.iopin GND
+*.iopin RFP
+*.iopin RFN
+*.iopin LOP
+*.iopin LON
+*.iopin IFP
+*.iopin IFN
+XQ20 ELOL RFP_I GND net2 npn13G2l Nx=4 El=2.5
+XQ21 ELOR RFN_I GND net3 npn13G2l Nx=4 El=2.5
+XQ22 2V4 LOP_I ELOL net4 npn13G2l Nx=4 El=2.5
+XQ23 IFN LON_I ELOL net5 npn13G2l Nx=4 El=2.5
+XQ24 IFN LOP_I ELOR net6 npn13G2l Nx=4 El=2.5
+XQ25 IFP LON_I ELOR net7 npn13G2l Nx=4 El=2.5
+XQ26 BIAS BIAS BIAS_MID net8 npn13G2l Nx=1 El=2.5
+XQ27 BIAS_MID BIAS_MID GND net9 npn13G2l Nx=1 El=2.5
+XR21 2V4 2V4 sub! rppd w=3.0u l=18.23u m=2 b=0
+XR22 2V4 2V4 sub! rppd w=3.0u l=18.23u m=2 b=0
+XR23 2V4 net1 sub! rppd w=3.0u l=27.48u m=1 b=0
+XR24 2V4 2V4 sub! rppd w=3.0u l=27.48u m=1 b=0
+XC37 LOP LOP_I cap_cmim w=7.0e-6 l=7.0e-6
+XC38 LON LON_I cap_cmim w=7.0e-6 l=7.0e-6
+XC39 RFP RFP_I cap_cmim w=7.0e-6 l=7.0e-6
+XC40 RFN RFN_I cap_cmim w=7.0e-6 l=7.0e-6
+XC41 2V4 GND cap_cmim w=7.0e-6 l=7.0e-6
+XC42 2V4 GND cap_cmim w=7.0e-6 l=7.0e-6
+XC43 2V4 GND cap_cmim w=7.0e-6 l=7.0e-6
+**.ends
+.end
