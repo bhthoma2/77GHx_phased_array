@@ -1,0 +1,51 @@
+v {xschem version=3.4.8RC file_version=1.3}
+K {type=subcircuit
+format="@name @pinlist @symname"
+spectre_format="@name ( @pinlist ) @symname"
+template="name=x1"
+}
+T {@symname} -76.5 -6 0 0 0.3 0.3 {}
+T {@name} 135 -152 0 0 0.2 0.2 {}
+P 4 5 130 -140 -130 -140 -130 140 130 140 130 -140 {}
+B 5 147.5 -132.5 152.5 -127.5 {name=VDD_12 dir=inout}
+L 7 130 -130 150 -130 {}
+T {VDD_12} 125 -134 0 1 0.2 0.2 {}
+B 5 147.5 -112.5 152.5 -107.5 {name=VCC_33 dir=inout}
+L 7 130 -110 150 -110 {}
+T {VCC_33} 125 -114 0 1 0.2 0.2 {}
+B 5 147.5 -92.5 152.5 -87.5 {name=DOUT_P dir=inout}
+L 7 130 -90 150 -90 {}
+T {DOUT_P} 125 -94 0 1 0.2 0.2 {}
+B 5 147.5 -72.5 152.5 -67.5 {name=ANT_RXP dir=inout}
+L 7 130 -70 150 -70 {}
+T {ANT_RXP} 125 -74 0 1 0.2 0.2 {}
+B 5 147.5 -52.5 152.5 -47.5 {name=DOUT_N dir=inout}
+L 7 130 -50 150 -50 {}
+T {DOUT_N} 125 -54 0 1 0.2 0.2 {}
+B 5 147.5 -32.5 152.5 -27.5 {name=ANT_RXN dir=inout}
+L 7 130 -30 150 -30 {}
+T {ANT_RXN} 125 -34 0 1 0.2 0.2 {}
+B 5 147.5 -12.5 152.5 -7.5 {name=CLK_ADC dir=inout}
+L 7 130 -10 150 -10 {}
+T {CLK_ADC} 125 -14 0 1 0.2 0.2 {}
+B 5 147.5 7.5 152.5 12.5 {name=VCTRL dir=inout}
+L 7 130 10 150 10 {}
+T {VCTRL} 125 6 0 1 0.2 0.2 {}
+B 5 147.5 27.5 152.5 32.5 {name=GND dir=inout}
+L 7 130 30 150 30 {}
+T {GND} 125 26 0 1 0.2 0.2 {}
+B 5 147.5 47.5 152.5 52.5 {name=ANT_TXP dir=inout}
+L 7 130 50 150 50 {}
+T {ANT_TXP} 125 46 0 1 0.2 0.2 {}
+B 5 147.5 67.5 152.5 72.5 {name=VTUNE dir=inout}
+L 7 130 70 150 70 {}
+T {VTUNE} 125 66 0 1 0.2 0.2 {}
+B 5 147.5 87.5 152.5 92.5 {name=ANT_TXN dir=inout}
+L 7 130 90 150 90 {}
+T {ANT_TXN} 125 86 0 1 0.2 0.2 {}
+B 5 147.5 107.5 152.5 112.5 {name=GND dir=inout}
+L 7 130 110 150 110 {}
+T {GND} 125 106 0 1 0.2 0.2 {}
+B 5 147.5 127.5 152.5 132.5 {name=GND dir=inout}
+L 7 130 130 150 130 {}
+T {GND} 125 126 0 1 0.2 0.2 {}

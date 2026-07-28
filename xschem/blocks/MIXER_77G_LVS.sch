@@ -1,11 +1,30 @@
-v {xschem version=3.4.7 file_version=1.2}
+v {xschem version=3.4.8RC file_version=1.3}
 G {}
 K {}
 V {}
 S {}
+F {}
 E {}
 T {77 GHz Mixer (MIXER_77GD) — LVS-Equivalent Schematic} 50 -900 0 0 0.5 0.5 {}
 T {Physical PDK cells only — matches generate_mixer_transistor.py} 50 -860 0 0 0.3 0.3 {layer=7}
+N 220 -270 220 -200 {lab=GND}
+N 480 -270 480 -200 {lab=GND}
+N 350 -200 480 -200 {lab=GND}
+N 350 -200 350 -50 {lab=GND}
+N 220 -520 220 -330 {lab=ELOL}
+N 480 -520 480 -330 {lab=ELOR}
+N 170 -700 170 -580 {lab=IFP}
+N 280 -700 280 -580 {lab=IFN}
+N 420 -700 420 -580 {lab=IFN}
+N 530 -700 530 -580 {lab=IFP}
+N 200 -800 200 -730 {lab=2V4}
+N 500 -800 500 -730 {lab=2V4}
+N 200 -800 500 -800 {lab=2V4}
+N 50 -300 180 -300 {lab=RFP}
+N 520 -300 650 -300 {lab=RFN}
+N 50 -550 130 -550 {lab=LOP}
+N 570 -550 650 -550 {lab=LON}
+N 220 -200 350 -200 {lab=GND}
 C {sg13g2_pr/npn13G2l.sym} 200 -300 0 0 {name=Q20
 model=npn13G2l
 spiceprefix=X
@@ -133,24 +152,5 @@ C {iopin.sym} 50 -550 0 1 {name=p5 lab=LOP}
 C {iopin.sym} 650 -550 0 0 {name=p6 lab=LON}
 C {iopin.sym} 200 -750 0 0 {name=p7 lab=IFP}
 C {iopin.sym} 500 -750 0 0 {name=p8 lab=IFN}
-N 220 -270 220 -200 {lab=GND}
-N 480 -270 480 -200 {lab=GND}
-N 220 -200 480 -200 {lab=GND}
-N 350 -200 350 -50 {lab=GND}
-N 220 -330 220 -520 {lab=ELOL}
-N 480 -330 480 -520 {lab=ELOR}
-N 170 -580 170 -700 {lab=IFP}
-N 280 -580 280 -700 {lab=IFN}
-N 420 -580 420 -700 {lab=IFN}
-N 530 -580 530 -700 {lab=IFP}
-N 200 -730 200 -800 {lab=2V4}
-N 500 -730 500 -800 {lab=2V4}
-N 200 -800 500 -800 {lab=2V4}
-N 350 -800 350 -800 {lab=2V4}
-N 50 -300 180 -300 {lab=RFP}
-N 520 -300 650 -300 {lab=RFN}
-N 130 -550 130 -550 {lab=LOP}
-N 50 -550 130 -550 {lab=LOP}
-N 570 -550 650 -550 {lab=LON}
 C {lab_pin.sym} 220 -420 0 0 {name=p9 sig_type=std_logic lab=ELOL}
 C {lab_pin.sym} 480 -420 0 0 {name=p10 sig_type=std_logic lab=ELOR}

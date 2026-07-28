@@ -1,0 +1,12 @@
+fix: Properly wire LNA_77G_LVS schematic and create LVS symbols
+
+- Rewrote LNA_77G_LVS.sch with correct pin-aligned wiring for all
+  5 BJTs, 5 resistors, and 9 capacitors
+- Created .sym files for VCO_77G_LVS, LNA_77G_LVS, MIXER_77G_LVS, TXPA_77G_LVS
+- Fixed SVaricap symbol path in VCO (sg13g2_pr/sg13_svaricap.sym)
+- Fixed YTRANSLINE symbol path in ILFD (full absolute path)
+- Copied YTRANSLINE.sym to blocks/ directory
+- Updated RADAR_TOP_LVS.sch to use original structure with LVS sub-blocks
+
+⚙️ Generated with ChipAgents
+Co-Authored-By: ChipAgents <noreply@chipagents.ai>

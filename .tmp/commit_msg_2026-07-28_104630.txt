@@ -1,0 +1,9 @@
+feat: LVS-equivalent schematics and layout fixes for all analog blocks
+
+- VCO: Added CPW tank stubs (L1/L2), renamed VSS->GND, GND via stack to M5
+- LNA: Added Q37 bias BJT, R29-R33, C55-C61, renamed ports (VCC->2V4, VCB->B35&36, TAIL->GND)
+- Mixer: Added Q26/Q27 bias BJTs, R23, C37-C43, renamed ports (RF_P->RFP, VCC->2V4)
+- TXPA: Wired bias resistor to VCB via M1-M5 stack, renamed VCC->2V4, added GND/VCB ports
+- Created LVS-equivalent xschem schematics using only physical PDK cells:
+  VCO_77G_LVS.sch, LNA_77G_LVS.sch, MIXER_77G_LVS.sch, TXPA_77G_LVS.sch
+- Cleaned up .tmp and embedded git repos from tracked files

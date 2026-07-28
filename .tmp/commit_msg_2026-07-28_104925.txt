@@ -1,0 +1,7 @@
+feat: Top-level LVS schematic and final full-chip layout
+
+- Created RADAR_TOP_LVS.sch: top-level schematic using LVS-equivalent sub-blocks
+- Regenerated PHASED_ARRAY_77G_XTOR.gds with updated VCO/LNA/Mixer/TXPA blocks
+- Full chip: 2.5x2.5mm die, 6 RX (LNA+Mixer), 4 TX PA, VCO, ILFD
+- Inter-block routing: LNA->Mixer RF on M5, VCO->ILFD/Mixer LO on TM2 H-tree
+- 34 bond pads, M3 power rings, TM1 segmented ground plane
