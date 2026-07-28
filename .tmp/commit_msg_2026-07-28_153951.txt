@@ -1,0 +1,9 @@
+wip: IFA M3/M4 routing architecture with via landing pads
+
+- Implemented M3-horizontal + M4-vertical routing to avoid same-layer shorts
+- Added proper via landing pads (M1/M2 for via1, M2/M3 for via2, M3/M4 for via3)
+- Identified remaining issue: via M2 pads short to npn emitter M2 (~1.8um gap)
+- Next: add M1 escape routes before transitioning to upper metals
+
+⚙️ Generated with ChipAgents
+Co-Authored-By: ChipAgents <noreply@chipagents.ai>
