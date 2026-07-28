@@ -1,26 +1,26 @@
-* Extracted by KLayout with SG13G2 LVS runset on : 28/07/2026 17:11
+* Extracted by KLayout with SG13G2 LVS runset on : 28/07/2026 17:15
 
 .SUBCKT IFA_77G_XTOR
-Q$1 \$5 \$4 \$19 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$2 \$5 \$4 \$19 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$3 \$5 \$6 \$19 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$4 \$5 \$6 \$19 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$5 \$19 \$38 \$3 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$6 \$19 \$38 \$3 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$7 \$19 \$38 \$3 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$8 \$19 \$38 \$3 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$9 \$38 \$38 \$38 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$10 \$4 \$68 \$19 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$11 \$4 \$68 \$19 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$12 \$6 \$69 \$19 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$13 \$6 \$69 \$19 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-R$14 \$38 \$2 \$1 rppd w=3u l=18.23u ps=0u b=0 m=1
-R$15 \$38 \$3 \$1 rppd w=3u l=5u ps=0u b=0 m=1
-R$16 \$3 \$3 \$1 rppd w=3u l=5u ps=0u b=0 m=1
-R$17 \$4 \$2 \$1 rppd w=3u l=8.33u ps=0u b=0 m=1
-R$18 \$6 \$2 \$1 rppd w=3u l=8.33u ps=0u b=0 m=1
-R$19 \$5 \$2 \$1 rppd w=3u l=8.33u ps=0u b=0 m=1
-R$20 \$5 \$2 \$1 rppd w=3u l=8.33u ps=0u b=0 m=1
-C$21 \$51 \$49 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
-C$22 \$52 \$50 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+Q$1 \$6 \$5 \$41 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$2 \$6 \$5 \$41 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$3 \$8 \$7 \$41 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$4 \$8 \$7 \$41 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$5 \$40 \$39 \$4 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$6 \$40 \$39 \$4 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$7 \$41 \$39 \$3 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$8 \$41 \$39 \$3 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$9 \$39 \$39 \$39 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$10 \$5 \$71 \$40 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$11 \$5 \$71 \$40 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$12 \$7 \$72 \$40 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$13 \$7 \$72 \$40 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+R$14 \$2 \$39 \$1 rppd w=3u l=18.23u ps=0u b=0 m=1
+R$15 \$39 \$3 \$1 rppd w=3u l=5u ps=0u b=0 m=1
+R$16 \$4 \$3 \$1 rppd w=3u l=5u ps=0u b=0 m=1
+R$17 \$2 \$5 \$1 rppd w=3u l=8.33u ps=0u b=0 m=1
+R$18 \$2 \$7 \$1 rppd w=3u l=8.33u ps=0u b=0 m=1
+R$19 \$2 \$6 \$1 rppd w=3u l=8.33u ps=0u b=0 m=1
+R$20 \$2 \$8 \$1 rppd w=3u l=8.33u ps=0u b=0 m=1
+C$21 \$54 \$52 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$22 \$55 \$53 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
 .ENDS IFA_77G_XTOR

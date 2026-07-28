@@ -186,13 +186,35 @@ def main(ext_layout=None):
         hw = w / 2
         box(ifa, lm4, x - hw, min(y1, y2), x + hw, max(y1, y2))
 
+    # Escape X positions: far from any transistor emitter M2
+    # Left column (x=30): escape to x=15 (15um left of cell, 18.9um from emitter at 33.9)
+    # Right column (x=90): escape to x=112 (12um right of last finger at 99.9+)
+    # Q7 (x=160): escape to x=178 (14um right of pin at 163.9)
+    # Resistor area (x=200+): already far from transistors, no escape needed
+    ESC_L = 15.0
+    ESC_R = 112.0
+    ESC_Q7 = 178.0
+
+    def m1_to_m3_esc(px, py, esc_x):
+        """Route M1 pin horizontally to escape point, then via stack to M3."""
+        m1_wire_h(py, px, esc_x)
+        place_via1(esc_x, py)
+        place_via2(esc_x, py)
+        return (esc_x, py)
+
     def m1_to_m3(px, py):
-        """Bring M1 pin up to M3."""
+        """Bring M1 pin up to M3 directly (for pins already far from transistors)."""
         place_via1(px, py)
         place_via2(px, py)
 
+    def m2_to_m3_esc(px, py, esc_x):
+        """Route M2 emitter to escape point, then via to M3."""
+        m2_wire_h(py, px, esc_x)
+        place_via2(esc_x, py)
+        return (esc_x, py)
+
     def m2_to_m3(px, py):
-        """Bring M2 pin up to M3."""
+        """Bring M2 pin up to M3 directly."""
         place_via2(px, py)
 
     def m3_to_m4(px, py):
@@ -219,51 +241,51 @@ def main(ext_layout=None):
     # --- tail1 net: Q1.E(×2), Q2.E(×2), Q5.C(×2) ---
     e1a, e1b = q_pins[0][0]['E'], q_pins[0][1]['E']
     e2a, e2b = q_pins[1][0]['E'], q_pins[1][1]['E']
-    m2_wire_h(e1a[1], e1a[0], e2b[0])  # M2 horizontal (same row)
+    m2_wire_h(e1a[1], e1a[0], e2b[0])  # M2 horizontal same row
     c5a, c5b = q_pins[4][0]['C'], q_pins[4][1]['C']
     m1_wire_h(c5a[1], c5a[0], c5b[0])
-    # Q5.C → M3 → M4(vertical) → M3 → M2(Q1.E)
-    m1_to_m3(c5a[0], c5a[1])
-    m2_to_m3(e1a[0], e1a[1])
-    # M3 horizontal at Q5.C y, then M4 vertical, then M3 horizontal at Q1.E y
-    tail1_vx = 22.0  # unique vertical track
-    m3_wire_h(c5a[1], c5a[0], tail1_vx)
+    # Escape Q5.C to left, Q1.E to left
+    m1_to_m3_esc(c5a[0], c5a[1], ESC_L)
+    m2_to_m3_esc(e1a[0], e1a[1], ESC_L - 2)
+    tail1_vx = 4.0
+    m3_wire_h(c5a[1], ESC_L, tail1_vx)
     m3_to_m4(tail1_vx, c5a[1])
-    m4_wire_v(tail1_vx, c5a[1], e1a[1])
+    m3_wire_h(e1a[1], ESC_L - 2, tail1_vx)
     m3_to_m4(tail1_vx, e1a[1])
-    m3_wire_h(e1a[1], tail1_vx, e1a[0])
+    m4_wire_v(tail1_vx, min(c5a[1], e1a[1]), max(c5a[1], e1a[1]))
 
     # --- tail2 net: Q3.E(×2), Q4.E(×2), Q6.C(×2) ---
     e3a, e3b = q_pins[2][0]['E'], q_pins[2][1]['E']
     e4a, e4b = q_pins[3][0]['E'], q_pins[3][1]['E']
-    m2_wire_h(e3a[1], e3a[0], e4b[0])  # M2 horizontal (same row)
+    m2_wire_h(e3a[1], e3a[0], e4b[0])  # M2 horizontal same row
     c6a, c6b = q_pins[5][0]['C'], q_pins[5][1]['C']
     m1_wire_h(c6a[1], c6a[0], c6b[0])
-    m1_to_m3(c6a[0], c6a[1])
-    m2_to_m3(e3a[0], e3a[1])
-    tail2_vx = 18.0
-    m3_wire_h(c6a[1], c6a[0], tail2_vx)
+    # Escape Q6.C to right, Q3.E to right
+    m1_to_m3_esc(c6a[0], c6a[1], ESC_R)
+    m2_to_m3_esc(e3a[0], e3a[1], ESC_R + 2)
+    tail2_vx = 126.0
+    m3_wire_h(c6a[1], ESC_R, tail2_vx)
     m3_to_m4(tail2_vx, c6a[1])
-    m4_wire_v(tail2_vx, c6a[1], e3a[1])
+    m3_wire_h(e3a[1], ESC_R + 2, tail2_vx)
     m3_to_m4(tail2_vx, e3a[1])
-    m3_wire_h(e3a[1], tail2_vx, e3a[0])
+    m4_wire_v(tail2_vx, min(c6a[1], e3a[1]), max(c6a[1], e3a[1]))
 
     # --- out1p net: Q1.C(×2), Q3.B(×2), R1.M ---
     c1a, c1b = q_pins[0][0]['C'], q_pins[0][1]['C']
     m1_wire_h(c1a[1], c1a[0], c1b[0])
     b3a, b3b = q_pins[2][0]['B'], q_pins[2][1]['B']
     m1_wire_h(b3a[1], b3a[0], b3b[0])
-    m1_to_m3(c1a[0], c1a[1])
-    m1_to_m3(b3a[0], b3a[1])
-    m1_to_m3(r1['M'][0], r1['M'][1])
-    out1p_vx = 26.0
-    m3_wire_h(c1a[1], c1a[0], out1p_vx)
+    m1_to_m3_esc(c1a[0], c1a[1], ESC_L)
+    m1_to_m3_esc(b3a[0], b3a[1], ESC_L)
+    m1_to_m3(r1['P'][0], r1['P'][1])
+    out1p_vx = 6.0
+    m3_wire_h(c1a[1], ESC_L, out1p_vx)
     m3_to_m4(out1p_vx, c1a[1])
-    m3_wire_h(b3a[1], b3a[0], out1p_vx)
+    m3_wire_h(b3a[1], ESC_L, out1p_vx)
     m3_to_m4(out1p_vx, b3a[1])
-    m3_wire_h(r1['M'][1], r1['M'][0], out1p_vx)
-    m3_to_m4(out1p_vx, r1['M'][1])
-    ys = sorted([c1a[1], b3a[1], r1['M'][1]])
+    m3_wire_h(r1['P'][1], r1['P'][0], out1p_vx)
+    m3_to_m4(out1p_vx, r1['P'][1])
+    ys = sorted([c1a[1], b3a[1], r1['P'][1]])
     m4_wire_v(out1p_vx, ys[0], ys[-1])
 
     # --- out1n net: Q2.C(×2), Q4.B(×2), R2.M ---
@@ -271,43 +293,43 @@ def main(ext_layout=None):
     m1_wire_h(c2a[1], c2a[0], c2b[0])
     b4a, b4b = q_pins[3][0]['B'], q_pins[3][1]['B']
     m1_wire_h(b4a[1], b4a[0], b4b[0])
-    m1_to_m3(c2a[0], c2a[1])
-    m1_to_m3(b4a[0], b4a[1])
-    m1_to_m3(r2['M'][0], r2['M'][1])
-    out1n_vx = 115.0
-    m3_wire_h(c2a[1], c2a[0], out1n_vx)
+    m1_to_m3_esc(c2a[0], c2a[1], ESC_R)
+    m1_to_m3_esc(b4a[0], b4a[1], ESC_R)
+    m1_to_m3(r2['P'][0], r2['P'][1])
+    out1n_vx = 130.0
+    m3_wire_h(c2a[1], ESC_R, out1n_vx)
     m3_to_m4(out1n_vx, c2a[1])
-    m3_wire_h(b4a[1], b4a[0], out1n_vx)
+    m3_wire_h(b4a[1], ESC_R, out1n_vx)
     m3_to_m4(out1n_vx, b4a[1])
-    m3_wire_h(r2['M'][1], r2['M'][0], out1n_vx)
-    m3_to_m4(out1n_vx, r2['M'][1])
-    ys = sorted([c2a[1], b4a[1], r2['M'][1]])
+    m3_wire_h(r2['P'][1], r2['P'][0], out1n_vx)
+    m3_to_m4(out1n_vx, r2['P'][1])
+    ys = sorted([c2a[1], b4a[1], r2['P'][1]])
     m4_wire_v(out1n_vx, ys[0], ys[-1])
 
     # --- OUTP net: Q3.C(×2), R3.M ---
     c3a, c3b = q_pins[2][0]['C'], q_pins[2][1]['C']
     m1_wire_h(c3a[1], c3a[0], c3b[0])
-    m1_to_m3(c3a[0], c3a[1])
-    m1_to_m3(r3['M'][0], r3['M'][1])
-    outp_vx = 119.0
-    m3_wire_h(c3a[1], c3a[0], outp_vx)
+    m1_to_m3_esc(c3a[0], c3a[1], ESC_L)
+    m1_to_m3(r3['P'][0], r3['P'][1])
+    outp_vx = 8.0
+    m3_wire_h(c3a[1], ESC_L, outp_vx)
     m3_to_m4(outp_vx, c3a[1])
-    m3_wire_h(r3['M'][1], r3['M'][0], outp_vx)
-    m3_to_m4(outp_vx, r3['M'][1])
-    ys = sorted([c3a[1], r3['M'][1]])
+    m3_wire_h(r3['P'][1], r3['P'][0], outp_vx)
+    m3_to_m4(outp_vx, r3['P'][1])
+    ys = sorted([c3a[1], r3['P'][1]])
     m4_wire_v(outp_vx, ys[0], ys[-1])
 
     # --- OUTN net: Q4.C(×2), R4.M ---
     c4a, c4b = q_pins[3][0]['C'], q_pins[3][1]['C']
     m1_wire_h(c4a[1], c4a[0], c4b[0])
-    m1_to_m3(c4a[0], c4a[1])
-    m1_to_m3(r4['M'][0], r4['M'][1])
-    outn_vx = 123.0
-    m3_wire_h(c4a[1], c4a[0], outn_vx)
+    m1_to_m3_esc(c4a[0], c4a[1], ESC_R)
+    m1_to_m3(r4['P'][0], r4['P'][1])
+    outn_vx = 134.0
+    m3_wire_h(c4a[1], ESC_R, outn_vx)
     m3_to_m4(outn_vx, c4a[1])
-    m3_wire_h(r4['M'][1], r4['M'][0], outn_vx)
-    m3_to_m4(outn_vx, r4['M'][1])
-    ys = sorted([c4a[1], r4['M'][1]])
+    m3_wire_h(r4['P'][1], r4['P'][0], outn_vx)
+    m3_to_m4(outn_vx, r4['P'][1])
+    ys = sorted([c4a[1], r4['P'][1]])
     m4_wire_v(outn_vx, ys[0], ys[-1])
 
     # --- BIAS net: Q5.B(×2), Q6.B(×2), Q7.C, Q7.B, R5.M ---
@@ -318,41 +340,41 @@ def main(ext_layout=None):
     m1_wire_h(b5a[1], b5a[0], b5b[0])
     m1_wire_h(b6a[1], b6a[0], b6b[0])
     m1_wire_v(q7c[0], q7b[1], q7c[1])
-    m1_to_m3(b5a[0], b5a[1])
-    m1_to_m3(b6a[0], b6a[1])
-    m1_to_m3(q7c[0], q7c[1])
-    m1_to_m3(r5['M'][0], r5['M'][1])
-    bias_vx = 175.0
-    m3_wire_h(b5a[1], b5a[0], bias_vx)
+    m1_to_m3_esc(b5a[0], b5a[1], ESC_L)
+    m1_to_m3_esc(b6a[0], b6a[1], ESC_R)
+    m1_to_m3_esc(q7c[0], q7c[1], ESC_Q7)
+    m1_to_m3(r5['P'][0], r5['P'][1])
+    bias_vx = 138.0
+    m3_wire_h(b5a[1], ESC_L, bias_vx)
     m3_to_m4(bias_vx, b5a[1])
-    m3_wire_h(b6a[1], b6a[0], bias_vx)
+    m3_wire_h(b6a[1], ESC_R, bias_vx)
     m3_to_m4(bias_vx, b6a[1])
-    m3_wire_h(q7c[1], q7c[0], bias_vx)
+    m3_wire_h(q7c[1], ESC_Q7, bias_vx)
     m3_to_m4(bias_vx, q7c[1])
-    m3_wire_h(r5['M'][1], r5['M'][0], bias_vx)
-    m3_to_m4(bias_vx, r5['M'][1])
-    bias_ys = sorted([b5a[1], b6a[1], q7c[1], r5['M'][1]])
+    m3_wire_h(r5['P'][1], r5['P'][0], bias_vx)
+    m3_to_m4(bias_vx, r5['P'][1])
+    bias_ys = sorted([b5a[1], b6a[1], q7c[1], r5['P'][1]])
     m4_wire_v(bias_vx, bias_ys[0], bias_ys[-1])
 
     # --- tail1_e net: Q5.E(×2), R7.M ---
     e5a, e5b = q_pins[4][0]['E'], q_pins[4][1]['E']
     m2_wire_h(e5a[1], e5a[0], e5b[0])
-    m2_to_m3(e5b[0], e5b[1])
+    m2_to_m3_esc(e5a[0], e5a[1], ESC_L - 4)
     m1_to_m3(r7['M'][0], r7['M'][1])
-    t1e_vx = 14.0
-    m3_wire_h(e5b[1], e5b[0], t1e_vx)
-    m3_to_m4(t1e_vx, e5b[1])
+    t1e_vx = 2.0
+    m3_wire_h(e5a[1], ESC_L - 4, t1e_vx)
+    m3_to_m4(t1e_vx, e5a[1])
     m3_wire_h(r7['M'][1], r7['M'][0], t1e_vx)
     m3_to_m4(t1e_vx, r7['M'][1])
-    ys = sorted([e5b[1], r7['M'][1]])
+    ys = sorted([e5a[1], r7['M'][1]])
     m4_wire_v(t1e_vx, ys[0], ys[-1])
 
     # --- BIAS_E net: Q7.E, R6.M ---
     q7e = q_pins[6][0]['E']
-    m2_to_m3(q7e[0], q7e[1])
+    m2_to_m3_esc(q7e[0], q7e[1], ESC_Q7 + 2)
     m1_to_m3(r6['M'][0], r6['M'][1])
-    biase_vx = 190.0
-    m3_wire_h(q7e[1], q7e[0], biase_vx)
+    biase_vx = 192.0
+    m3_wire_h(q7e[1], ESC_Q7 + 2, biase_vx)
     m3_to_m4(biase_vx, q7e[1])
     m3_wire_h(r6['M'][1], r6['M'][0], biase_vx)
     m3_to_m4(biase_vx, r6['M'][1])
@@ -362,11 +384,11 @@ def main(ext_layout=None):
     # --- GND net: Q6.E(×2), R6.P, R7.P ---
     e6a, e6b = q_pins[5][0]['E'], q_pins[5][1]['E']
     m2_wire_h(e6a[1], e6a[0], e6b[0])
-    m2_to_m3(e6b[0], e6b[1])
+    m2_to_m3_esc(e6b[0], e6b[1], ESC_R + 4)
     m1_to_m3(r6['P'][0], r6['P'][1])
     m1_to_m3(r7['P'][0], r7['P'][1])
-    gnd_vx = 10.0
-    m3_wire_h(e6b[1], e6b[0], gnd_vx)
+    gnd_vx = 142.0
+    m3_wire_h(e6b[1], ESC_R + 4, gnd_vx)
     m3_to_m4(gnd_vx, e6b[1])
     m3_wire_h(r6['P'][1], r6['P'][0], gnd_vx)
     m3_to_m4(gnd_vx, r6['P'][1])
@@ -376,16 +398,15 @@ def main(ext_layout=None):
     m4_wire_v(gnd_vx, gnd_ys[0], gnd_ys[-1])
 
     # --- VCC net: R1.P, R2.P, R3.P, R4.P, R5.P ---
-    vcc_pins = [r1['P'], r2['P'], r3['P'], r4['P'], r5['P']]
+    vcc_pins = [r1['M'], r2['M'], r3['M'], r4['M'], r5['M']]
     for vp in vcc_pins:
         m1_to_m3(vp[0], vp[1])
-    vcc_hy = 385.0
+    vcc_vx = 196.0
     for vp in vcc_pins:
-        m3_to_m4(vp[0], vp[1])
-        m4_wire_v(vp[0], vp[1], vcc_hy)
-        m3_to_m4(vp[0], vcc_hy)
-    vcc_xs = sorted([vp[0] for vp in vcc_pins])
-    m3_wire_h(vcc_hy, vcc_xs[0], vcc_xs[-1])
+        m3_wire_h(vp[1], vp[0], vcc_vx)
+        m3_to_m4(vcc_vx, vp[1])
+    vcc_ys = sorted([vp[1] for vp in vcc_pins])
+    m4_wire_v(vcc_vx, vcc_ys[0], vcc_ys[-1])
 
     # --- Port labels on TM2 ---
     ly_tm2 = ly['TM2']

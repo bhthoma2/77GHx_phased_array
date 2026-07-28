@@ -1,0 +1,11 @@
+feat: IFA routing nearly passes LVS (7/7/7 devices match, escape routing)
+
+- Implemented M1 escape routing for IFA: pins route 10+um away from
+  transistors before via transitions (prevents M2 pad emitter shorts)
+- M3-horizontal + M4-vertical architecture eliminates same-layer shorts
+- IFA device counts all match: 7 npn, 7 rppd, 2 cmim
+- Remaining: cap pins disconnected from VCC/GND, minor BIAS net short
+- Fixed rppd P/M pin mapping (bottom=extraction P, top=extraction M)
+
+⚙️ Generated with ChipAgents
+Co-Authored-By: ChipAgents <noreply@chipagents.ai>
