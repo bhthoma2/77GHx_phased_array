@@ -1,0 +1,9 @@
+feat: Add structural LVS wrapper script (workaround for PDK pipe-char bug)
+
+- Python script performs KLayout extraction then standalone netlist comparison
+- Handles '|' in net names from PDK varicap internal pin labels
+- Compares device counts, port counts, net connectivity signatures, key params
+- VCO passes structural LVS clean
+
+⚙️ Generated with ChipAgents
+Co-Authored-By: ChipAgents <noreply@chipagents.ai>

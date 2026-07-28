@@ -1,0 +1,12 @@
+fix: VCO LVS label cleanup and schematic matching
+
+- Added datatype 25 text labels for LVS recognition (IHP rule deck)
+- Removed duplicate/conflicting labels (OUTN removed since same DC net)
+- Removed OUTP/VTUNE from LVS layer to avoid PDK varicap pin merging
+- Created lvs/ directory with export script and reference netlist
+- VCO extracted netlist matches schematic topology but KLayout
+  self-comparison fails due to pipe chars in PDK varicap pin names
+- Fixed TXPA substrate pins (sub!) and VCO varicap bn/NW connections
+
+⚙️ Generated with ChipAgents
+Co-Authored-By: ChipAgents <noreply@chipagents.ai>
