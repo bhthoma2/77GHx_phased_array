@@ -1,0 +1,214 @@
+OpenROAD 26Q3-771-g7cfb2105c9 
+Features included (+) or not (-): +GPU +GUI +Python
+This program is licensed under the BSD-3 license. See the LICENSE file for details.
+Components of this program may be licensed under more restrictive licenses which must be honored.
+[INFO ODB-0227] LEF file: /pdk/ihp-sg13g2/libs.ref/sg13g2_stdcell/lef/sg13g2_tech.lef, created 19 layers, 70 vias
+[INFO ODB-0227] LEF file: /pdk/ihp-sg13g2/libs.ref/sg13g2_stdcell/lef/sg13g2_stdcell.lef, created 84 library cells
+[INFO ODB-0227] LEF file: /pdk/ihp-sg13g2/libs.ref/sg13g2_sram/lef/RM_IHPSG13_1P_1024x32_c2_bm_bist.lef, created 1 library cells
+[INFO ODB-0127] Reading DEF file: build/vibrometer_top.def
+[INFO ODB-0128] Design: vibrometer_top
+[INFO ODB-0094] 		Created 100000 Insts
+[INFO ODB-0097] 		Created 100000 Nets
+[INFO ODB-0130]     Created 123 pins.
+[INFO ODB-0131]     Created 111466 components and 672190 component-terminals.
+[INFO ODB-0132]     Created 9 special nets and 210334 connections.
+[INFO ODB-0133]     Created 110012 nets and 447648 connections.
+[INFO ODB-0134] Finished DEF file: build/vibrometer_top.def
+Snapped SRAM to (1330160, 22735)
+[WARNING GRT-0281] Net u_range_fft/_025645_ has a large fanout of 2293 terminals.
+[INFO DRT-0149] Reading tech and libs.
+[WARNING DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer Cont
+[WARNING DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer Via1
+[WARNING DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer Via1
+[WARNING DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer Via2
+[WARNING DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer Via3
+[WARNING DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer Via4
+[WARNING DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer TopVia1
+[WARNING DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer TopVia1
+[WARNING DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer TopVia2
+[WARNING DRT-0349] LEF58_ENCLOSURE with no CUTCLASS is not supported. Skipping for layer TopVia2
+
+Units:                1000
+Number of layers:     15
+Number of macros:     85
+Number of vias:       70
+Number of viarulegen: 6
+
+[INFO DRT-0150] Reading design.
+[WARNING DRT-0120] Large net rst_n has 443 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_025636_ has 246 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_025644_ has 726 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_025645_ has 2293 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_025702_ has 113 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_025788_ has 124 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_025807_ has 123 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_025813_ has 121 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_025860_ has 145 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_025873_ has 141 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_025882_ has 121 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_025902_ has 133 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_026706_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_027141_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_027143_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_027408_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_027411_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_027677_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_027679_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_027944_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_027948_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_028214_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_028217_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_028482_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_028485_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_028751_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_028754_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_029019_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_029022_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_029288_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_029291_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_029556_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_029559_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_029825_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_029827_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_030093_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_030095_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_030362_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_030365_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_030629_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_030631_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_030893_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_030895_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_050927_ has 137 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_050928_ has 249 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_051370_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_051371_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_051645_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_051647_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_051919_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_051922_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_052194_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_052196_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_052467_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_052469_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_052743_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_052745_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_053018_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_053020_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_053293_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_053295_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_053568_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_053570_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_053843_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_053845_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_054117_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_054119_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_054394_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_054396_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_054670_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_054672_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_054944_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_054946_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_055214_ has 385 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/_055216_ has 379 pins which may impact routing performance. Consider optimization.
+[WARNING DRT-0120] Large net u_range_fft/mac_b\[0\][15] has 139 pins which may impact routing performance. Consider optimization.
+
+Design:                   vibrometer_top
+Die area:                 ( 0 0 ) ( 2000000 2000000 )
+Number of track patterns: 14
+Number of DEF vias:       0
+Number of components:     111466
+Number of terminals:      123
+Number of snets:          9
+Number of nets:           110007
+
+[WARNING DRT-0418] Term u_sram/u_sram/A_DIN[15] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DOUT[16] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DOUT[14] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DIN[18] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DIN[13] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DOUT[18] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DIN[12] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DOUT[12] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DIN[20] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DIN[10] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DOUT[21] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DIN[22] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DOUT[9] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DIN[23] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DIN[8] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DOUT[23] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DOUT[7] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DIN[25] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DIN[5] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DOUT[26] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DOUT[5] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DIN[27] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DIN[3] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DOUT[28] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DOUT[2] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DIN[30] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DIN[1] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DOUT[30] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DIN[0] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_DOUT[0] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_ADDR[0] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_ADDR[1] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_ADDR[2] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_ADDR[3] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_ADDR[5] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_ADDR[8] has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_REN has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_WEN has no pins on routing grid
+[WARNING DRT-0418] Term u_sram/u_sram/A_MEN has no pins on routing grid
+[INFO DRT-0167] List of default vias:
+  Layer Via1
+    default via: Via1_XY
+  Layer Via2
+    default via: Via2_YX
+  Layer Via3
+    default via: Via3_XY
+  Layer Via4
+    default via: Via4_YX
+  Layer TopVia1
+    default via: TopVia1EWNS
+  Layer TopVia2
+    default via: TopVia2EWNS
+[INFO DRT-0162] Library cell analysis.
+[INFO DRT-0163] Instance analysis.
+  Complete 100000 instances.
+[INFO DRT-0164] Number of unique instances = 55.
+[INFO DRT-0168] Init region query.
+[INFO DRT-0018]   Complete 100000 insts.
+[INFO DRT-0024]   Complete GatPoly.
+[INFO DRT-0024]   Complete Cont.
+[INFO DRT-0024]   Complete Metal1.
+[INFO DRT-0024]   Complete Via1.
+[INFO DRT-0024]   Complete Metal2.
+[INFO DRT-0024]   Complete Via2.
+[INFO DRT-0024]   Complete Metal3.
+[INFO DRT-0024]   Complete Via3.
+[INFO DRT-0024]   Complete Metal4.
+[INFO DRT-0024]   Complete Via4.
+[INFO DRT-0024]   Complete Metal5.
+[INFO DRT-0024]   Complete TopVia1.
+[INFO DRT-0024]   Complete TopMetal1.
+[INFO DRT-0024]   Complete TopVia2.
+[INFO DRT-0024]   Complete TopMetal2.
+[INFO DRT-0033] GatPoly shape region query size = 0.
+[INFO DRT-0033] Cont shape region query size = 0.
+[INFO DRT-0033] Metal1 shape region query size = 3026900.
+[INFO DRT-0033] Via1 shape region query size = 0.
+[INFO DRT-0033] Metal2 shape region query size = 432.
+[INFO DRT-0033] Via2 shape region query size = 0.
+[INFO DRT-0033] Metal3 shape region query size = 1.
+[INFO DRT-0033] Via3 shape region query size = 0.
+[INFO DRT-0033] Metal4 shape region query size = 209.
+[INFO DRT-0033] Via4 shape region query size = 0.
+[INFO DRT-0033] Metal5 shape region query size = 0.
+[INFO DRT-0033] TopVia1 shape region query size = 0.
+[INFO DRT-0033] TopMetal1 shape region query size = 0.
+[INFO DRT-0033] TopVia2 shape region query size = 0.
+[INFO DRT-0033] TopMetal2 shape region query size = 0.
+[INFO DRT-0165] Start pin access.
+[INFO DRT-0078]   Complete 503 pins.
+[INFO DRT-0081]   Complete 54 unique inst patterns.

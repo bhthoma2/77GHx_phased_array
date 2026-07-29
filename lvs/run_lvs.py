@@ -136,6 +136,19 @@ def compare_netlists(layout_file, schem_file, sub_net="sub!"):
                 combined[-1]["params"] = dict(d["params"])
         return combined
 
+    # Merge named nets: "VCC$1" → "VCC", etc. (text labels on disconnected conductors)
+    def merge_named_nets(devices):
+        """Rename net variants (FOO$1, FOO$2) to base name (FOO).
+        Only applies to nets with alphabetic prefix (not anonymous $N nets)."""
+        def fix_net(n):
+            if n.startswith('$') or n.startswith('\\$'):
+                return n  # anonymous net, don't touch
+            return re.sub(r'\$\d+$', '', n)
+        for d in devices:
+            d["nets"] = [fix_net(n) for n in d["nets"]]
+        return devices
+
+    l_devices = merge_named_nets(l_devices)
     l_devices = combine_parallel(l_devices)
     s_devices = combine_parallel(s_devices)
 

@@ -408,6 +408,43 @@ def main(ext_layout=None):
     vcc_ys = sorted([vp[1] for vp in vcc_pins])
     m4_wire_v(vcc_vx, vcc_ys[0], vcc_ys[-1])
 
+    # --- Bypass caps: C53, C54 at (220, 300) and (220, 280) ---
+    # cmim cell has vmim (129,0) internal vias connecting M5↔TM1
+    # c0 = mim_top (TM1 plate), c1 = mim_btm (M5 plate) per extraction terminal order
+    # Schematic: XC1 VCC GND → c0(TM1)=VCC, c1(M5)=GND
+    # VCO approach: M5 wire touching cap M5 TOP edge (outside MIM), TM1 text label
+    cap_origins = [(220.0, 300.0), (220.0, 280.0)]
+
+    # GND → c1 (M5 bottom plate): M5 wire touching cap M5 TOP edge
+    # CRITICAL: GND M4 horizontal must NOT cross VCC M4 vertical at x=196
+    # Solution: Via4 at gnd_vx=142 (on GND M4 vertical), then M5 horizontal to cap
+    gnd_m5_x = 225.0
+    gnd_via4_y = cap_origins[0][1] + 7.59 + 2.0  # 309.59
+    m4_wire_v(gnd_vx, gnd_ys[-1], gnd_via4_y)
+    # Single Via4 at GND M4 vertical top (x=142), then M5 horizontal to each cap
+    box(ifa, ly['Via4'], gnd_vx - 0.095, gnd_via4_y - 0.095, gnd_vx + 0.095, gnd_via4_y + 0.095)
+    box(ifa, lm4, gnd_vx - 0.25, gnd_via4_y - 0.25, gnd_vx + 0.25, gnd_via4_y + 0.25)
+    box(ifa, ly['M5'], gnd_vx - 0.25, gnd_via4_y - 0.25, gnd_vx + 0.25, gnd_via4_y + 0.25)
+    for cx_cap, cy_cap in cap_origins:
+        cap_m5_top = cy_cap + 7.59
+        # M5 horizontal from gnd_vx to cap X, then vertical down to cap M5 top edge
+        box(ifa, ly['M5'], gnd_vx - 0.25, gnd_via4_y - 0.25, gnd_m5_x + 0.25, gnd_via4_y + 0.25)
+        box(ifa, ly['M5'], gnd_m5_x - 0.25, cap_m5_top, gnd_m5_x + 0.25, gnd_via4_y + 0.25)
+
+    # VCC → c0 (TM1 top plate): use text label (same as VCO approach)
+    # Physical TM1 routing into cap area breaks device recognition (enters MIM area)
+    # Instead: place "VCC" text on TM1 text layer (126,25) at cap TM1 plate
+    ly_tm1_txt = layout.layer(126, 25)
+    ly_m5_txt = layout.layer(67, 25)
+    for cx_cap, cy_cap in cap_origins:
+        ifa.shapes(ly_tm1_txt).insert(pya.Text("VCC", pya.Trans(um(cx_cap + 3.5), um(cy_cap + 3.5))))
+    # Also label the GND M5 connection
+    for cx_cap, cy_cap in cap_origins:
+        ifa.shapes(ly_m5_txt).insert(pya.Text("GND", pya.Trans(um(gnd_m5_x), um(cy_cap + 7.59 + 1.0))))
+    # Label VCC on the rppd VCC M4 rail (M4 text layer 50,25)
+    ly_m4_txt = layout.layer(50, 25)
+    ifa.shapes(ly_m4_txt).insert(pya.Text("VCC", pya.Trans(um(vcc_vx), um(vcc_ys[2]))))
+
     # --- Port labels on TM2 ---
     ly_tm2 = ly['TM2']
     cx = CELL_W / 2

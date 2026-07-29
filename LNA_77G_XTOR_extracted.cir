@@ -1,4 +1,4 @@
-* Extracted by KLayout with SG13G2 LVS runset on : 28/07/2026 17:56
+* Extracted by KLayout with SG13G2 LVS runset on : 29/07/2026 09:30
 
 .SUBCKT LNA_77G_XTOR
 Q$1 \$84 \$84 \$65 \$1 npn13G2l we=70n le=1000n Nx=1 m=1

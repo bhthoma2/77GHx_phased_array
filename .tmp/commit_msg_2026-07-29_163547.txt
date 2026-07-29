@@ -1,0 +1,14 @@
+feat: IFA cap routing working (cmim 1/1), fix run_lvs named-net merging
+
+- IFA: cmim cap routing via M5 edge-touch for GND (c1) + TM1 text
+  label for VCC (c0). Key insight: TM1 wire entering MIM area breaks
+  device recognition; must use text labels for TM1 plate connection.
+- IFA: GND M5 routed via Via4 at gnd_vx then M5 horizontal to avoid
+  crossing VCC M4 vertical (was shorting VCC=GND on M4).
+- run_lvs.py: Added merge_named_nets() to handle KLayout text-label
+  naming of disconnected conductors (VCC$1 -> VCC).
+- IFA status: cap 1/1, npn 7/7, rppd 7/7, 1 remaining net error
+  (pre-existing BIAS routing issue).
+
+⚙️ Generated with ChipAgents
+Co-Authored-By: ChipAgents <noreply@chipagents.ai>
