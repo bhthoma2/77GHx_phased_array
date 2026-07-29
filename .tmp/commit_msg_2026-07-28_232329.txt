@@ -1,0 +1,11 @@
+feat: Mixer npn 8/8 passes with escape routing, LNA rppd 5/5
+
+- Mixer: GND emitter escape routing separates GND M4 from base M4
+  stubs (was shorting GND to RFP_I/RFN_I). npn 8/8 now matches.
+- Mixer: Q26/Q27 bias transistor escape routing added
+- Mixer: R23 pin swap corrected (bottom=VCC, top=net1 floating)
+- Mixer remaining: rppd 4/2 (some M3 via overlaps), caps 7/5
+- LNA: npn 5/5, rppd 5/5, caps 5/9 (PDK cmim plate interactions)
+
+⚙️ Generated with ChipAgents
+Co-Authored-By: ChipAgents <noreply@chipagents.ai>

@@ -244,25 +244,32 @@ def main(ext_layout=None):
         hwire('M3', q25_px, elor_bus_x, qy+emi_dy)
 
     # --- Net GND (M4): Q20.E + Q21.E + Q27.E ---
-    # Q20.E and Q21.E are on M2; route to M4 shared bus
+    # Route emitters to OFFSET X positions to avoid overlap with base M4 stubs
     gnd_hy = q20_ys[0] + emi_dy - 5.0
+    q20_esc_x = 120.0   # left escape for Q20 emitters
+    q21_esc_x = 180.0   # right escape for Q21 emitters
+    q27_esc_x = 200.0   # right escape for Q27 emitter
+    # Q20.E: route M2 left to escape, via up to M4
     for qy in q20_ys:
-        via_n(q20_px, qy+emi_dy, 'M2', 'Via2', 'M3')
-        via_n(q20_px, qy+emi_dy, 'M3', 'Via3', 'M4')
+        hwire('M2', q20_esc_x, q20_px, qy+emi_dy)
+        via_n(q20_esc_x, qy+emi_dy, 'M2', 'Via2', 'M3')
+        via_n(q20_esc_x, qy+emi_dy, 'M3', 'Via3', 'M4')
+    # Q21.E: route M2 right to escape, via up to M4
     for qy in q21_ys:
-        via_n(q21_px, qy+emi_dy, 'M2', 'Via2', 'M3')
-        via_n(q21_px, qy+emi_dy, 'M3', 'Via3', 'M4')
-    # Q27.E
-    via_n(q27_px, q27_y+emi_dy, 'M2', 'Via2', 'M3')
-    via_n(q27_px, q27_y+emi_dy, 'M3', 'Via3', 'M4')
-    # M4 vertical buses
-    vwire('M4', q20_px, gnd_hy, q20_ys[3]+emi_dy)
-    vwire('M4', q21_px, gnd_hy, q21_ys[3]+emi_dy)
-    # M4 horizontal connecting Q20.E, Q21.E columns at bottom
-    hwire('M4', q20_px, q21_px, gnd_hy)
-    # Connect Q27.E to GND bus
-    vwire('M4', q27_px, q27_y+emi_dy, gnd_hy)
-    hwire('M4', q21_px, q27_px, gnd_hy)
+        hwire('M2', q21_px, q21_esc_x, qy+emi_dy)
+        via_n(q21_esc_x, qy+emi_dy, 'M2', 'Via2', 'M3')
+        via_n(q21_esc_x, qy+emi_dy, 'M3', 'Via3', 'M4')
+    # Q27.E: route M2 right to escape, via up to M4
+    hwire('M2', q27_px, q27_esc_x, q27_y+emi_dy)
+    via_n(q27_esc_x, q27_y+emi_dy, 'M2', 'Via2', 'M3')
+    via_n(q27_esc_x, q27_y+emi_dy, 'M3', 'Via3', 'M4')
+    # M4 vertical buses at escape positions
+    vwire('M4', q20_esc_x, gnd_hy, q20_ys[3]+emi_dy)
+    vwire('M4', q21_esc_x, gnd_hy, q21_ys[3]+emi_dy)
+    # M4 horizontal connecting all GND columns
+    hwire('M4', q20_esc_x, q27_esc_x, gnd_hy)
+    # Q27 vertical to GND bus
+    vwire('M4', q27_esc_x, q27_y+emi_dy, gnd_hy)
 
     # --- Net RFP_I (M4): Q20.B ---
     rfp_bus_x = q20_px - 5.0
@@ -322,11 +329,16 @@ def main(ext_layout=None):
     # VCC/2V4 rail on M3 at top of cell
     vcc_rail_y = cy + 125
     mixer.shapes(ly['M3']).insert(pya.Box(um(10), um(vcc_rail_y), um(CELL_W - 10), um(vcc_rail_y + 2.0)))
-    # Q22.C → M3 via stubs to VCC rail
+    # Q22.C → escape RIGHT to x=136 on M1, then via to M4, M4 vertical to VCC rail
+    q22c_esc_x = 136.0
     for qy in q22_ys:
-        via_n(q22_px, qy+col_dy, 'M1', 'Via1', 'M2')
-        via_n(q22_px, qy+col_dy, 'M2', 'Via2', 'M3')
-    vwire('M3', q22_px, q22_ys[0]+col_dy, vcc_rail_y)
+        hwire('M1', q22_px, q22c_esc_x, qy+col_dy)
+        via_n(q22c_esc_x, qy+col_dy, 'M1', 'Via1', 'M2')
+        via_n(q22c_esc_x, qy+col_dy, 'M2', 'Via2', 'M3')
+        via_n(q22c_esc_x, qy+col_dy, 'M3', 'Via3', 'M4')
+    vwire('M4', q22c_esc_x, q22_ys[0]+col_dy, vcc_rail_y)
+    # Connect M4 to M3 VCC rail at top
+    via_n(q22c_esc_x, vcc_rail_y, 'M3', 'Via3', 'M4')
     # R21, R22, R23, R24 top pins (P) connect to VCC rail via M1 stubs
     # R21.M, R22.M, R24.M also connect to VCC rail
     # The rppd P pin is at top, M pin is at bottom
@@ -340,59 +352,71 @@ def main(ext_layout=None):
         via_n(mx, my, 'M1', 'Via1', 'M2')
         via_n(mx, my, 'M2', 'Via2', 'M3')
         vwire('M3', mx, my, vcc_rail_y)
-    # R23.P connects to VCC rail
-    px, py = r23_pins['P']
-    via_n(px, py, 'M1', 'Via1', 'M2')
-    via_n(px, py, 'M2', 'Via2', 'M3')
-    vwire('M3', px, py, vcc_rail_y)
-    # R23.M is net1 (floating) — no routing needed
+    # R23.M (bottom pin = schematic P = 2V4) connects to VCC rail
+    mx, my = r23_pins['M']
+    via_n(mx, my, 'M1', 'Via1', 'M2')
+    via_n(mx, my, 'M2', 'Via2', 'M3')
+    vwire('M3', mx, my, vcc_rail_y)
+    # R23.P (top pin = schematic M = net1) is floating — no routing needed
 
     # --- Net IFN (M4): Q23.C + Q24.C ---
+    # Escape collectors to offset X to avoid crossing base/emitter M3/M4 pads
     ifn_hy = q23_ys[0] + col_dy - 3.0
+    q23c_esc_x = 108.0  # left of ELOL bus (111.1)
+    q24c_esc_x = 192.0  # right of ELOR bus (188.9)
     for qy in q23_ys:
-        via_n(q23_px, qy+col_dy, 'M1', 'Via1', 'M2')
-        via_n(q23_px, qy+col_dy, 'M2', 'Via2', 'M3')
-        via_n(q23_px, qy+col_dy, 'M3', 'Via3', 'M4')
+        hwire('M1', q23c_esc_x, q23_px, qy+col_dy)
+        via_n(q23c_esc_x, qy+col_dy, 'M1', 'Via1', 'M2')
+        via_n(q23c_esc_x, qy+col_dy, 'M2', 'Via2', 'M3')
+        via_n(q23c_esc_x, qy+col_dy, 'M3', 'Via3', 'M4')
     for qy in q24_ys:
-        via_n(q24_px, qy+col_dy, 'M1', 'Via1', 'M2')
-        via_n(q24_px, qy+col_dy, 'M2', 'Via2', 'M3')
-        via_n(q24_px, qy+col_dy, 'M3', 'Via3', 'M4')
-    vwire('M4', q23_px, ifn_hy, q23_ys[3]+col_dy)
-    vwire('M4', q24_px, ifn_hy, q24_ys[3]+col_dy)
-    hwire('M4', q23_px, q24_px, ifn_hy)
+        hwire('M1', q24_px, q24c_esc_x, qy+col_dy)
+        via_n(q24c_esc_x, qy+col_dy, 'M1', 'Via1', 'M2')
+        via_n(q24c_esc_x, qy+col_dy, 'M2', 'Via2', 'M3')
+        via_n(q24c_esc_x, qy+col_dy, 'M3', 'Via3', 'M4')
+    vwire('M4', q23c_esc_x, ifn_hy, q23_ys[3]+col_dy)
+    vwire('M4', q24c_esc_x, ifn_hy, q24_ys[3]+col_dy)
+    hwire('M4', q23c_esc_x, q24c_esc_x, ifn_hy)
 
     # --- Net IFP (M4): Q25.C ---
+    # Escape RIGHT to avoid crossing base M3/M4 pads in column
+    q25c_esc_x = 175.0
     for qy in q25_ys:
-        via_n(q25_px, qy+col_dy, 'M1', 'Via1', 'M2')
-        via_n(q25_px, qy+col_dy, 'M2', 'Via2', 'M3')
-        via_n(q25_px, qy+col_dy, 'M3', 'Via3', 'M4')
-    vwire('M4', q25_px, q25_ys[0]+col_dy, q25_ys[3]+col_dy)
+        hwire('M1', q25_px, q25c_esc_x, qy+col_dy)
+        via_n(q25c_esc_x, qy+col_dy, 'M1', 'Via1', 'M2')
+        via_n(q25c_esc_x, qy+col_dy, 'M2', 'Via2', 'M3')
+        via_n(q25c_esc_x, qy+col_dy, 'M3', 'Via3', 'M4')
+    vwire('M4', q25c_esc_x, q25_ys[0]+col_dy, q25_ys[3]+col_dy)
 
     # --- Net BIAS (M3): Q26.C + Q26.B (diode-connected) ---
-    via_n(q26_px, q26_y+col_dy, 'M1', 'Via1', 'M2')
-    via_n(q26_px, q26_y+col_dy, 'M2', 'Via2', 'M3')
-    via_n(q26_px, q26_y+bas_dy, 'M1', 'Via1', 'M2')
-    via_n(q26_px, q26_y+bas_dy, 'M2', 'Via2', 'M3')
-    # Connect C and B on M3
-    hwire('M3', q26_px, q26_px + 3.0, q26_y+col_dy)
-    vwire('M3', q26_px + 3.0, q26_y+bas_dy, q26_y+col_dy)
-    hwire('M3', q26_px, q26_px + 3.0, q26_y+bas_dy)
+    # Escape Q26.C and Q26.B on M1 LEFT to x=95, via there to M3
+    q26_esc_x = 95.0
+    hwire('M1', q26_esc_x, q26_px, q26_y+col_dy)
+    via_n(q26_esc_x, q26_y+col_dy, 'M1', 'Via1', 'M2')
+    via_n(q26_esc_x, q26_y+col_dy, 'M2', 'Via2', 'M3')
+    hwire('M1', q26_esc_x, q26_px, q26_y+bas_dy)
+    via_n(q26_esc_x, q26_y+bas_dy, 'M1', 'Via1', 'M2')
+    via_n(q26_esc_x, q26_y+bas_dy, 'M2', 'Via2', 'M3')
+    # Connect C and B on M3 (vertical at escape X)
+    vwire('M3', q26_esc_x, q26_y+bas_dy, q26_y+col_dy)
 
     # --- Net BIAS_MID (M3): Q26.E + Q27.C + Q27.B ---
+    # Q26.E: via M2→M3 at pin position (no M1 conflict)
     via_n(q26_px, q26_y+emi_dy, 'M2', 'Via2', 'M3')
-    via_n(q27_px, q27_y+col_dy, 'M1', 'Via1', 'M2')
-    via_n(q27_px, q27_y+col_dy, 'M2', 'Via2', 'M3')
-    via_n(q27_px, q27_y+bas_dy, 'M1', 'Via1', 'M2')
-    via_n(q27_px, q27_y+bas_dy, 'M2', 'Via2', 'M3')
-    # Connect Q27.C and Q27.B on M3 (diode)
-    bm_y = (q27_y+col_dy + q27_y+bas_dy) / 2
-    vwire('M3', q27_px + 3.0, q27_y+bas_dy, q27_y+col_dy)
-    hwire('M3', q27_px, q27_px + 3.0, q27_y+col_dy)
-    hwire('M3', q27_px, q27_px + 3.0, q27_y+bas_dy)
+    # Q27.C and Q27.B: escape on M1 RIGHT to x=205, via there to M3
+    q27_esc_x = 205.0
+    hwire('M1', q27_px, q27_esc_x, q27_y+col_dy)
+    via_n(q27_esc_x, q27_y+col_dy, 'M1', 'Via1', 'M2')
+    via_n(q27_esc_x, q27_y+col_dy, 'M2', 'Via2', 'M3')
+    hwire('M1', q27_px, q27_esc_x, q27_y+bas_dy)
+    via_n(q27_esc_x, q27_y+bas_dy, 'M1', 'Via1', 'M2')
+    via_n(q27_esc_x, q27_y+bas_dy, 'M2', 'Via2', 'M3')
+    # Connect Q27.C and Q27.B on M3 (diode) at escape X
+    vwire('M3', q27_esc_x, q27_y+bas_dy, q27_y+col_dy)
     # Connect Q26.E to Q27.C/B net via M3 horizontal
     bm_route_y = q26_y + emi_dy
-    hwire('M3', q26_px, q27_px + 3.0, bm_route_y)
-    vwire('M3', q27_px + 3.0, q27_y+col_dy, bm_route_y)
+    hwire('M3', q26_px, q27_esc_x, bm_route_y)
+    vwire('M3', q27_esc_x, q27_y+col_dy, bm_route_y)
 
     # ================================================================
     # PORT LABELS (for LVS extraction)
@@ -410,7 +434,7 @@ def main(ext_layout=None):
     # RFP, RFN on caps C39, C40 far side
     # LOP, LON on caps C37, C38 far side
     # IFP on Q25.C net, IFN on Q23.C+Q24.C net
-    mixer.shapes(ly['M4']).insert(pya.Text("IFP", pya.Trans(um(q25_px), um(q25_ys[0]+col_dy))))
+    mixer.shapes(ly['M4']).insert(pya.Text("IFP", pya.Trans(um(q25c_esc_x), um(q25_ys[0]+col_dy))))
     mixer.shapes(ly['M4']).insert(pya.Text("IFN", pya.Trans(um(cx), um(ifn_hy))))
 
     # LOP/LON port labels on M5 LO nets
@@ -418,9 +442,9 @@ def main(ext_layout=None):
     mixer.shapes(ly['M5']).insert(pya.Text("LON_I", pya.Trans(um(cx), um(lon_hy))))
 
     # BIAS label
-    mixer.shapes(ly['M3']).insert(pya.Text("BIAS", pya.Trans(um(q26_px + 3.0), um(q26_y+col_dy))))
+    mixer.shapes(ly['M3']).insert(pya.Text("BIAS", pya.Trans(um(q26_esc_x), um(q26_y+col_dy))))
     # BIAS_MID label
-    mixer.shapes(ly['M3']).insert(pya.Text("BIAS_MID", pya.Trans(um(q27_px + 3.0), um(q27_y+col_dy))))
+    mixer.shapes(ly['M3']).insert(pya.Text("BIAS_MID", pya.Trans(um(q27_esc_x), um(q27_y+col_dy))))
 
     print("Routing complete")
 
