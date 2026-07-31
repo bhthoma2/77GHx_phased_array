@@ -712,10 +712,11 @@ def main(ext_layout=None):
     # C53: c0(M5)=net1(Q1.B bus), c1(TM1)=INP
     c53_c0x = c53_x + cmim_c0_dx
     c53_c0y = c53_y + cmim_c0_dy
-    # Connect C53.c0 (M5) to Q1 base bus (INP_B on M4 at inp_bus_x)
-    inp_b_m5_y = inp_port_y  # M5 pad already at inp_bus_x
+    # Connect C53.c0 (M5) to Q1 base bus — touch cap M5 TOP edge from above
+    inp_b_m5_y = inp_port_y
+    c53_m5_top = c53_y + 7.59
     m5_wire(inp_bus_x, inp_b_m5_y, c53_c0x, inp_b_m5_y)
-    m5_wire(c53_c0x, inp_b_m5_y, c53_c0x, c53_c0y)
+    m5_wire(c53_c0x, inp_b_m5_y, c53_c0x, c53_m5_top)
 
     # C54: c0(M5)=GND, c1(TM1)=net2(Q2.B)
     c54_c0x = c54_x + cmim_c0_dx
@@ -729,36 +730,19 @@ def main(ext_layout=None):
     m4_wire(c54_c0x, c54_via4_y, gnd_trk_x, c54_via4_y)
     via_n(lna, gnd_trk_x, c54_via4_y, 'M3', 'Via3', 'M4')
 
-    # C54 c1(TM1) to Q2 base bus (INN_B on M4→M5)
+    # C54 c1(TM1) = net2(Q2.B) — use text label (TM1 into MIM breaks cap recognition)
     c54_c1x = c54_x + cmim_c0_dx
     c54_c1y = c54_y + cmim_c0_dy
-    inn_b_m5_y = inp_port_y
-    via_n(lna, inn_bus_x, inp_port_y, 'M5', 'TopVia1', 'TM1')
-    lna.shapes(ly['TM1']).insert(pya.Box(
-        um(min(inn_bus_x, c54_c1x)-0.25), um(min(inp_port_y, c54_c1y)-0.25),
-        um(max(inn_bus_x, c54_c1x)+0.25), um(inp_port_y+0.25)))
-    lna.shapes(ly['TM1']).insert(pya.Box(
-        um(c54_c1x-0.25), um(min(inp_port_y, c54_c1y)-0.25),
-        um(c54_c1x+0.25), um(max(inp_port_y, c54_c1y)+0.25)))
 
     # C55: c0(M5)=OUTP, c1(TM1)=net6(Q3.C)
     c55_c0x = c55_x + cmim_c0_dx
     c55_c0y = c55_y + cmim_c0_dy
+    c55_m5_bot = c55_y - 0.6  # cap M5 bottom edge
     m5_wire(inp_bus_x, outp_port_y, c55_c0x, outp_port_y)
-    m5_wire(c55_c0x, outp_port_y, c55_c0x, c55_c0y)
-    # c1(TM1) = net6 = Q3.C bus on M4 at inp_bus_x
+    m5_wire(c55_c0x, outp_port_y, c55_c0x, c55_m5_bot)
+    # c1(TM1) = net6 = Q3.C — text label only (TM1 into MIM breaks cap recognition)
     c55_c1x = c55_x + cmim_c0_dx
     c55_c1y = c55_y + cmim_c0_dy
-    outp_c_via_x = inp_bus_x - 3.0
-    via_m1_to_m5(outp_c_via_x, outp_port_y)
-    via_n(lna, outp_c_via_x, outp_port_y, 'M5', 'TopVia1', 'TM1')
-    m4_wire(inp_bus_x, outp_port_y, outp_c_via_x, outp_port_y)
-    lna.shapes(ly['TM1']).insert(pya.Box(
-        um(min(outp_c_via_x, c55_c1x)-0.25), um(min(outp_port_y, c55_c1y)-0.25),
-        um(max(outp_c_via_x, c55_c1x)+0.25), um(outp_port_y+0.25)))
-    lna.shapes(ly['TM1']).insert(pya.Box(
-        um(c55_c1x-0.25), um(min(outp_port_y, c55_c1y)-0.25),
-        um(c55_c1x+0.25), um(max(outp_port_y, c55_c1y)+0.25)))
 
     # C56: c0(M5)=2V4, c1(TM1)=net7(Q4.C)
     c56_c0x = c56_x + cmim_c0_dx
@@ -770,19 +754,9 @@ def main(ext_layout=None):
     m5_wire(c56_c0x, c56_m5_top, c56_c0x, c56_via4_y)
     m4_wire(c56_c0x, c56_via4_y, c56_c0x, vcc_y)
     via_n(lna, c56_c0x, vcc_y, 'M3', 'Via3', 'M4')
-    # c1(TM1) = net7 = Q4.C = OUTN_C bus on M4 at inn_bus_x
+    # c1(TM1) = net7 = Q4.C — text label only (TM1 into MIM breaks cap recognition)
     c56_c1x = c56_x + cmim_c0_dx
     c56_c1y = c56_y + cmim_c0_dy
-    outn_c_via_x = inn_bus_x + 3.0
-    via_m1_to_m5(outn_c_via_x, outp_port_y)
-    via_n(lna, outn_c_via_x, outp_port_y, 'M5', 'TopVia1', 'TM1')
-    m4_wire(inn_bus_x, outp_port_y, outn_c_via_x, outp_port_y)
-    lna.shapes(ly['TM1']).insert(pya.Box(
-        um(min(outn_c_via_x, c56_c1x)-0.25), um(min(outp_port_y, c56_c1y)-0.25),
-        um(max(outn_c_via_x, c56_c1x)+0.25), um(outp_port_y+0.25)))
-    lna.shapes(ly['TM1']).insert(pya.Box(
-        um(c56_c1x-0.25), um(min(outp_port_y, c56_c1y)-0.25),
-        um(c56_c1x+0.25), um(max(outp_port_y, c56_c1y)+0.25)))
 
     # C57-C61: VCC bypass chain on M5 (c0) and TM1 (c1)
     bypass_route_x = c57_61_x - 5.0  # x=255, clear of cap M5 plates

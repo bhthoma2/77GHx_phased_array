@@ -1,23 +1,23 @@
-* Extracted by KLayout with SG13G2 LVS runset on : 31/07/2026 10:06
+* Extracted by KLayout with SG13G2 LVS runset on : 31/07/2026 10:09
 
 .SUBCKT LNA_77G_XTOR
 Q$1 \$84 \$84 \$65 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$2 \$154 \$153 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$3 \$156 \$155 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$4 \$154 \$153 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$5 \$156 \$155 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$6 \$154 \$153 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$7 \$156 \$155 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$8 \$154 \$153 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$9 \$156 \$155 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$10 \$225 \$220 \$154 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$11 \$226 \$220 \$156 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$12 \$225 \$220 \$154 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$13 \$226 \$220 \$156 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$14 \$225 \$220 \$154 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$15 \$226 \$220 \$156 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$16 \$225 \$220 \$154 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$17 \$226 \$220 \$156 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$2 \$156 \$155 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$3 \$158 \$157 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$4 \$156 \$155 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$5 \$158 \$157 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$6 \$156 \$155 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$7 \$158 \$157 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$8 \$156 \$155 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$9 \$158 \$157 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$10 \$228 \$223 \$156 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$11 \$229 \$223 \$158 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$12 \$228 \$223 \$156 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$13 \$229 \$223 \$158 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$14 \$228 \$223 \$156 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$15 \$229 \$223 \$158 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$16 \$228 \$223 \$156 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$17 \$229 \$223 \$158 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
 R$18 \$33 \$84 \$1 rppd w=7u l=38.8u ps=0u b=0 m=1
 R$19 \$33 \$84 \$1 rppd w=7u l=38.8u ps=0u b=0 m=1
 R$20 \$33 \$84 \$1 rppd w=7u l=38.8u ps=0u b=0 m=1
@@ -34,14 +34,15 @@ R$30 \$65 \$84 \$1 rppd w=2.5u l=10.53u ps=0u b=0 m=1
 R$31 \$65 \$84 \$1 rppd w=2.5u l=10.53u ps=0u b=0 m=1
 R$32 \$65 \$84 \$1 rppd w=2.5u l=10.53u ps=0u b=0 m=1
 R$33 \$65 \$84 \$1 rppd w=2.5u l=10.53u ps=0u b=0 m=1
-R$34 \$286 \$220 \$1 rppd w=3u l=18.23u ps=0u b=0 m=1
-R$35 \$286 \$220 \$1 rppd w=3u l=18.23u ps=0u b=0 m=1
-R$36 \$220 \$84 \$1 rppd w=3u l=18.23u ps=0u b=0 m=1
+R$34 \$296 \$223 \$1 rppd w=3u l=18.23u ps=0u b=0 m=1
+R$35 \$296 \$223 \$1 rppd w=3u l=18.23u ps=0u b=0 m=1
+R$36 \$223 \$84 \$1 rppd w=3u l=18.23u ps=0u b=0 m=1
 R$37 \$84 \$84 \$1 rppd w=3u l=18.23u ps=0u b=0 m=1
 R$38 \$84 \$84 \$1 rppd w=3u l=18.23u ps=0u b=0 m=1
-C$39 \$121 \$153 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$39 \$121 \$155 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$40 \$290 \$228 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
 C$42 \$84 \$14 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
-C$43 \$226 \$286 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
-C$45 \$155 \$84 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
-C$47 \$14 \$286 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$43 \$291 \$296 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$45 \$122 \$84 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$47 \$14 \$296 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
 .ENDS LNA_77G_XTOR

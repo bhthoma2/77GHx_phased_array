@@ -1,0 +1,5 @@
+wip: LNA cap routing - fix Via4-inside-cap for C54/C56
+
+- LNA C54/C56: moved Via4 outside cap M5 plate (touch M5 top edge)
+- Still 5/9 caps found - remaining 4 signal caps (C53-C56) need
+  M5/TM1 routing refactor to avoid entering cap interior
