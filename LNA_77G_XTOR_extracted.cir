@@ -1,23 +1,23 @@
-* Extracted by KLayout with SG13G2 LVS runset on : 29/07/2026 09:30
+* Extracted by KLayout with SG13G2 LVS runset on : 31/07/2026 10:06
 
 .SUBCKT LNA_77G_XTOR
 Q$1 \$84 \$84 \$65 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
 Q$2 \$154 \$153 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$3 \$155 \$156 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$3 \$156 \$155 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
 Q$4 \$154 \$153 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$5 \$155 \$156 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$5 \$156 \$155 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
 Q$6 \$154 \$153 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$7 \$155 \$156 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$7 \$156 \$155 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
 Q$8 \$154 \$153 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$9 \$155 \$156 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$9 \$156 \$155 \$33 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
 Q$10 \$225 \$220 \$154 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$11 \$226 \$220 \$155 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$11 \$226 \$220 \$156 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
 Q$12 \$225 \$220 \$154 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$13 \$226 \$220 \$155 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$13 \$226 \$220 \$156 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
 Q$14 \$225 \$220 \$154 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$15 \$226 \$220 \$155 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$15 \$226 \$220 \$156 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
 Q$16 \$225 \$220 \$154 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
-Q$17 \$226 \$220 \$155 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
+Q$17 \$226 \$220 \$156 \$1 npn13G2l we=70n le=1000n Nx=1 m=1
 R$18 \$33 \$84 \$1 rppd w=7u l=38.8u ps=0u b=0 m=1
 R$19 \$33 \$84 \$1 rppd w=7u l=38.8u ps=0u b=0 m=1
 R$20 \$33 \$84 \$1 rppd w=7u l=38.8u ps=0u b=0 m=1
@@ -42,6 +42,6 @@ R$38 \$84 \$84 \$1 rppd w=3u l=18.23u ps=0u b=0 m=1
 C$39 \$121 \$153 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
 C$42 \$84 \$14 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
 C$43 \$226 \$286 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
-C$45 \$156 \$84 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
+C$45 \$155 \$84 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
 C$47 \$14 \$286 cap_cmim w=6.99u l=6.99u A=48.8601p P=27.96u m=1
 .ENDS LNA_77G_XTOR

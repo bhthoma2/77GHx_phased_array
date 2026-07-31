@@ -720,18 +720,14 @@ def main(ext_layout=None):
     # C54: c0(M5)=GND, c1(TM1)=net2(Q2.B)
     c54_c0x = c54_x + cmim_c0_dx
     c54_c0y = c54_y + cmim_c0_dy
-    # c0 to GND: short M5 stub down to GND M5 bus via M4 track
-    # Use Via4 at c54_c0x to bring M5 down to M4, then M4 to GND track
-    # Actually c0 is already on M5 and GND bus is on M5 at y=20.
-    # But a vertical M5 from c54_c0y(~193.5) down to gnd_y=20 is long and may cross things.
-    # Route: c54 M5 → Via4 → M4 at c54_c0x, M4 down short distance, M4 horizontal to gnd_trk_x,
-    # then on gnd_trk M4 down to GND M5 bus.
-    # Actually simpler: the GND M5 bus is wide (y=17-23). A short M5 stub left to gnd_trk_x,
-    # then gnd_trk_x M4 vertical already connects to it. But c54 is at y~193 which is far.
-    # Let's use a dedicated short M5 connection: c54_c0 → Via4 → M4 → horizontal to gnd_trk_x M4.
-    via_n(lna, c54_c0x, c54_c0y, 'M4', 'Via4', 'M5')
-    m4_wire(c54_c0x, c54_c0y, gnd_trk_x, c54_c0y)
-    via_n(lna, gnd_trk_x, c54_c0y, 'M3', 'Via3', 'M4')  # ensure M4 continuity at junction
+    # c0(M5) to GND: M5 wire touching cap M5 TOP edge (outside MIM), then Via4 above cap
+    # Cap M5 top at c54_y + 7.59. Via4 ABOVE cap at c54_y + 9.0
+    c54_m5_top = c54_y + 7.59
+    c54_via4_y = c54_m5_top + 2.0
+    via_n(lna, c54_c0x, c54_via4_y, 'M4', 'Via4', 'M5')
+    m5_wire(c54_c0x, c54_m5_top, c54_c0x, c54_via4_y)
+    m4_wire(c54_c0x, c54_via4_y, gnd_trk_x, c54_via4_y)
+    via_n(lna, gnd_trk_x, c54_via4_y, 'M3', 'Via3', 'M4')
 
     # C54 c1(TM1) to Q2 base bus (INN_B on M4→M5)
     c54_c1x = c54_x + cmim_c0_dx
@@ -767,10 +763,12 @@ def main(ext_layout=None):
     # C56: c0(M5)=2V4, c1(TM1)=net7(Q4.C)
     c56_c0x = c56_x + cmim_c0_dx
     c56_c0y = c56_y + cmim_c0_dy
-    # c0 to VCC: short M5 stub up to vcc_y (c56_c0y~333.5, vcc_y=540)
-    # Use M4 vertical instead to avoid long M5
-    via_n(lna, c56_c0x, c56_c0y, 'M4', 'Via4', 'M5')
-    m4_wire(c56_c0x, c56_c0y, c56_c0x, vcc_y)
+    # c0(M5) to VCC: M5 wire touching cap M5 TOP edge, Via4 above cap, M4 to VCC rail
+    c56_m5_top = c56_y + 7.59
+    c56_via4_y = c56_m5_top + 2.0
+    via_n(lna, c56_c0x, c56_via4_y, 'M4', 'Via4', 'M5')
+    m5_wire(c56_c0x, c56_m5_top, c56_c0x, c56_via4_y)
+    m4_wire(c56_c0x, c56_via4_y, c56_c0x, vcc_y)
     via_n(lna, c56_c0x, vcc_y, 'M3', 'Via3', 'M4')
     # c1(TM1) = net7 = Q4.C = OUTN_C bus on M4 at inn_bus_x
     c56_c1x = c56_x + cmim_c0_dx
