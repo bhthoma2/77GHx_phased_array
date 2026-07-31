@@ -339,10 +339,10 @@ def main(ext_layout=None):
     q7b = q_pins[6][0]['B']
     m1_wire_h(b5a[1], b5a[0], b5b[0])
     m1_wire_h(b6a[1], b6a[0], b6b[0])
-    m1_wire_v(q7c[0], q7b[1], q7c[1])
     m1_to_m3_esc(b5a[0], b5a[1], ESC_L)
     m1_to_m3_esc(b6a[0], b6a[1], ESC_R)
     m1_to_m3_esc(q7c[0], q7c[1], ESC_Q7)
+    m1_to_m3_esc(q7b[0], q7b[1], ESC_Q7 - 4)
     m1_to_m3(r5['P'][0], r5['P'][1])
     bias_vx = 138.0
     m3_wire_h(b5a[1], ESC_L, bias_vx)
@@ -351,9 +351,11 @@ def main(ext_layout=None):
     m3_to_m4(bias_vx, b6a[1])
     m3_wire_h(q7c[1], ESC_Q7, bias_vx)
     m3_to_m4(bias_vx, q7c[1])
+    m3_wire_h(q7b[1], ESC_Q7 - 4, bias_vx)
+    m3_to_m4(bias_vx, q7b[1])
     m3_wire_h(r5['P'][1], r5['P'][0], bias_vx)
     m3_to_m4(bias_vx, r5['P'][1])
-    bias_ys = sorted([b5a[1], b6a[1], q7c[1], r5['P'][1]])
+    bias_ys = sorted([b5a[1], b6a[1], q7c[1], q7b[1], r5['P'][1]])
     m4_wire_v(bias_vx, bias_ys[0], bias_ys[-1])
 
     # --- tail1_e net: Q5.E(×2), R7.M ---

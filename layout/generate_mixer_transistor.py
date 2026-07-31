@@ -419,6 +419,91 @@ def main(ext_layout=None):
     vwire('M3', q27_esc_x, q27_y+col_dy, bm_route_y)
 
     # ================================================================
+    # CMIM CAP ROUTING — proven IFA/VCO pattern
+    # c0=TM1(top plate)→supply/port via text label
+    # c1=M5(bottom plate)→internal net via M5 wire touching cap M5 TOP edge
+    # RULE: M5/TM1 wires must NOT enter cap interior (breaks device recognition)
+    # RULE: Via4/M5 routing must NOT cross other M4 verticals (causes shorts)
+    # ================================================================
+    ly_tm1_txt = layout.layer(126, 25)
+    ly_m5_txt  = layout.layer(67, 25)
+    ly_m3_txt  = layout.layer(30, 25)
+
+    # Cap origins (same as placement above)
+    c37_ox, c37_oy = cx - 55,     cy + 55   # (95, 280)
+    c38_ox, c38_oy = cx + 42,     cy + 55   # (192, 280)
+    c39_ox, c39_oy = cx - 55,     cy - 80   # (95, 145)
+    c40_ox, c40_oy = cx + 42,     cy - 80   # (192, 145)
+    bypass_origs = [(200 + i * 20, cy + 150) for i in range(3)]  # C41-C43
+
+    # ── C37: c0=LOP(TM1 label), c1=LOP_I(M5 from LOP_I bus at q22_px=131.1) ──
+    # LOP_I M5 bus vertical at x=131.1, y=276.775–306.775; M5 approach from above
+    c37_cap_top = c37_oy + 7.59   # 287.59
+    c37_cx      = c37_ox + 3.5    # 98.5
+    c37_via_y   = c37_cap_top + 2.0  # 289.59 — above cap, on LOP_I M5 bus
+    # M5: LOP_I bus → horizontal to cap center → vertical down to cap M5 top
+    hwire('M5', q22_px, c37_cx, c37_via_y)
+    vwire('M5', c37_cx, c37_cap_top, c37_via_y)
+    # TM1 text label for c0=LOP
+    mixer.shapes(ly_tm1_txt).insert(pya.Text("LOP", pya.Trans(um(c37_cx), um(c37_oy + 3.5))))
+    mixer.shapes(ly_m5_txt).insert(pya.Text("LOP_I", pya.Trans(um(c37_cx), um(c37_via_y))))
+
+    # ── C38: c0=LON(TM1 label), c1=LON_I(M5 from LON_I bus at q25_px=168.9) ──
+    c38_cap_top = c38_oy + 7.59   # 287.59
+    c38_cx      = c38_ox + 3.5    # 195.5
+    c38_via_y   = c38_cap_top + 2.0  # 289.59
+    # LON_I M5 bus at q25_px=168.9; horizontal to cap center, vertical to edge
+    hwire('M5', q25_px, c38_cx, c38_via_y)
+    vwire('M5', c38_cx, c38_cap_top, c38_via_y)
+    mixer.shapes(ly_tm1_txt).insert(pya.Text("LON", pya.Trans(um(c38_cx), um(c38_oy + 3.5))))
+    mixer.shapes(ly_m5_txt).insert(pya.Text("LON_I", pya.Trans(um(c38_cx), um(c38_via_y))))
+
+    # ── C39: c0=RFP(TM1 label), c1=RFP_I(Via4 on RFP_I M4 → M5 to cap) ──
+    # RFP_I M4 at rfp_bus_x=126.1, y=166.775–196.775; Via4 at bottom of bus
+    c39_cap_top = c39_oy + 7.59   # 152.59
+    c39_cx      = c39_ox + 3.5    # 98.5
+    c39_via4_y  = 167.5           # on RFP_I M4 bus (bottom at 166.775)
+    via_n(rfp_bus_x, c39_via4_y, 'M4', 'Via4', 'M5')
+    # M5: horizontal from rfp_bus_x to cap center; vertical down to cap M5 top
+    hwire('M5', rfp_bus_x, c39_cx, c39_via4_y)
+    vwire('M5', c39_cx, c39_cap_top, c39_via4_y)
+    mixer.shapes(ly_tm1_txt).insert(pya.Text("RFP", pya.Trans(um(c39_cx), um(c39_oy + 3.5))))
+    mixer.shapes(ly_m5_txt).insert(pya.Text("RFP_I", pya.Trans(um(c39_cx), um(c39_via4_y))))
+
+    # ── C40: c0=RFN(TM1 label), c1=RFN_I(Via4 on RFN_I M4 → M5 to cap) ──
+    c40_cap_top = c40_oy + 7.59   # 152.59
+    c40_cx      = c40_ox + 3.5    # 195.5
+    c40_via4_y  = 167.5           # on RFN_I M4 bus
+    via_n(rfn_bus_x, c40_via4_y, 'M4', 'Via4', 'M5')
+    hwire('M5', rfn_bus_x, c40_cx, c40_via4_y)
+    vwire('M5', c40_cx, c40_cap_top, c40_via4_y)
+    mixer.shapes(ly_tm1_txt).insert(pya.Text("RFN", pya.Trans(um(c40_cx), um(c40_oy + 3.5))))
+    mixer.shapes(ly_m5_txt).insert(pya.Text("RFN_I", pya.Trans(um(c40_cx), um(c40_via4_y))))
+
+    # ── C41–C43: c0=2V4(TM1 label), c1=GND(M5 from extended GND M4 vertical) ──
+    # Extend GND M4 vertical at gnd_esc_l=120 from gnd_hy up to bypass cap region
+    bypass_m4_top_y = bypass_origs[0][1] + 7.59 + 2.0  # 384.59
+    vwire('M4', gnd_esc_l, gnd_hy, bypass_m4_top_y)
+    # Via4 at top of extended GND M4 vertical
+    via_n(gnd_esc_l, bypass_m4_top_y, 'M4', 'Via4', 'M5')
+    # M5 horizontal from Via4 to rightmost cap center
+    rightmost_cx = bypass_origs[-1][0] + 3.5  # 243.5
+    hwire('M5', gnd_esc_l, rightmost_cx, bypass_m4_top_y)
+    for ox, oy in bypass_origs:
+        cap_cx_b = ox + 3.5
+        cap_top_b = oy + 7.59  # 382.59
+        # M5 vertical from bypass level down to cap M5 top edge
+        vwire('M5', cap_cx_b, cap_top_b, bypass_m4_top_y)
+        # TM1 text label c0=2V4
+        mixer.shapes(ly_tm1_txt).insert(pya.Text("2V4", pya.Trans(um(cap_cx_b), um(oy + 3.5))))
+
+    # Label named nets so extraction assigns correct net names
+    # 2V4 on M3 rail (already labelled as "2V4" text on M3 layer below)
+    mixer.shapes(ly_m3_txt).insert(pya.Text("2V4", pya.Trans(um(cx), um(vcc_rail_y + 1.0))))
+    # GND on M4 GND bus (already labelled below; also add M5 label)
+    mixer.shapes(ly_m5_txt).insert(pya.Text("GND", pya.Trans(um(gnd_esc_l), um(bypass_m4_top_y))))
+
+    # ================================================================
     # PORT LABELS (for LVS extraction)
     # ================================================================
     # GND port label on M4 GND bus

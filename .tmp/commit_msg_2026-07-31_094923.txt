@@ -1,0 +1,7 @@
+feat: IFA LVS CLEAN - all devices and nets match
+
+- IFA: Fixed Q7 BIAS/BIAS_E short by escaping C and B separately
+  (M1 vertical through emitter Y was shorting via internal npn cell M1)
+- IFA: Cap routing via M5 edge-touch + TM1 text labels
+- IFA: All 7 npn, 7 rppd, 1 cap_cmim match structurally
+- run_lvs.py: merge_named_nets handles text-label port naming
