@@ -175,6 +175,14 @@ def main(ext_layout=None):
     r24_x, r24_y = 92.0, cy + 130
     r24_pins = create_rppd(mixer, layout, r24_x, r24_y, 3.0, 27.48, m=1)
 
+    # Connect both stripes of m=2 rppd (stripe spacing = w+0.5 = 3.5um)
+    for rx, ry, w_r in [(r21_x, r21_y, 3.0), (r22_x, r22_y, 3.0)]:
+        s0_cx = rx + w_r / 2          # stripe 0 center X
+        s1_cx = rx + w_r + 0.5 + w_r / 2  # stripe 1 center X
+        p_y = ry + 18.23 + 0.1        # P pin Y (top, approximate)
+        m_y = ry - 0.15               # M pin Y (bottom, approximate)
+        hwire('M1', s0_cx, s1_cx, p_y)
+        hwire('M1', s0_cx, s1_cx, m_y)
     print("Placed 4 rppd (parameterized)")
 
     # ================================================================
@@ -436,27 +444,21 @@ def main(ext_layout=None):
     c40_ox, c40_oy = cx + 42,     cy - 80   # (192, 145)
     bypass_origs = [(200 + i * 20, cy + 150) for i in range(3)]  # C41-C43
 
-    # ── C37: c0=LOP(TM1 label), c1=LOP_I(M5 from LOP_I bus at q22_px=131.1) ──
-    # LOP_I M5 bus vertical at x=131.1, y=276.775–306.775; M5 approach from above
+    # ── C37: c0=LOP(TM1 label), c1=LOP_I(route at lop_hy to avoid crossing LON_I) ──
     c37_cap_top = c37_oy + 7.59   # 287.59
     c37_cx      = c37_ox + 3.5    # 98.5
-    c37_via_y   = c37_cap_top + 2.0  # 289.59 — above cap, on LOP_I M5 bus
-    # M5: LOP_I bus → horizontal to cap center → vertical down to cap M5 top
-    hwire('M5', q22_px, c37_cx, c37_via_y)
-    vwire('M5', c37_cx, c37_cap_top, c37_via_y)
-    # TM1 text label for c0=LOP
+    # Route below LON_I M5 vertical (starts at y=276.775): use lop_hy=273.775
+    vwire('M5', c37_cx, lop_hy, c37_cap_top)
+    hwire('M5', c37_cx, q22_px, lop_hy)
     mixer.shapes(ly_tm1_txt).insert(pya.Text("LOP", pya.Trans(um(c37_cx), um(c37_oy + 3.5))))
-    mixer.shapes(ly_m5_txt).insert(pya.Text("LOP_I", pya.Trans(um(c37_cx), um(c37_via_y))))
 
-    # ── C38: c0=LON(TM1 label), c1=LON_I(M5 from LON_I bus at q25_px=168.9) ──
+    # ── C38: c0=LON(TM1 label), c1=LON_I(route above LOP_I bus to avoid cross) ──
     c38_cap_top = c38_oy + 7.59   # 287.59
     c38_cx      = c38_ox + 3.5    # 195.5
-    c38_via_y   = c38_cap_top + 2.0  # 289.59
-    # LON_I M5 bus at q25_px=168.9; horizontal to cap center, vertical to edge
-    hwire('M5', q25_px, c38_cx, c38_via_y)
-    vwire('M5', c38_cx, c38_cap_top, c38_via_y)
+    # Route: M5 vertical from cap top to lon_hy, then horizontal to q25_px
+    vwire('M5', c38_cx, c38_cap_top, lon_hy)
+    hwire('M5', q25_px, c38_cx, lon_hy)
     mixer.shapes(ly_tm1_txt).insert(pya.Text("LON", pya.Trans(um(c38_cx), um(c38_oy + 3.5))))
-    mixer.shapes(ly_m5_txt).insert(pya.Text("LON_I", pya.Trans(um(c38_cx), um(c38_via_y))))
 
     # ── C39: c0=RFP(TM1 label), c1=RFP_I(Via4 on RFP_I M4 → M5 to cap) ──
     # RFP_I M4 at rfp_bus_x=126.1, y=166.775–196.775; Via4 at bottom of bus
@@ -480,15 +482,20 @@ def main(ext_layout=None):
     mixer.shapes(ly_tm1_txt).insert(pya.Text("RFN", pya.Trans(um(c40_cx), um(c40_oy + 3.5))))
     mixer.shapes(ly_m5_txt).insert(pya.Text("RFN_I", pya.Trans(um(c40_cx), um(c40_via4_y))))
 
-    # ── C41–C43: c0=2V4(TM1 label), c1=GND(M5 from extended GND M4 vertical) ──
-    # Extend GND M4 vertical at gnd_esc_l=120 from gnd_hy up to bypass cap region
+    # ── C41–C43: c0=2V4(TM1 label), c1=GND(M5 from GND M4 bus via Via4) ──
+    gnd_esc_l = q20_esc_x  # 120.0
     bypass_m4_top_y = bypass_origs[0][1] + 7.59 + 2.0  # 384.59
-    vwire('M4', gnd_esc_l, gnd_hy, bypass_m4_top_y)
-    # Via4 at top of extended GND M4 vertical
-    via_n(gnd_esc_l, bypass_m4_top_y, 'M4', 'Via4', 'M5')
-    # M5 horizontal from Via4 to rightmost cap center
+    # Via4 at top of existing GND M4 vertical (y=198.6)
+    gnd_m4_top = q20_ys[3] + emi_dy  # 198.6
+    via_n(gnd_esc_l, gnd_m4_top, 'M4', 'Via4', 'M5')
+    # Route M5: horizontal at safe Y (198.6, below all other M5 buses) to cap region X,
+    # then vertical up to bypass caps (avoids crossing LON_I M5 at y=309)
     rightmost_cx = bypass_origs[-1][0] + 3.5  # 243.5
-    hwire('M5', gnd_esc_l, rightmost_cx, bypass_m4_top_y)
+    hwire('M5', gnd_esc_l, rightmost_cx, gnd_m4_top)
+    vwire('M5', rightmost_cx, gnd_m4_top, bypass_m4_top_y)
+    # M5 horizontal at bypass level connecting all bypass caps
+    leftmost_cx = bypass_origs[0][0] + 3.5  # 203.5
+    hwire('M5', leftmost_cx, rightmost_cx, bypass_m4_top_y)
     for ox, oy in bypass_origs:
         cap_cx_b = ox + 3.5
         cap_top_b = oy + 7.59  # 382.59

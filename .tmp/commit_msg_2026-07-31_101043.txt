@@ -1,0 +1,7 @@
+wip: LNA caps 6/9, removed TM1 routing into MIM for C54/C55/C56
+
+- LNA: Removed TM1 wires entering cap MIM areas for C54, C55, C56
+- LNA: Fixed M5 routing for C53/C55 to touch cap edge (not interior)
+- LNA: Caps improved from 5/9 to 6/9
+- Remaining 3 caps: bypass chain TM1 routing fundamentally requires
+  entering MIM area for inter-cap connections
