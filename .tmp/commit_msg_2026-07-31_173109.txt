@@ -1,0 +1,9 @@
+LNA: all 9 caps found via text-label bypass chain approach
+
+- Rewrote bypass chain (C57-C61) using text labels for TM1 (c0)
+  and M5 edge-touch for c1, eliminating TM1-into-MIM routing
+- Removed Via4 that shorted C57.c1 to VCC M4 rail
+- Added M5_txt (67,25) and TM1_txt (126,25) to layer dict
+- Fixed port labels to use text layers instead of drawing layers
+- All devices match: 9/9 cap, 5/5 npn, 5/5 rppd
+- Remaining: net signature mismatches (routing connectivity)

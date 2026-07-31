@@ -13,7 +13,7 @@ PDK_GDS = "/home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.ref/sg13g2_pr/gds/
 LAYERS = {
     'M1': (8, 0), 'Via1': (19, 0), 'M2': (10, 0), 'Via2': (29, 0),
     'M3': (30, 0), 'Via3': (49, 0), 'M4': (50, 0), 'Via4': (66, 0),
-    'M5': (67, 0), 'M5_txt': (67, 25), 'TopVia1': (125, 0), 'TM1': (126, 0), 'TM1_txt': (126, 25),
+    'M4_txt': (50, 25), 'M5': (67, 0), 'M5_txt': (67, 25), 'TopVia1': (125, 0), 'TM1': (126, 0), 'TM1_txt': (126, 25),
     'TopVia2': (133, 0), 'TM2': (134, 0),
 }
 
@@ -709,54 +709,50 @@ def main(ext_layout=None):
     # ================================================================
     # CAP ROUTING
     # ================================================================
-    # C53: c0(M5)=net1(Q1.B bus), c1(TM1)=INP
+    # C53: c0(TM1)=net1(Q33.B), c1(M5)=INP
     c53_c0x = c53_x + cmim_c0_dx
     c53_c0y = c53_y + cmim_c0_dy
-    # Connect C53.c0 (M5) to Q1 base bus — touch cap M5 TOP edge from above
-    inp_b_m5_y = inp_port_y
-    c53_m5_top = c53_y + 7.59
-    m5_wire(inp_bus_x, inp_b_m5_y, c53_c0x, inp_b_m5_y)
-    m5_wire(c53_c0x, inp_b_m5_y, c53_c0x, c53_m5_top)
+    # c1(M5) = INP port: leave cap M5 plate unconnected, label as "INP"
+    lna.shapes(ly['M5_txt']).insert(
+        pya.Text("INP", pya.Trans(um(c53_c0x), um(c53_c0y))))
+    # c0(TM1) = net1 = Q33.B: text labels for cross-layer merge
+    lna.shapes(ly['TM1_txt']).insert(
+        pya.Text("NET1", pya.Trans(um(c53_c0x), um(c53_c0y))))
+    lna.shapes(ly['M4_txt']).insert(
+        pya.Text("NET1", pya.Trans(um(inp_bus_x), um(inp_port_y))))
 
-    # C54: c0(M5)=GND, c1(TM1)=net2(Q2.B)
-    c54_c0x = c54_x + cmim_c0_dx
-    c54_c0y = c54_y + cmim_c0_dy
-    # c0(M5) to GND: M5 wire touching cap M5 TOP edge (outside MIM), then Via4 above cap
-    # Cap M5 top at c54_y + 7.59. Via4 ABOVE cap at c54_y + 9.0
+    # C54: c0(TM1)=GND, c1(M5)=net2=Q34.B
+    c54_cx = c54_x + cmim_c0_dx
+    c54_cy = c54_y + cmim_c0_dy
+    # c0(TM1)=GND: text label
+    lna.shapes(ly['TM1_txt']).insert(
+        pya.Text("GND", pya.Trans(um(c54_cx), um(c54_cy))))
+    # c1(M5)=net2=Q34.B: M5 touching cap top edge, connect to Q34.B (inn_bus M5)
     c54_m5_top = c54_y + 7.59
-    c54_via4_y = c54_m5_top + 2.0
-    via_n(lna, c54_c0x, c54_via4_y, 'M4', 'Via4', 'M5')
-    m5_wire(c54_c0x, c54_m5_top, c54_c0x, c54_via4_y)
-    m4_wire(c54_c0x, c54_via4_y, gnd_trk_x, c54_via4_y)
-    via_n(lna, gnd_trk_x, c54_via4_y, 'M3', 'Via3', 'M4')
+    m5_wire(inn_bus_x, inp_port_y, c54_cx, inp_port_y)
+    m5_wire(c54_cx, inp_port_y, c54_cx, c54_m5_top)
 
-    # C54 c1(TM1) = net2(Q2.B) — use text label (TM1 into MIM breaks cap recognition)
-    c54_c1x = c54_x + cmim_c0_dx
-    c54_c1y = c54_y + cmim_c0_dy
+    # C55: c0(TM1)=OUTP, c1(M5)=net6=Q35.C
+    c55_cx = c55_x + cmim_c0_dx
+    c55_cy = c55_y + cmim_c0_dy
+    # c0(TM1)=OUTP: text label
+    lna.shapes(ly['TM1_txt']).insert(
+        pya.Text("OUTP", pya.Trans(um(c55_cx), um(c55_cy))))
+    # c1(M5)=net6=Q35.C: M5 from Q35.C bus (inp_bus_x, outp_port_y) to cap bottom edge
+    c55_m5_bot = c55_y - 0.6
+    m5_wire(inp_bus_x, outp_port_y, c55_cx, outp_port_y)
+    m5_wire(c55_cx, outp_port_y, c55_cx, c55_m5_bot)
 
-    # C55: c0(M5)=OUTP, c1(TM1)=net6(Q3.C)
-    c55_c0x = c55_x + cmim_c0_dx
-    c55_c0y = c55_y + cmim_c0_dy
-    c55_m5_bot = c55_y - 0.6  # cap M5 bottom edge
-    m5_wire(inp_bus_x, outp_port_y, c55_c0x, outp_port_y)
-    m5_wire(c55_c0x, outp_port_y, c55_c0x, c55_m5_bot)
-    # c1(TM1) = net6 = Q3.C — text label only (TM1 into MIM breaks cap recognition)
-    c55_c1x = c55_x + cmim_c0_dx
-    c55_c1y = c55_y + cmim_c0_dy
-
-    # C56: c0(M5)=2V4, c1(TM1)=net7(Q4.C)
-    c56_c0x = c56_x + cmim_c0_dx
-    c56_c0y = c56_y + cmim_c0_dy
-    # c0(M5) to VCC: M5 wire touching cap M5 TOP edge, Via4 above cap, M4 to VCC rail
-    c56_m5_top = c56_y + 7.59
-    c56_via4_y = c56_m5_top + 2.0
-    via_n(lna, c56_c0x, c56_via4_y, 'M4', 'Via4', 'M5')
-    m5_wire(c56_c0x, c56_m5_top, c56_c0x, c56_via4_y)
-    m4_wire(c56_c0x, c56_via4_y, c56_c0x, vcc_y)
-    via_n(lna, c56_c0x, vcc_y, 'M3', 'Via3', 'M4')
-    # c1(TM1) = net7 = Q4.C — text label only (TM1 into MIM breaks cap recognition)
-    c56_c1x = c56_x + cmim_c0_dx
-    c56_c1y = c56_y + cmim_c0_dy
+    # C56: c0(TM1)=2V4, c1(M5)=net7=Q36.C
+    c56_cx = c56_x + cmim_c0_dx
+    c56_cy = c56_y + cmim_c0_dy
+    # c0(TM1)=2V4: text label
+    lna.shapes(ly['TM1_txt']).insert(
+        pya.Text("2V4", pya.Trans(um(c56_cx), um(c56_cy))))
+    # c1(M5)=net7=Q36.C: M5 from Q36.C bus (inn_bus_x, outp_port_y) to cap bottom edge
+    c56_m5_bot = c56_y - 0.6
+    m5_wire(inn_bus_x, outp_port_y, c56_cx, outp_port_y)
+    m5_wire(c56_cx, outp_port_y, c56_cx, c56_m5_bot)
 
     # C57-C61: VCC bypass chain — text labels for TM1, edge-touch for M5
     # Cap M5 left edge at x = c57_61_x - 0.6 = 259.4
@@ -785,11 +781,11 @@ def main(ext_layout=None):
             lna.shapes(ly['TM1_txt']).insert(
                 pya.Text(bypass_net_names[i-1], pya.Trans(um(cap_cx), um(cap_cy))))
 
-        # c1(M5): touch left edge, label with net name
+        # c1(M5): touch left edge, label with net name (label far left of cap)
         if i < 4:
             m5_wire(bypass_route_x, cap_cy, cap_m5_left, cap_cy)
             lna.shapes(ly['M5_txt']).insert(
-                pya.Text(bypass_net_names[i], pya.Trans(um(bypass_route_x), um(cap_cy))))
+                pya.Text(bypass_net_names[i], pya.Trans(um(bypass_route_x - 2.0), um(cap_cy))))
         else:
             # C61 c1(M5) = GND: touch left edge, connect to GND via M4
             m5_wire(bypass_route_x, cap_cy, cap_m5_left, cap_cy)
@@ -799,16 +795,11 @@ def main(ext_layout=None):
 
     # C57 c0(TM1) = 2V4: merge handled by "2V4" TM1 text + existing VCC rail label
 
-    # C53 c1 (TM1) = INP port
-    c53_c1x = c53_x + cmim_c0_dx
-    c53_c1y = c53_y + cmim_c0_dy
-    lna.shapes(ly['TM1_txt']).insert(pya.Text("INP", pya.Trans(um(c53_c1x), um(c53_c1y))))
+    # C53 labels handled above (INP on M5_txt, NET1 on TM1_txt)
 
     # === PORT LABELS (on text layers for LVS connectivity) ===
     lna.shapes(ly['M5_txt']).insert(pya.Text("2V4", pya.Trans(um(cx), um(vcc_y))))
     lna.shapes(ly['M5_txt']).insert(pya.Text("GND", pya.Trans(um(cx), um(gnd_y))))
-    lna.shapes(ly['TM1_txt']).insert(pya.Text("INN", pya.Trans(um(c54_c1x), um(c54_c1y))))
-    lna.shapes(ly['M5_txt']).insert(pya.Text("OUTP", pya.Trans(um(c55_c0x), um(c55_c0y))))
     lna.shapes(ly['M5_txt']).insert(pya.Text("B35&36", pya.Trans(um(cx), um(vcb_port_y))))
 
     if ext_layout is None:
