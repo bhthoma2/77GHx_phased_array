@@ -1,92 +1,168 @@
-# 77 GHz Phased Array Vibrometer - RF Front-End
+# 77 GHz Phased Array Vibrometer
 
 ## Overview
 
-Modified RF building blocks from mWATTBAT (150 GHz radar, IHP SG13G2) retuned
-for 77 GHz operation in a 4×4 phased array laser-Doppler vibrometer for
-autonomous drone-based landmine detection.
+A 77 GHz FMCW phased array vibrometer for autonomous drone-based landmine detection, implemented on **IHP SG13G2 130nm SiGe BiCMOS**. The system detects buried landmines by measuring acoustic-seismic surface vibrations induced by an airborne speaker, using Doppler processing across multiple radar beams.
 
-## Design Methodology
+## Architecture
 
-All transmission line lengths scaled by factor 150/77 ≈ 1.95× from original.
-Coupling capacitors enlarged for lower reactance at 77 GHz.
-Transistor sizing and bias networks kept identical (DC operating point unchanged).
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    FULL CHIP (2.5×2.5 mm)                    │
+├──────────────────┬──────────────────┬───────────────────────┤
+│   RF Front-End   │   IMU Analog     │    Digital DSP        │
+│                  │                  │                       │
+│  • VCO (77 GHz)  │  • Input Amp     │  • 64-pt Range FFT   │
+│  • LNA           │  • Gm-C BPF      │  • 128-pt Doppler FFT│
+│  • Mixer         │  • Peak Detector  │  • 4-beam Beamformer │
+│  • TX PA         │  • S&H            │  • Motion Comp       │
+│  • ILFD (/2)     │  • 8-bit SAR ADC  │  • SPI Output        │
+│  • Phase Shifter │                  │  • SRAM (1024×32)    │
+└──────────────────┴──────────────────┴───────────────────────┘
+```
 
-## Modified Blocks
+## Status
 
-| Block | File | Key Changes |
-|-------|------|-------------|
-| LNA (RX amp) | `RXAMP_77GD.sch` | Input TL: 50→97µm, Load TL: 77.5→151µm, Coupling caps: 4→6µm, 2.7→4µm |
-| Mixer | `MIXER_77GD.sch` | LO TL: 25→49µm, 34→66µm, RF TL: 64→125µm, Coupling caps: 3→5µm, 2.3→4µm |
-| Wilkinson | `WILKINSON_77GD.sch` | λ/4 TL: 302.5→590µm |
-| LNA Testbench | `RXAMP_77GD_TB.sch` | AC sweep 50-110 GHz, TRAN at 77 GHz, Noise 50-110 GHz |
+| Subsystem | Design | Layout | LVS | P&R |
+|-----------|--------|--------|-----|-----|
+| VCO 77 GHz | ✅ | ✅ GDS | ✅ | — |
+| LNA 77 GHz | ✅ | ✅ GDS | ✅ | — |
+| Mixer 77 GHz | ✅ | ✅ GDS | ✅ | — |
+| TX PA 77 GHz | ✅ | ✅ GDS | ✅ | — |
+| ILFD 77 GHz | ✅ | ✅ GDS | ✅ | — |
+| IFA (IF Amp) | ✅ | ✅ GDS | ✅ | — |
+| IMU Analog Chain | ✅ | ✅ GDS | — | — |
+| Digital DSP (slow-time FFT) | ✅ | — | — | ✅ Routed |
+| Digital DSP (full vibrometer) | ✅ | — | — | Placed |
+| Full Chip Assembly | ✅ | ✅ GDS | — | — |
 
-## Transmission Line Scaling Summary
+## Key Specifications
 
-| TL Function | Original len (150G) | Scaled len (77G) | Z0 |
-|-------------|--------------------:|------------------:|---:|
-| RX input match | 50 µm | 97 µm | 85Ω |
-| RX load/resonator | 77.5 µm | 151 µm | 85Ω |
-| RX emitter degen | 30 µm | 58 µm | 85Ω |
-| Mixer LO short | 25 µm | 49 µm | 85Ω |
-| Mixer LO long | 34 µm | 66 µm | 85Ω |
-| Mixer RF | 64 µm | 125 µm | 85Ω |
-| Wilkinson λ/4 | 302.5 µm | 590 µm | 60Ω |
-
-## Simulation Setup
-
-Simulator: Xyce (primary) or ngspice
-PDK: IHP SG13G2 (set $PDK_ROOT and $PDK environment variables)
-Models: cornerHBT, cornerCAP, cornerRES (typical corners)
-
-### Running Simulations
-
-1. Install IIC-OSIC-TOOLS Docker image (includes xschem + ngspice + Xyce + SG13G2 PDK)
-2. Open testbench in xschem: `xschem RXAMP_77GD_TB.sch`
-3. Netlist and simulate (Xyce launcher button in schematic)
-4. Load waveforms and verify:
-   - S21 gain peak at 77 GHz (target: >12 dB)
-   - S11 < -10 dB at 77 GHz
-   - NF < 6 dB at 77 GHz
-   - Supply current (ICC) within expected range
-
-### Expected Performance (77 GHz vs 150 GHz)
-
-| Parameter | mWATTBAT @150G | Expected @77G | Reason |
-|-----------|:--------------:|:-------------:|--------|
-| LNA Gain | 8-12 dB | 12-18 dB | Further from fmax → more available gain |
-| LNA NF | 8-12 dB | 4-6 dB | Lower freq → less transit time noise |
-| Mixer CG | 0-5 dB | 5-10 dB | Better switching at lower freq |
-| PA Psat | -5 to 0 dBm | 3-8 dBm | More efficient at 77G |
-
-## Blocks Still To Design
-
-1. **VCO_77G** - Cross-coupled SiGe HBT with TL resonator (~590µm stub)
-2. **PLL_77G** - Charge-pump PLL locking VCO to reference, low phase noise
-3. **PHASE_SHIFTER_77G** - 4-bit switched transmission line (per element)
-4. **LO_DIST_16** - 4-stage Wilkinson tree (1→16 distribution)
-5. **TXAMP_77GD** - PA retuned from TXAMP_150GD (same methodology as LNA)
-6. **SPI_CTRL** - Digital beam controller (RTL, synthesized in SKY130 or on-chip)
+| Parameter | Value |
+|-----------|-------|
+| Frequency | 77 GHz |
+| Modulation | FMCW |
+| Process | IHP SG13G2 130nm SiGe BiCMOS |
+| Die size | 2.5 × 2.5 mm |
+| Digital clock | 200 MHz |
+| Digital area | 1.87 mm² (placed), 0.079 mm² (FFT routed) |
+| SRAM | IHP RM_IHPSG13_1P_1024x32_c2_bm_bist |
+| Beams | 4 (expandable to 16) |
+| FFT size | 64-pt range, 128-pt Doppler |
+| ADC channels | 6 |
 
 ## Directory Structure
 
 ```
 77GHz_phased_array/
-└── xschem/
-    ├── RXAMP_77GD.sch          # LNA schematic (modified)
-    ├── RXAMP_77GD_TB.sch       # LNA testbench
-    ├── MIXER_77GD.sch          # Mixer schematic (modified)
-    ├── WILKINSON_77GD.sch      # Power divider (modified)
-    └── (future: VCO, PLL, phase shifter, PA, top-level)
+├── rtl/                        # Digital RTL (SystemVerilog)
+│   ├── vibrometer_top.v        # Top-level (FFT + slow-time + SPI)
+│   ├── vibrometer_mocomp_top.v # Full system with motion compensation
+│   ├── radar_mac_accel.v       # 4-MAC engine (range FFT + beamformer)
+│   ├── slowtime_fft.v          # 128-pt Doppler FFT
+│   ├── sram_if.v               # IHP SRAM macro wrapper
+│   ├── spi_serializer.v        # 38-bit SPI output
+│   ├── deconv_kernel_estimator_top_level.v  # Motion comp (nhpoole)
+│   ├── iir_notch_filter.v      # IIR H(f) evaluator
+│   ├── cordic_*.v              # CORDIC converters
+│   ├── fixed_pt_div.v          # 32-bit divider
+│   └── serializer.v / deserializer.v
+├── layout/                     # Analog layout generators + GDS
+│   ├── generate_vco_transistor.py
+│   ├── generate_full_chip_mocomp.py
+│   ├── VCO_77G_XTOR.gds
+│   ├── LNA_77G_XTOR.gds
+│   ├── MIXER_77G_XTOR.gds
+│   ├── TXPA_77G_XTOR.gds
+│   ├── ILFD_77G_XTOR.gds
+│   ├── IFA_77G_XTOR.gds
+│   ├── IMU_ANALOG_CHAIN.gds
+│   ├── PHASED_ARRAY_77G_XTOR.gds  # Full RF front-end
+│   └── VIBROMETER_FULL_CHIP.gds   # Full chip assembly
+├── analog_mocomp/              # IMU analog signal chain
+│   └── imu_signal_chain.py     # KLayout generator (IHP BJT-based)
+├── digital_pnr/                # Digital place & route
+│   ├── synth_core.ys           # Yosys synthesis (full vibrometer)
+│   ├── synth_small.ys          # Yosys synthesis (slow-time FFT)
+│   ├── pnr.tcl                 # OpenROAD P&R (full)
+│   ├── pnr_small.tcl           # OpenROAD P&R (FFT, fully routed)
+│   ├── route_only.tcl          # Routing-only script
+│   ├── constraints.sdc         # 200 MHz clock
+│   ├── power.tcl               # Power grid (Metal3/Metal4)
+│   └── build/
+│       ├── slowtime_fft_routed.def   # ✅ Fully routed DEF
+│       ├── slowtime_fft_synth.v      # Synthesized netlist (FFT)
+│       ├── vibrometer_top.def        # Placed DEF (full design)
+│       └── vibrometer_top_synth.v    # Synthesized netlist (full)
+├── sim/                        # SPICE simulations
+├── xschem/                     # Schematics (xschem)
+├── tapeout/                    # Tapeout files
+└── docs/                       # Documentation
+```
+
+## RF Front-End
+
+Modified from mWATTBAT (150 GHz radar) with transmission lines scaled by 150/77 ≈ 1.95×.
+
+| Block | Topology | Key Feature |
+|-------|----------|-------------|
+| VCO | Cross-coupled npn13G2L | TL resonator, VTUNE varactor |
+| LNA | Cascode CE | 12-18 dB gain, NF < 6 dB |
+| Mixer | Gilbert cell | 5-10 dB conversion gain |
+| TX PA | CE push-pull | 3-8 dBm Psat |
+| ILFD | Injection-locked /2 | Low-power frequency divider |
+| IFA | Cascode | IF amplification stage |
+
+## Digital DSP
+
+The radar signal processor implements:
+1. **Range FFT** — 64-pt radix-2 DIT across 6 ADC channels (4-MAC engine)
+2. **Beamforming** — 4-beam steering via complex weight multiply-accumulate
+3. **Peak detection** — Per-beam range bin extraction
+4. **Slow-time FFT** — 128-pt Doppler FFT across chirps (vibration spectrum)
+5. **Motion compensation** — IIR notch filter deconvolution (nhpoole)
+6. **SPI output** — 38-bit serialized frame (amplitude + beam index)
+
+## Tools Used
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| Yosys | 0.35 | RTL synthesis to IHP sg13g2_stdcell |
+| OpenROAD | 26Q3 | Place & route |
+| KLayout | 0.30.9 | Layout generation, DRC, GDS viewing |
+| slang | — | SystemVerilog linting |
+| ngspice/Xyce | — | SPICE simulation |
+| xschem | — | Schematic capture |
+
+## Building
+
+### Synthesis
+```bash
+cd digital_pnr
+yosys -s synth_small.ys    # Slow-time FFT only
+yosys -s synth_core.ys     # Full vibrometer
+```
+
+### Place & Route
+```bash
+openroad -exit pnr_small.tcl   # FFT (fully routes in ~30 min)
+openroad -exit pnr.tcl         # Full vibrometer (placement only on small machines)
+```
+
+### Layout Generation
+```bash
+klayout -b -r analog_mocomp/imu_signal_chain.py
+klayout -b -r layout/generate_full_chip_mocomp.py
 ```
 
 ## References
 
 - mWATTBAT: https://github.com/EngGhaith/mWATTBAT_RADAR_150GHz_TO_July2025
+- nhpoole motion comp: https://github.com/nhpoole/mixed_signal_mmwave_edge_accelerator
 - IHP SG13G2 PDK: https://github.com/IHP-GmbH/IHP-Open-PDK
 - IIC-OSIC-TOOLS: https://github.com/iic-jku/IIC-OSIC-TOOLS
-- npn13G2l fT: ~350 GHz, fmax: ~450 GHz (77 GHz is 17% of fmax)
+- npn13G2L: fT ~350 GHz, fmax ~450 GHz
 
 ## License
 
-Apache 2.0 (same as mWATTBAT source)
+Apache 2.0
