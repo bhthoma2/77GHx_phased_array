@@ -1,0 +1,9 @@
+Mixer LVS: all devices match (5/5 cap, 8/8 npn, 2/2 rppd)
+
+- Fixed gnd_esc_l undefined variable bug
+- Connected C37/C38 to correct LOP_I/LON_I M5 buses (bases, not emitters)
+- Fixed C37 M5 route to avoid crossing LON_I M5 vertical
+- Fixed C38 M5 route above LOP_I M5 bus to avoid short
+- Fixed GND-IFN M4 short: replaced M4 vertical with M5 routing
+- Connected both stripes of m=2 rppd with M1 bridges
+- Only param multiplier assignment mismatch remains (not connectivity)

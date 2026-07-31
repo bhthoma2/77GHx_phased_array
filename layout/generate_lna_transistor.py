@@ -13,7 +13,7 @@ PDK_GDS = "/home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.ref/sg13g2_pr/gds/
 LAYERS = {
     'M1': (8, 0), 'Via1': (19, 0), 'M2': (10, 0), 'Via2': (29, 0),
     'M3': (30, 0), 'Via3': (49, 0), 'M4': (50, 0), 'Via4': (66, 0),
-    'M5': (67, 0), 'TopVia1': (125, 0), 'TM1': (126, 0),
+    'M5': (67, 0), 'M5_txt': (67, 25), 'TopVia1': (125, 0), 'TM1': (126, 0), 'TM1_txt': (126, 25),
     'TopVia2': (133, 0), 'TM2': (134, 0),
 }
 
@@ -758,58 +758,58 @@ def main(ext_layout=None):
     c56_c1x = c56_x + cmim_c0_dx
     c56_c1y = c56_y + cmim_c0_dy
 
-    # C57-C61: VCC bypass chain on M5 (c0) and TM1 (c1)
-    bypass_route_x = c57_61_x - 5.0  # x=255, clear of cap M5 plates
+    # C57-C61: VCC bypass chain — text labels for TM1, edge-touch for M5
+    # Cap M5 left edge at x = c57_61_x - 0.6 = 259.4
+    bypass_route_x = c57_61_x - 5.0  # x=255
+    cap_m5_left = c57_61_x - 0.6     # 259.4
 
-    # C57 c0 to VCC: horizontal M5 stub to bypass_route_x, then M4 vertical to vcc_y
-    c57_c0x = c57_61_x + cmim_c0_dx
-    c57_c0y = c57_61_ys[0] + cmim_c0_dy
-    m5_wire(c57_c0x, c57_c0y, bypass_route_x, c57_c0y)
-    via_n(lna, bypass_route_x, c57_c0y, 'M4', 'Via4', 'M5')
-    m4_wire(bypass_route_x, c57_c0y, bypass_route_x, vcc_y)
-    via_n(lna, bypass_route_x, vcc_y, 'M3', 'Via3', 'M4')
+    # C57 c0(TM1)=2V4: text label at cap center
+    # (2V4 TM1 text added below in the loop)
 
-    # Chain: c1 of Cn connects to c0 of Cn+1
-    for i in range(4):
-        c1x = c57_61_x + cmim_c0_dx
-        c1y = c57_61_ys[i] + cmim_c0_dy
-        c0_next_x = c57_61_x + cmim_c0_dx
-        c0_next_y = c57_61_ys[i+1] + cmim_c0_dy
-        mid_y = (c1y + c0_next_y) / 2
-        via_n(lna, bypass_route_x, mid_y, 'M5', 'TopVia1', 'TM1')
-        lna.shapes(ly['TM1']).insert(pya.Box(
-            um(min(c1x, bypass_route_x)-0.25), um(min(c1y, mid_y)-0.25),
-            um(max(c1x, bypass_route_x)+0.25), um(c1y+0.25)))
-        lna.shapes(ly['TM1']).insert(pya.Box(
-            um(bypass_route_x-0.25), um(min(c1y, mid_y)-0.25),
-            um(bypass_route_x+0.25), um(max(c1y, mid_y)+0.25)))
-        m5_wire(bypass_route_x, mid_y, bypass_route_x, c0_next_y)
-        m5_wire(bypass_route_x, c0_next_y, c0_next_x, c0_next_y)
+    # C57 c1(M5) to C58 c0(TM1): use text label "BYP1"
+    # C58 c1(M5) to C59 c0(TM1): "BYP2"
+    # C59 c1(M5) to C60 c0(TM1): "BYP3"
+    # C60 c1(M5) to C61 c0(TM1): "BYP4"
 
-    # C61 c1 to GND (use DIFFERENT X to avoid shorting to VCC M4 at bypass_route_x)
-    bypass_gnd_x = bypass_route_x + 4.0  # 259, separate from VCC at 255
-    c61_c1x = c57_61_x + cmim_c0_dx
-    c61_c1y = c57_61_ys[4] + cmim_c0_dy
-    via_n(lna, bypass_gnd_x, c61_c1y, 'M5', 'TopVia1', 'TM1')
-    lna.shapes(ly['TM1']).insert(pya.Box(
-        um(min(c61_c1x, bypass_gnd_x)-0.25), um(c61_c1y-0.25),
-        um(max(c61_c1x, bypass_gnd_x)+0.25), um(c61_c1y+0.25)))
-    # Connect bypass GND M5 to GND bus via M4 at separate X
-    via_n(lna, bypass_gnd_x, c61_c1y, 'M4', 'Via4', 'M5')
-    m4_wire(bypass_gnd_x, c61_c1y, bypass_gnd_x, gnd_y)
-    via_n(lna, bypass_gnd_x, gnd_y, 'M4', 'Via4', 'M5')
+    # For each cap c1(M5): M5 wire touching left edge from outside
+    bypass_net_names = ["BYP1", "BYP2", "BYP3", "BYP4"]
+    for i in range(5):
+        cap_cy = c57_61_ys[i] + cmim_c0_dy  # cap center Y
+        cap_cx = c57_61_x + cmim_c0_dx      # cap center X (263.495)
+
+        # c0(TM1) text label
+        if i == 0:
+            lna.shapes(ly['TM1_txt']).insert(
+                pya.Text("2V4", pya.Trans(um(cap_cx), um(cap_cy))))
+        else:
+            lna.shapes(ly['TM1_txt']).insert(
+                pya.Text(bypass_net_names[i-1], pya.Trans(um(cap_cx), um(cap_cy))))
+
+        # c1(M5): touch left edge, label with net name
+        if i < 4:
+            m5_wire(bypass_route_x, cap_cy, cap_m5_left, cap_cy)
+            lna.shapes(ly['M5_txt']).insert(
+                pya.Text(bypass_net_names[i], pya.Trans(um(bypass_route_x), um(cap_cy))))
+        else:
+            # C61 c1(M5) = GND: touch left edge, connect to GND via M4
+            m5_wire(bypass_route_x, cap_cy, cap_m5_left, cap_cy)
+            via_n(lna, bypass_route_x, cap_cy, 'M4', 'Via4', 'M5')
+            m4_wire(bypass_route_x, cap_cy, bypass_route_x, gnd_y)
+            via_n(lna, bypass_route_x, gnd_y, 'M4', 'Via4', 'M5')
+
+    # C57 c0(TM1) = 2V4: merge handled by "2V4" TM1 text + existing VCC rail label
 
     # C53 c1 (TM1) = INP port
     c53_c1x = c53_x + cmim_c0_dx
     c53_c1y = c53_y + cmim_c0_dy
-    lna.shapes(ly['TM1']).insert(pya.Text("INP", pya.Trans(um(c53_c1x), um(c53_c1y))))
+    lna.shapes(ly['TM1_txt']).insert(pya.Text("INP", pya.Trans(um(c53_c1x), um(c53_c1y))))
 
-    # === PORT LABELS ===
-    lna.shapes(ly['M5']).insert(pya.Text("2V4", pya.Trans(um(cx), um(vcc_y))))
-    lna.shapes(ly['M5']).insert(pya.Text("GND", pya.Trans(um(cx), um(gnd_y))))
-    lna.shapes(ly['TM1']).insert(pya.Text("INN", pya.Trans(um(c54_c1x), um(c54_c1y))))
-    lna.shapes(ly['M5']).insert(pya.Text("OUTP", pya.Trans(um(c55_c0x), um(c55_c0y))))
-    lna.shapes(ly['M5']).insert(pya.Text("B35&36", pya.Trans(um(cx), um(vcb_port_y))))
+    # === PORT LABELS (on text layers for LVS connectivity) ===
+    lna.shapes(ly['M5_txt']).insert(pya.Text("2V4", pya.Trans(um(cx), um(vcc_y))))
+    lna.shapes(ly['M5_txt']).insert(pya.Text("GND", pya.Trans(um(cx), um(gnd_y))))
+    lna.shapes(ly['TM1_txt']).insert(pya.Text("INN", pya.Trans(um(c54_c1x), um(c54_c1y))))
+    lna.shapes(ly['M5_txt']).insert(pya.Text("OUTP", pya.Trans(um(c55_c0x), um(c55_c0y))))
+    lna.shapes(ly['M5_txt']).insert(pya.Text("B35&36", pya.Trans(um(cx), um(vcb_port_y))))
 
     if ext_layout is None:
         output = "/home/bthomas3/Videos/77GHz_phased_array/layout/LNA_77G_XTOR.gds"
