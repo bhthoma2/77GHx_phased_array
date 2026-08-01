@@ -139,10 +139,14 @@ def compare_netlists(layout_file, schem_file, sub_net="sub!"):
     # Merge named nets: "VCC$1" → "VCC", etc. (text labels on disconnected conductors)
     def merge_named_nets(devices):
         """Rename net variants (FOO$1, FOO$2) to base name (FOO).
+        Also splits KLayout '|' multi-label nets (picks first label).
         Only applies to nets with alphabetic prefix (not anonymous $N nets)."""
         def fix_net(n):
             if n.startswith('$') or n.startswith('\\$'):
                 return n  # anonymous net, don't touch
+            # Handle KLayout multi-label format: "NAME1|NAME2" → use first
+            if '|' in n:
+                n = n.split('|')[0]
             return re.sub(r'\$\d+$', '', n)
         for d in devices:
             d["nets"] = [fix_net(n) for n in d["nets"]]

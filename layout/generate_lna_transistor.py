@@ -102,11 +102,19 @@ def main(ext_layout=None):
     cx = CELL_W / 2
     cy = CELL_H / 2
 
-    # Ground plane (TM1 with slots) - Region-based to cut holes at via stacks
+    # Ground plane (TM1 with slots) - Region-based to cut holes at via stacks and caps
     slot_pitch = 25.0
     slot_w = 4.0
     via_stack_positions = [(cx - 15.0 - 3.9, cy - 100), (cx + 15.0 + 3.9, cy - 100),
                            (cx - 15.0 - 3.9, cy + 80), (cx + 15.0 + 3.9, cy + 80)]
+    # Add holes for all 9 cmim caps (TM1 plate must not connect to ground plane)
+    c53_pos = (cx - 55 + 3.495, cy - 60 + 3.495)
+    c54_pos = (cx + 47 + 3.495, cy - 60 + 3.495)
+    c55_pos = (cx - 55 + 3.495, cy + 80 + 3.495)
+    c56_pos = (cx + 47 + 3.495, cy + 80 + 3.495)
+    bypass_caps = [(CELL_W - 40 + 3.495, 50 + i * 20 + 3.495) for i in range(5)]
+    cap_holes = [c53_pos, c54_pos, c55_pos, c56_pos] + bypass_caps
+    via_stack_positions += cap_holes
     hole_sz = 9.0
     y = 5.0
     while y < CELL_H - 5:
@@ -781,11 +789,11 @@ def main(ext_layout=None):
             lna.shapes(ly['TM1_txt']).insert(
                 pya.Text(bypass_net_names[i-1], pya.Trans(um(cap_cx), um(cap_cy))))
 
-        # c1(M5): touch left edge, label with net name (label far left of cap)
+        # c1(M5): touch left edge, label with net name (on M5 wire at bypass_route_x)
         if i < 4:
             m5_wire(bypass_route_x, cap_cy, cap_m5_left, cap_cy)
             lna.shapes(ly['M5_txt']).insert(
-                pya.Text(bypass_net_names[i], pya.Trans(um(bypass_route_x - 2.0), um(cap_cy))))
+                pya.Text(bypass_net_names[i], pya.Trans(um(bypass_route_x), um(cap_cy))))
         else:
             # C61 c1(M5) = GND: touch left edge, connect to GND via M4
             m5_wire(bypass_route_x, cap_cy, cap_m5_left, cap_cy)
