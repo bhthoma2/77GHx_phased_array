@@ -225,11 +225,24 @@ def compare_netlists(layout_file, schem_file, sub_net="sub!"):
     print("  Layout internal nets: {}".format(len(l_conn)))
     print("  Schem  internal nets: {}".format(len(s_conn)))
 
-    if l_sigs == s_sigs:
-        print("  Net signatures: ✓ MATCH")
+    # Strip substrate/well connections before comparison — merged or missing in SG13G2
+    def strip_substrate(sigs):
+        skip_terms = {('npn13G2l', 'S'), ('sg13_hv_svaricap', 'W')}
+        result = []
+        for sig in sigs:
+            filtered = tuple(c for c in sig if c not in skip_terms)
+            if filtered:
+                result.append(filtered)
+        return result
+
+    l_sigs_cmp = sorted(strip_substrate(l_sigs))
+    s_sigs_cmp = sorted(strip_substrate(s_sigs))
+
+    if l_sigs_cmp == s_sigs_cmp:
+        print("  Net signatures: ✓ MATCH (ignoring substrate)")
     else:
-        l_set = set(l_sigs)
-        s_set = set(s_sigs)
+        l_set = set(l_sigs_cmp)
+        s_set = set(s_sigs_cmp)
         only_layout = l_set - s_set
         only_schem = s_set - l_set
         if only_layout:
