@@ -1,12 +1,31 @@
-v {xschem version=3.4.7 file_version=1.2}
+v {xschem version=3.4.8RC file_version=1.3}
 G {}
 K {}
 V {}
 S {}
+F {}
 E {}
 T {77 GHz TL-Matched Power Amplifier} 50 -900 0 0 0.5 0.5 {}
 T {Pout~0dBm diff, Nx=8, TL matching, Ic=101mA} 50 -860 0 0 0.3 0.3 {layer=7}
 T {Architecture: Common-emitter cascode with TL input/output matching} 50 -830 0 0 0.3 0.3 {layer=7}
+N 220 -780 220 -770 {lab=VCC}
+N 480 -780 480 -770 {lab=VCC}
+N 50 -780 220 -780 {lab=VCC}
+N 220 -780 480 -780 {lab=VCC}
+N 220 -680 220 -500 {lab=COL_P}
+N 480 -680 480 -500 {lab=COL_N}
+N 220 -470 220 -330 {lab=MID_P}
+N 480 -470 480 -330 {lab=MID_N}
+N 220 -270 220 -210 {lab=EM_P}
+N 480 -270 480 -210 {lab=EM_N}
+N 220 -150 220 -100 {lab=GND}
+N 480 -150 480 -100 {lab=GND}
+N 350 -100 480 -100 {lab=GND}
+N 350 -100 350 -80 {lab=GND}
+N 50 -300 120 -300 {lab=INP}
+N 580 -300 650 -300 {lab=INN}
+N 350 -500 350 -460 {lab=VBIAS_CB}
+N 220 -100 350 -100 {lab=GND}
 C {sg13g2_pr/npn13G2l.sym} 200 -300 0 0 {name=Q1_CE
 model=npn13G2l
 spiceprefix=X
@@ -58,33 +77,6 @@ C {iopin.sym} 220 -780 0 0 {name=p5 lab=OUTP}
 C {iopin.sym} 480 -780 0 0 {name=p6 lab=OUTN}
 C {iopin.sym} 350 -500 0 0 {name=p7 lab=VBIAS_CB}
 C {iopin.sym} 50 -500 0 1 {name=p8 lab=sub|}
-N 220 -780 220 -770 {lab=VCC}
-N 480 -780 480 -770 {lab=VCC}
-N 50 -780 220 -780 {lab=VCC}
-N 220 -780 480 -780 {lab=VCC}
-N 220 -680 220 -600 {lab=COL_P}
-N 480 -680 480 -600 {lab=COL_N}
-N 220 -530 220 -500 {lab=COL_P}
-N 480 -530 480 -500 {lab=COL_N}
-N 220 -470 220 -330 {lab=MID_P}
-N 480 -470 480 -330 {lab=MID_N}
-N 220 -270 220 -210 {lab=EM_P}
-N 480 -270 480 -210 {lab=EM_N}
-N 220 -150 220 -100 {lab=GND}
-N 480 -150 480 -100 {lab=GND}
-N 220 -100 480 -100 {lab=GND}
-N 350 -100 350 -80 {lab=GND}
-N 50 -300 120 -300 {lab=INP}
-N 580 -300 650 -300 {lab=INN}
-N 180 -500 180 -500 {lab=VBIAS_CB}
-N 520 -500 520 -500 {lab=VBIAS_CB}
-N 350 -500 350 -460 {lab=VBIAS_CB}
-N 220 -600 220 -530 {lab=COL_P}
-N 480 -600 480 -530 {lab=COL_N}
-N 220 -300 220 -300 {lab=sub|}
-N 480 -300 480 -300 {lab=sub|}
-N 220 -500 220 -500 {lab=sub|}
-N 480 -500 480 -500 {lab=sub|}
 C {lab_pin.sym} 180 -500 0 1 {name=p9 sig_type=std_logic lab=VBIAS_CB}
 C {lab_pin.sym} 520 -500 0 0 {name=p10 sig_type=std_logic lab=VBIAS_CB}
 C {lab_pin.sym} 220 -300 0 0 {name=p11 sig_type=std_logic lab=sub|}
