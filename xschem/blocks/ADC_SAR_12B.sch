@@ -94,9 +94,13 @@ N 370 -130 370 -130 {lab=tail}
 N 220 -230 220 -350 {lab=dn1}
 N 480 -230 480 -350 {lab=dn2}
 N 220 -410 220 -520 {lab=doutp}
-N 220 -520 220 -650 {lab=doutp}
+N 220 -520 230 -520 {lab=doutp}
+N 230 -520 230 -650 {lab=doutp}
+N 230 -650 220 -650 {lab=doutp}
 N 480 -410 480 -520 {lab=doutn}
-N 480 -520 480 -650 {lab=doutn}
+N 480 -520 470 -520 {lab=doutn}
+N 470 -520 470 -650 {lab=doutn}
+N 470 -650 480 -650 {lab=doutn}
 N 220 -460 80 -460 {lab=doutp}
 N 480 -460 620 -460 {lab=doutn}
 C {lab_wire.sym} 520 -380 2 0 {name=lw1 sig_type=std_logic lab=doutp}
@@ -117,12 +121,12 @@ N 330 -50 560 -50 {lab=clk}
 N 370 -20 370 30 {lab=vss}
 N 350 30 370 30 {lab=vss}
 N 350 30 350 60 {lab=vss}
-N 220 -200 220 -200 {lab=vss}
-N 480 -200 480 -200 {lab=vss}
-N 220 -380 220 -380 {lab=vss}
-N 480 -380 480 -380 {lab=vss}
-N 370 -50 370 -50 {lab=vss}
-N 220 -550 220 -550 {lab=vdd}
-N 480 -550 480 -550 {lab=vdd}
-N 220 -680 220 -680 {lab=vdd}
-N 480 -680 480 -680 {lab=vdd}
+C {lab_wire.sym} 220 -200 0 0 {name=lw5 sig_type=std_logic lab=vss}
+C {lab_wire.sym} 480 -200 2 0 {name=lw6 sig_type=std_logic lab=vss}
+C {lab_wire.sym} 220 -380 0 0 {name=lw7 sig_type=std_logic lab=vss}
+C {lab_wire.sym} 480 -380 2 0 {name=lw8 sig_type=std_logic lab=vss}
+C {lab_wire.sym} 370 -50 0 0 {name=lw9 sig_type=std_logic lab=vss}
+C {lab_wire.sym} 220 -550 0 0 {name=lw10 sig_type=std_logic lab=vdd}
+C {lab_wire.sym} 480 -550 2 0 {name=lw11 sig_type=std_logic lab=vdd}
+C {lab_wire.sym} 220 -680 0 0 {name=lw12 sig_type=std_logic lab=vdd}
+C {lab_wire.sym} 480 -680 2 0 {name=lw13 sig_type=std_logic lab=vdd}

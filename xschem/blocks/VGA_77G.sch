@@ -37,21 +37,25 @@ C {iopin.sym} 180 -150 0 1 {name=p5 lab=VCTRL}
 C {iopin.sym} 300 -500 0 0 {name=p6 lab=VCC}
 C {iopin.sym} 320 20 0 0 {name=p7 lab=GND}
 C {iopin.sym} 350 20 0 0 {name=p8 lab=sub!}
-C {lab_pin.sym} 220 -330 3 0 {name=l1 sig_type=std_logic lab=OUTP}
-C {lab_pin.sym} 180 -300 0 0 {name=l2 sig_type=std_logic lab=INP}
-C {lab_pin.sym} 220 -270 1 0 {name=l3 sig_type=std_logic lab=tail}
-C {lab_pin.sym} 220 -300 0 0 {name=l4 sig_type=std_logic lab=sub!}
-C {lab_pin.sym} 380 -330 3 0 {name=l5 sig_type=std_logic lab=OUTN}
-C {lab_pin.sym} 420 -300 2 0 {name=l6 sig_type=std_logic lab=INN}
-C {lab_pin.sym} 380 -270 1 0 {name=l7 sig_type=std_logic lab=tail}
-C {lab_pin.sym} 380 -300 2 0 {name=l8 sig_type=std_logic lab=sub!}
-C {lab_pin.sym} 320 -180 3 0 {name=l9 sig_type=std_logic lab=tail}
-C {lab_pin.sym} 280 -150 0 0 {name=l10 sig_type=std_logic lab=VCTRL}
-C {lab_pin.sym} 320 -120 1 0 {name=l11 sig_type=std_logic lab=etail}
-C {lab_pin.sym} 320 -150 0 0 {name=l12 sig_type=std_logic lab=sub!}
-C {lab_pin.sym} 220 -430 3 0 {name=l13 sig_type=std_logic lab=VCC}
-C {lab_pin.sym} 220 -370 1 0 {name=l14 sig_type=std_logic lab=OUTP}
-C {lab_pin.sym} 380 -430 3 0 {name=l15 sig_type=std_logic lab=VCC}
-C {lab_pin.sym} 380 -370 1 0 {name=l16 sig_type=std_logic lab=OUTN}
-C {lab_pin.sym} 320 -90 3 0 {name=l17 sig_type=std_logic lab=etail}
-C {lab_pin.sym} 320 -30 1 0 {name=l18 sig_type=std_logic lab=GND}
+N 80 -300 180 -300 {lab=INP}
+N 420 -300 520 -300 {lab=INN}
+N 220 -330 220 -370 {lab=OUTP}
+N 380 -330 380 -370 {lab=OUTN}
+N 220 -370 80 -370 {lab=OUTP}
+N 380 -370 520 -370 {lab=OUTN}
+N 220 -270 220 -240 {lab=tail}
+N 220 -240 380 -240 {lab=tail}
+N 380 -270 380 -240 {lab=tail}
+N 320 -180 320 -240 {lab=tail}
+N 220 -430 220 -470 {lab=VCC}
+N 380 -430 380 -470 {lab=VCC}
+N 220 -470 300 -470 {lab=VCC}
+N 300 -470 380 -470 {lab=VCC}
+N 300 -500 300 -470 {lab=VCC}
+N 180 -150 280 -150 {lab=VCTRL}
+N 320 -120 320 -90 {lab=etail}
+N 320 -30 320 20 {lab=GND}
+N 320 20 350 20 {lab=GND}
+C {lab_wire.sym} 220 -300 0 0 {name=lw1 sig_type=std_logic lab=sub!}
+C {lab_wire.sym} 380 -300 2 0 {name=lw2 sig_type=std_logic lab=sub!}
+C {lab_wire.sym} 320 -150 0 0 {name=lw3 sig_type=std_logic lab=sub!}
