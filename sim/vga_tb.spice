@@ -1,0 +1,35 @@
+* VGA 77G Testbench - IHP SG13G2 PDK
+* Variable-gm amplifier, VCC=3.3V
+
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+
+.subckt VGA_77G INP INN OUTP OUTN VCTRL VCC GND
+XQ1 outp_i INP tail GND npn13G2l Nx=2
+XQ2 outn_i INN tail GND npn13G2l Nx=2
+XQtail tail VCTRL etail GND npn13G2l Nx=4
+RL1 VCC outp_i 500
+RL2 VCC outn_i 500
+RE etail GND 10
+R_outp outp_i OUTP 0.001
+R_outn outn_i OUTN 0.001
+.ends VGA_77G
+
+Vcc vcc 0 3.3
+Vinp inp 0 DC 1.1 AC 1m
+Vinn inn 0 DC 1.1 AC -1m
+Vctrl vctrl 0 DC 1.2
+
+XDUT inp inn outp outn vctrl vcc 0 VGA_77G
+
+.ac dec 100 1Meg 1G
+
+.control
+run
+meas ac gain_db max vdb(outp) from=1e6 to=100e6
+print gain_db
+wrdata /home/bthomas3/Videos/77GHz_phased_array/sim/vga_ac.txt v(outp) v(outn)
+quit
+.endc
+
+.end

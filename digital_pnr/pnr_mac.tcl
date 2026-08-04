@@ -30,6 +30,10 @@ clock_tree_synthesis -root_buf sg13g2_buf_8 \
 repair_timing -hold
 detailed_placement
 
+# Repair high-fanout nets with buffer trees
+set_max_fanout 100 [current_design]
+repair_design
+
 global_route -guide_file build/route_mac.guide
 
 set block [ord::get_db_block]

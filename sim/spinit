@@ -1,0 +1,13 @@
+* Custom spinit for IHP SG13G2 simulation
+set osdi_enabled
+set num_threads=8
+
+codemodel /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/spice2poly.cm
+codemodel /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/analog.cm
+codemodel /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/digital.cm
+codemodel /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/xtradev.cm
+codemodel /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/xtraevt.cm
+codemodel /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/table.cm
+codemodel /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/tlines.cm
+
+osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/psp103_nqs.osdi

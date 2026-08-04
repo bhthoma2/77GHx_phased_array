@@ -1,0 +1,52 @@
+* StrongARM Comparator Testbench - IHP SG13G2 PDK Models
+* VDD=1.2V, 1GHz clock, 10mV differential input
+
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+
+.subckt ADC_SAR_12B ainp ainn clk doutp doutn vdd vss
+XM1 dn1 ainp tail vss sg13_lv_nmos w=8u l=200n ng=4 m=4 rfmode=1
+XM2 dn2 ainn tail vss sg13_lv_nmos w=8u l=200n ng=4 m=4 rfmode=1
+XM9 tail clk vss vss sg13_lv_nmos w=8u l=200n ng=4 m=2 rfmode=1
+XM5 doutp doutn dn1 vss sg13_lv_nmos w=4u l=200n ng=2 m=2 rfmode=1
+XM6 doutn doutp dn2 vss sg13_lv_nmos w=4u l=200n ng=2 m=2 rfmode=1
+XM3 doutp doutn vdd vdd sg13_lv_pmos w=4u l=200n ng=2 m=2 rfmode=1
+XM4 doutn doutp vdd vdd sg13_lv_pmos w=4u l=200n ng=2 m=2 rfmode=1
+XM7 doutp clk vdd vdd sg13_lv_pmos w=2u l=200n ng=1 m=2 rfmode=1
+XM8 doutn clk vdd vdd sg13_lv_pmos w=2u l=200n ng=1 m=2 rfmode=1
+.ends ADC_SAR_12B
+
+* Supply
+Vdd vdd 0 1.2
+Vss vss 0 0
+
+* Clock: 1GHz, 50% duty
+Vclk clk 0 PULSE(0 1.2 0 50p 50p 450p 1000p)
+
+* Input: VCM=0.6V, differential=10mV
+Vinp ainp 0 0.605
+Vinn ainn 0 0.595
+
+* DUT
+XDUT ainp ainn clk doutp doutn vdd vss ADC_SAR_12B
+
+* Analysis
+.tran 1p 5n
+
+* Measurements: ainp>ainn so doutp should go LOW, doutn stays HIGH
+.meas tran clk_to_outp TRIG v(clk) val=0.6 rise=1 TARG v(doutp) val=0.6 fall=1
+.meas tran clk_to_outn TRIG v(clk) val=0.6 rise=1 TARG v(doutn) val=1.1 rise=1
+.meas tran doutp_min MIN v(doutp) from=100p to=600p
+.meas tran doutn_max MAX v(doutn) from=100p to=600p
+
+.control
+run
+wrdata /home/bthomas3/Videos/77GHz_phased_array/sim/adc_results.txt v(doutp) v(doutn) v(clk)
+meas tran clk_to_outp trig v(clk) val=0.6 rise=1 targ v(doutp) val=0.6 fall=1
+meas tran doutp_final find v(doutp) at=450p
+meas tran doutn_final find v(doutn) at=450p
+meas tran doutp_min min v(doutp) from=100p to=600p
+meas tran doutn_min min v(doutn) from=100p to=600p
+quit
+.endc
+
+.end

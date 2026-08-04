@@ -1,0 +1,36 @@
+* IFA 77G Testbench - IHP SG13G2 PDK
+* 2-stage diff pair IF amplifier, VCC=3.3V
+
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+
+.subckt IFA_77G INP INN OUTP OUTN VCC GND
+XQ1 outp1 INP tail1 GND npn13G2l Nx=2
+XQ2 outn1 INN tail1 GND npn13G2l Nx=2
+XQ3 OUTP outp1 tail2 GND npn13G2l Nx=2
+XQ4 OUTN outn1 tail2 GND npn13G2l Nx=2
+RL1 VCC outp1 500
+RL2 VCC outn1 500
+RL3 VCC OUTP 500
+RL4 VCC OUTN 500
+ITAIL1 tail1 GND DC 2m
+ITAIL2 tail2 GND DC 2m
+.ends IFA_77G
+
+Vcc vcc 0 3.3
+Vinp inp 0 DC 1.1 AC 1m
+Vinn inn 0 DC 1.1 AC -1m
+
+XDUT inp inn outp outn vcc 0 IFA_77G
+
+.ac dec 100 1Meg 1G
+
+.control
+run
+print outp outn
+meas ac gain_db max vdb(outp) from=1e6 to=100e6
+wrdata /home/bthomas3/Videos/77GHz_phased_array/sim/ifa_ac.txt v(outp) v(outn)
+quit
+.endc
+
+.end

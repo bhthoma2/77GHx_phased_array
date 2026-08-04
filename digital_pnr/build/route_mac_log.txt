@@ -242,9 +242,9 @@ Use set_wire_rc to set them.
 [INFO CTS-0101]  Average sink wire length 2556.12 um
 [INFO CTS-0102]  Path depth 6 - 6
 [INFO CTS-0207]  Dummy loads inserted 1825
-[INFO CTS-0500] Runtime: 9.55s
+[INFO CTS-0500] Runtime: 12.33s
 [INFO RSZ-0033] No hold violations found.
-[INFO RSZ-0506] Runtime: 9.21s
+[INFO RSZ-0506] Runtime: 10.15s
 [INFO DPL-0006] Core area: 3162063.74 um^2
 [INFO DPL-0007] Movable instances area: 1764257.24 um^2
 [INFO DPL-0008] Fixed instances area within core: 0.00 um^2
@@ -265,7 +265,7 @@ Iteration | Violations |    Cells |    Sites
         2 |         10 |         2 |         8
         3 |          0 |         0 |         0
 Negotiation phase 1 converged at iteration 3.
-[INFO DPL-0500] Runtime: 4.63s
+[INFO DPL-0500] Runtime: 4.26s
 Placement Analysis
 ---------------------------------
 total displacement     516656.2 u
@@ -275,4 +275,28 @@ original HPWL        11798053.7 u
 legalized HPWL       12271008.6 u
 delta HPWL                    4 %
 
-[WARNING GRT-0281] Net _025644_ has a large fanout of 2127 terminals.
+Iteration |   Area    | Resized | Buffers | Nets repaired | Remaining
+---------------------------------------------------------------------
+        0 |     +0.0% |       0 |       0 |             0 |    118999
+    final |     +9.7% |       0 |   23698 |          3215 |         0
+---------------------------------------------------------------------
+[INFO RSZ-0034] Found 253 slew violations.
+[INFO RSZ-0035] Found 3215 fanout violations.
+[INFO RSZ-0038] Inserted 23698 buffers in 3215 nets.
+[INFO RSZ-0504] Runtime: 19.69s
+[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clknet_0_clk
+[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clk
+[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clknet_3_1_0_clk
+[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clknet_2_2_0_clk
+[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clknet_3_4_0_clk
+[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clknet_2_0_0_clk
+[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clknet_3_0_0_clk
+[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clknet_3_7_0_clk
+[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clknet_2_3_0_clk
+[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clknet_3_5_0_clk
+[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clknet_2_1_0_clk
+[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clknet_3_6_0_clk
+[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clknet_3_3_0_clk
+[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clknet_3_2_0_clk
+[ERROR GRT-0116] Global routing finished with congestion. Check the congestion regions in the DRC Viewer.
+Error: pnr_mac.tcl, 37 GRT-0116

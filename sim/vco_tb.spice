@@ -1,0 +1,35 @@
+* VCO 77G Testbench - IHP SG13G2 PDK
+* Cross-coupled LC VCO, VCC=3.3V, ~76GHz
+
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+
+.subckt VCO_77G OUTP OUTN VCC GND VTUNE
+XQ1 OUTP OUTN tail GND npn13G2l Nx=2 selft=0
+XQ2 OUTN OUTP tail GND npn13G2l Nx=2 selft=0
+L1 VCC OUTP 100p
+L2 VCC OUTN 100p
+Cvar1 OUTP GND 30f
+Cvar2 OUTN GND 30f
+Itail tail GND DC 6m
+.ends VCO_77G
+
+Vcc vcc 0 3.3
+Vtune vtune 0 1.5
+
+XDUT outp outn vcc 0 vtune VCO_77G
+
+.ic v(outp)=1.7 v(outn)=1.5
+
+.tran 0.1p 500p uic
+
+.control
+run
+meas tran vosc_p max v(outp) from=300p to=500p
+meas tran vosc_n min v(outp) from=300p to=500p
+let swing = vosc_p - vosc_n
+print swing
+wrdata /home/bthomas3/Videos/77GHz_phased_array/sim/vco_tran.txt v(outp) v(outn)
+quit
+.endc
+
+.end
