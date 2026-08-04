@@ -1,0 +1,148 @@
+* RADAR_TOP - Full System Simulation
+* IHP SG13G2 PDK Models - 77GHz FMCW Phased Array
+* Signal chain: LNA -> Mixer -> IFA -> VGA -> ADC -> DIGIF
+
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+
+** ========== BLOCK SUBCIRCUITS ==========
+
+* LNA - behavioral: 15dB gain, BW=10GHz
+.subckt LNA_77G INP INN OUTP OUTN VCC GND
+Rin_p INP GND 50
+Rin_n INN GND 50
+E1 outp_ac GND INP GND 5.6
+E2 outn_ac GND INN GND 5.6
+R1 outp_ac OUTP 50
+R2 outn_ac OUTN 50
+C1 OUTP GND 0.3p
+C2 OUTN GND 0.3p
+.ends LNA_77G
+
+* Mixer - behavioral: 6dB conversion gain
+.subckt MIXER_77G RFP RFN LOP LON IFP IFN VCC GND
+B1 IFP GND V = 0.6 + 2*V(RFP,RFN)*V(LOP,LON)
+B2 IFN GND V = 0.6 - 2*V(RFP,RFN)*V(LOP,LON)
+Rout1 IFP GND 1k
+Rout2 IFN GND 1k
+.ends MIXER_77G
+
+* IFA - behavioral: 40dB gain, 10MHz BW
+.subckt IFA_77G INP INN OUTP OUTN VCC GND
+E1 outp_i GND INP INN 100
+E2 outn_i GND INN INP 100
+R1 outp_i OUTP 1k
+R2 outn_i OUTN 1k
+C1 OUTP GND 16p
+C2 OUTN GND 16p
+.ends IFA_77G
+
+* VGA - behavioral: 20dB gain
+.subckt VGA_77G INP INN OUTP OUTN VCTRL VCC GND
+E1 outp_i GND INP INN 10
+E2 outn_i GND INN INP 10
+R1 outp_i OUTP 1k
+R2 outn_i OUTN 1k
+C1 OUTP GND 16p
+C2 OUTN GND 16p
+.ends VGA_77G
+
+* ADC - StrongARM comparator (CMOS)
+.subckt ADC_SAR_12B AINP AINN CLK DOUTP DOUTN VDD VSS
+XM1 dn1 AINP tail VSS sg13_lv_nmos w=8u l=200n ng=4 m=4 rfmode=1
+XM2 dn2 AINN tail VSS sg13_lv_nmos w=8u l=200n ng=4 m=4 rfmode=1
+XM9 tail CLK VSS VSS sg13_lv_nmos w=8u l=200n ng=4 m=2 rfmode=1
+XM5 DOUTP DOUTN dn1 VSS sg13_lv_nmos w=4u l=200n ng=2 m=2 rfmode=1
+XM6 DOUTN DOUTP dn2 VSS sg13_lv_nmos w=4u l=200n ng=2 m=2 rfmode=1
+XM3 DOUTP DOUTN VDD VDD sg13_lv_pmos w=4u l=200n ng=2 m=2 rfmode=1
+XM4 DOUTN DOUTP VDD VDD sg13_lv_pmos w=4u l=200n ng=2 m=2 rfmode=1
+XM7 DOUTP CLK VDD VDD sg13_lv_pmos w=2u l=200n ng=1 m=2 rfmode=1
+XM8 DOUTN CLK VDD VDD sg13_lv_pmos w=2u l=200n ng=1 m=2 rfmode=1
+.ends ADC_SAR_12B
+
+* VCO - Cross-coupled LC oscillator
+.subckt VCO_77G OUTP OUTN VCC GND VTUNE
+XQ1 OUTP OUTN tail GND npn13G2l Nx=2 selft=0
+XQ2 OUTN OUTP tail GND npn13G2l Nx=2 selft=0
+L1 VCC OUTP 100p
+L2 VCC OUTN 100p
+Cvar1 OUTP GND 30f
+Cvar2 OUTN GND 30f
+Itail tail GND DC 6m
+.ends VCO_77G
+
+* DIGIF - CML output buffer (simplified)
+.subckt DIGIF_CML DINP DINN DOUTP DOUTN VCC GND
+XQ1 DOUTP DINP tail GND npn13G2l Nx=2 selft=0
+XQ2 DOUTN DINN tail GND npn13G2l Nx=2 selft=0
+RL1 VCC DOUTP 50
+RL2 VCC DOUTN 50
+Itail tail GND DC 16m
+.ends DIGIF_CML
+
+** ========== TOP LEVEL ==========
+
+* Power supplies
+Vcc33 vcc33 0 3.3
+Vdd12 vdd12 0 1.2
+
+* VCO tuning
+Vtune vtune 0 1.5
+
+* VGA gain control (mid-range)
+Vctrl vctrl 0 1.2
+
+* ADC clock - 1GHz
+Vclk clk 0 PULSE(0 1.2 0 50p 50p 450p 1000p)
+
+* RF input - 77GHz tone (represented as baseband equivalent for this sim)
+* Using 10MHz IF signal to represent downconverted signal
+Vrf_p rf_p 0 DC 1.1 AC 0.5m SIN(1.1 1m 10Meg)
+Vrf_n rf_n 0 DC 1.1 AC -0.5m SIN(1.1 -1m 10Meg)
+
+* LO drive for mixer (CM=2.4V to sit above RF pair collectors)
+Vlo_p lo_p 0 DC 2.4 SIN(2.4 100m 10Meg)
+Vlo_n lo_n 0 DC 2.4 SIN(2.4 -100m 10Meg)
+
+** ========== SIGNAL CHAIN ==========
+
+* LNA
+X_lna rf_p rf_n lna_op lna_on vcc33 0 LNA_77G
+
+* Mixer (behavioral - direct connection)
+X_mixer lna_op lna_on lo_p lo_n if_p if_n vcc33 0 MIXER_77G
+
+* IFA (behavioral - direct connection)
+X_ifa if_p if_n ifa_op ifa_on vcc33 0 IFA_77G
+
+* VGA (behavioral - direct connection)
+X_vga ifa_op ifa_on vga_op vga_on vctrl vcc33 0 VGA_77G
+
+* ADC (actual PDK CMOS transistors)
+X_adc vga_op vga_on clk adc_op adc_on vdd12 0 ADC_SAR_12B
+
+* Digital Interface
+X_digif adc_op adc_on dout_p dout_n vcc33 0 DIGIF_CML
+
+* VCO (free-running for now)
+X_vco vco_op vco_on vcc33 0 vtune VCO_77G
+
+** ========== ANALYSIS ==========
+
+.options method=gear reltol=1e-3 abstol=1e-9 vntol=1e-6 gmin=1e-12 itl4=200
+.tran 10p 10n
+
+.control
+run
+wrdata /home/bthomas3/Videos/77GHz_phased_array/sim/radar_top_results.txt v(lna_op) v(if_p) v(ifa_op) v(vga_op) v(adc_op) v(dout_p) v(vco_op)
+meas tran lna_swing pp v(lna_op) from=2n to=10n
+meas tran if_swing pp v(if_p) from=2n to=10n
+meas tran ifa_swing pp v(ifa_op) from=2n to=10n
+meas tran vga_swing pp v(vga_op) from=2n to=10n
+meas tran dout_swing pp v(dout_p) from=2n to=10n
+meas tran vco_swing pp v(vco_op) from=2n to=10n
+quit
+.endc
+
+.end
