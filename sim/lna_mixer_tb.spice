@@ -1,0 +1,190 @@
+* LNA + Mixer Transistor-Level Transient Simulation
+* IHP SG13G2 PDK - Matching LNA_77G.sch and MIXER_77G.sch
+* Topology: 2-stage cascode LNA -> Gilbert cell mixer
+
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+
+.options method=gear reltol=1e-2 abstol=1e-8 vntol=1e-4 itl1=500 itl4=500 gmin=1e-11 trtol=7
+
+** ============================================================
+** LUMPED TL MODELS (Pi-section, SG13G2 microstrip Z0=85)
+** er_eff=6.5, vp=1.18e8, L=720pH/mm, C=99.7fF/mm, R=22.16Ω/mm
+** ============================================================
+* 49um: L=35.3pH, C=4.9fF, R=1.09Ω
+.subckt TL49 inp outp
+Rs1 inp m1 0.54
+Ls1 m1 m2 35.3p
+Rs2 m2 outp 0.54
+Cp1 inp 0 2.4f
+Cp2 outp 0 2.4f
+.ends TL49
+
+* 58um: L=41.8pH, C=5.8fF, R=1.29Ω
+.subckt TL58 inp outp
+Rs1 inp m1 0.64
+Ls1 m1 m2 41.8p
+Rs2 m2 outp 0.64
+Cp1 inp 0 2.9f
+Cp2 outp 0 2.9f
+.ends TL58
+
+* 97um: L=69.8pH, C=9.7fF, R=2.15Ω
+.subckt TL97 inp outp
+Rs1 inp m1 1.07
+Ls1 m1 m2 69.8p
+Rs2 m2 outp 1.07
+Cp1 inp 0 4.8f
+Cp2 outp 0 4.8f
+.ends TL97
+
+* 125um: L=90pH, C=12.5fF, R=2.77Ω
+.subckt TL125 inp outp
+Rs1 inp m1 1.39
+Ls1 m1 m2 90p
+Rs2 m2 outp 1.39
+Cp1 inp 0 6.2f
+Cp2 outp 0 6.2f
+.ends TL125
+
+* 151um: L=108.7pH, C=15.1fF, R=3.35Ω
+.subckt TL151 inp outp
+Rs1 inp m1 1.67
+Ls1 m1 m2 108.7p
+Rs2 m2 outp 1.67
+Cp1 inp 0 7.5f
+Cp2 outp 0 7.5f
+.ends TL151
+
+** ============================================================
+** LNA (from LNA_77G.sch)
+** Stage 1: Q33(Nx=4) CE + Q35(Nx=4) CB cascode
+** Stage 2: Q34(Nx=4) CE + Q36(Nx=4) CB cascode
+** Q37(Nx=1): bias mirror
+** TL input matching (97um), TL interstage (58um), TL output (151um)
+** Load: rppd R32/R33 (bias), rsil R29 (emitter degeneration)
+** Supply: 2.4V
+** ============================================================
+.subckt LNA_77G INP INN OUTP OUTN VCC GND
+
+* Input TL matching (97um each)
+XTL_inp INP inp_m TL97
+XTL_inn INN inn_m TL97
+
+* Stage 1 CE pair (Q33 Nx=4 and Q34 mirror via Q37 bias)
+XQ33 col1_p inp_m em1 GND npn13G2l Nx=4 selft=0
+XQ34 col1_n inn_m em1 GND npn13G2l Nx=4 selft=0
+
+* Emitter degeneration (R29: rsil w=7u l=38.8u m=4 ~ 22 ohms)
+Re1 em1 GND 22
+
+* Interstage TL (58um)
+XTL_s1p col1_p col1_pm TL58
+XTL_s1n col1_n col1_nm TL58
+
+* Stage 2 CB cascode (Q35, Q36 Nx=4)
+* Base bias at B35&36 (fixed from supply through R30/R31)
+XQ35 col2_p bias_cb col1_pm GND npn13G2l Nx=4 selft=0
+XQ36 col2_n bias_cb col1_nm GND npn13G2l Nx=4 selft=0
+
+* CB bias network (R30: rppd ~121 ohms, R31: rppd ~61 ohms)
+* Sets cascode base ~ 1.4V for proper Vce headroom
+Rb_cb1 VCC bias_cb 500
+Rb_cb2 bias_cb GND 300
+
+* Output TL (151um)
+XTL_outp col2_p outp_m TL151
+XTL_outn col2_n outn_m TL151
+
+* Collector loads (R32: rppd ~ 200 ohms effective)
+RL_p VCC outp_m 200
+RL_n VCC outn_m 200
+
+* Output DC blocking caps (C55/C56: cap_cmim 4x4um ~ 0.5pF)
+Cout_p outp_m OUTP 500f
+Cout_n outn_m OUTN 500f
+
+* Bias current (set by Q37 mirror, ~4mA total)
+Ibias em1 GND DC 0
+* Note: bias is set by the CE pair Vbe; tail resistor Re1 sets Ie
+
+.ends LNA_77G
+
+** ============================================================
+** MIXER (from MIXER_77G.sch)
+** Gilbert cell: Q22-Q25 (Nx=4) switching quad
+** Q20,Q21 (Nx=4) RF transconductance pair
+** TL matching at all inputs (49-125um)
+** Supply: 2.4V, RL=200 (from rppd R21/R22)
+** ============================================================
+.subckt MIXER_77G RFP RFN LOP LON IFP IFN VCC GND
+
+* RF input TL (125um)
+XTL_rfp RFP rfp_m TL125
+XTL_rfn RFN rfn_m TL125
+
+* RF transconductance pair (Q20 Nx=4, Q21 Nx=4)
+XQ20 elol rfp_m mtail GND npn13G2l Nx=4 selft=0
+XQ21 elor rfn_m mtail GND npn13G2l Nx=4 selft=0
+
+* Tail current (4mA)
+Itail mtail GND DC 4m
+
+* LO input TLs (49um)
+XTL_lop LOP lop_m TL49
+XTL_lon LON lon_m TL49
+
+* Switching quad (Q22-Q25 Nx=4)
+XQ22 IFP lop_m elol GND npn13G2l Nx=4 selft=0
+XQ23 IFN lon_m elol GND npn13G2l Nx=4 selft=0
+XQ24 IFN lop_m elor GND npn13G2l Nx=4 selft=0
+XQ25 IFP lon_m elor GND npn13G2l Nx=4 selft=0
+
+* IF load resistors (R21/R22: rppd ~200 ohms)
+RL1 VCC IFP 200
+RL2 VCC IFN 200
+
+.ends MIXER_77G
+
+** ============================================================
+** TOP-LEVEL TESTBENCH
+** ============================================================
+
+* Supply
+Vcc vcc 0 2.4
+
+* 77GHz RF input (1mV differential - target RX signal)
+Vrf_p rf_p 0 DC 1.0 SIN(1.0 0.5m 77G)
+Vrf_n rf_n 0 DC 1.0 SIN(1.0 -0.5m 77G)
+
+* LO drive (2.4V CM, 100mV amplitude at 76.99GHz -> 10MHz IF)
+Vlo_p lo_p 0 DC 1.6 SIN(1.6 100m 76.99G)
+Vlo_n lo_n 0 DC 1.6 SIN(1.6 -100m 76.99G)
+
+* LNA
+X_lna rf_p rf_n lna_op lna_on vcc 0 LNA_77G
+
+* AC coupling LNA -> Mixer RF input (bias at 1.0V for RF pair)
+Cc_m1 lna_op mix_rfp 500f
+Cc_m2 lna_on mix_rfn 500f
+Rb_m1 vcc mix_rfp 2.2k
+Rb_m2 mix_rfp 0 1.5k
+Rb_m3 vcc mix_rfn 2.2k
+Rb_m4 mix_rfn 0 1.5k
+
+* Mixer
+X_mixer mix_rfp mix_rfn lo_p lo_n if_p if_n vcc 0 MIXER_77G
+
+** ============================================================
+** ANALYSIS
+** ============================================================
+.tran 0.5p 2n
+
+.control
+run
+meas tran lna_swing pp v(lna_op) from=0.5n to=2n
+meas tran if_swing pp v(if_p) from=0.5n to=2n
+quit
+.endc
+
+.end

@@ -1,0 +1,322 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * radar_top full system - all blocks from xschem .sch netlists
+
+Warning: Model issue on line 232 :
+  .model x_adc.xm1:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 254 :
+  .model x_adc.xm1:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 256 :
+  .model x_adc.xm1:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 s ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 232 :
+  .model x_adc.xm2:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 254 :
+  .model x_adc.xm2:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 256 :
+  .model x_adc.xm2:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 s ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 232 :
+  .model x_adc.xm9:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 254 :
+  .model x_adc.xm9:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 256 :
+  .model x_adc.xm9:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 s ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 232 :
+  .model x_adc.xm5:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 254 :
+  .model x_adc.xm5:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 256 :
+  .model x_adc.xm5:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 s ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 232 :
+  .model x_adc.xm6:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 254 :
+  .model x_adc.xm6:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 256 :
+  .model x_adc.xm6:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 s ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 343 :
+  .model x_adc.xm3:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 365 :
+  .model x_adc.xm3:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 367 :
+  .model x_adc.xm3:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 s ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 343 :
+  .model x_adc.xm4:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 365 :
+  .model x_adc.xm4:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 367 :
+  .model x_adc.xm4:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 s ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 343 :
+  .model x_adc.xm7:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 365 :
+  .model x_adc.xm7:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 367 :
+  .model x_adc.xm7:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 s ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 343 :
+  .model x_adc.xm8:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 365 :
+  .model x_adc.xm8:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27. ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 367 :
+  .model x_adc.xm8:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 s ...
+Unknown model type psp103va - ignored
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Warning: singular matrix:  check node lna_on
+
+Note: Starting dynamic gmin stepping
+Warning: singular matrix:  check node lna_on
+
+Warning: Dynamic gmin stepping failed
+Note: Starting true gmin stepping
+Warning: singular matrix:  check node lna_on
+
+Warning: singular matrix:  check node lna_on
+
+Warning: singular matrix:  check node lna_on
+
+Warning: singular matrix:  check node lna_on
+
+Warning: True gmin stepping failed
+Note: Starting source stepping
+Warning: source stepping failed
+Note: Transient op started
+Note: Transient op finished successfully
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vcc                                        3.3
+v2v4                                       2.4
+vdd                                        1.2
+sub!                                         0
+vctrl                                     0.95
+rf_p                                         1
+rf_n                                         1
+lo_p                                         1
+lo_n                                         1
+clk                                          0
+x_lna.net8                            0.728848
+x_lna.net7                             1.00001
+x_lna.net4                            0.135376
+x_lna.xq33.s1                      1.33651e-08
+x_lna.xq33.t                                 0
+x_lna.net5                            0.728848
+x_lna.net1                             1.00001
+x_lna.xq34.s1                      1.33651e-08
+x_lna.xq34.t                                 0
+x_lna.bias6                            1.00003
+x_lna.net2                            0.137806
+x_lna.xq37.s1                      6.83776e-09
+x_lna.xq37.t                                 0
+x_lna.net6                             2.37743
+x_lna.b3536                            1.59328
+x_lna.xq35.s1                      4.46838e-08
+x_lna.xq35.t                                 0
+x_lna.net3                             2.37743
+x_lna.xq36.s1                      4.46838e-08
+x_lna.xq36.t                                 0
+x_lna.tl35m                                  1
+x_lna.tl35m2                                 1
+x_lna.tl36m                                  1
+x_lna.tl36m2                                 1
+x_lna.tl37m                            1.00002
+x_lna.tl37m2                           1.00002
+x_lna.tl38m                            1.00002
+x_lna.tl38m2                           1.00002
+x_lna.tl39m                            2.38872
+x_lna.tl39m2                           2.38872
+x_lna.tl40m                            2.38872
+x_lna.tl40m2                           2.38872
+x_lna.xr32.dt                                0
+x_lna.xr33.dt                                0
+x_lna.xr30.dt                                0
+x_lna.xr31.dt                                0
+x_lna.xr29.dt                                0
+x_lna.xc53.1                                 1
+x_lna.xc54.1                                 1
+lna_on                                0.887606
+x_lna.xc55.1                          0.887606
+lna_op                                0.887606
+x_lna.xc56.1                          0.887606
+x_lna.xc58.1                               2.4
+x_lna.xc57.1                               2.4
+x_lna.xc59.1                               2.4
+x_lna.xc60.1                               2.4
+x_lna.xc61.1                               2.4
+mix_rfp                               0.814542
+mix_rfn                               0.814542
+if_p                                  0.843373
+x_mixer.blop                           1.00042
+x_mixer.elol                           0.20858
+x_mixer.xq22.s1                    1.59693e-08
+x_mixer.xq22.t                               0
+if_n                                  0.843373
+x_mixer.blon                           1.00042
+x_mixer.xq23.s1                    1.59693e-08
+x_mixer.xq23.t                               0
+x_mixer.elor                           0.20858
+x_mixer.xq24.s1                    1.59693e-08
+x_mixer.xq24.t                               0
+x_mixer.xq25.s1                    1.59693e-08
+x_mixer.xq25.t                               0
+x_mixer.brfp                          0.813848
+x_mixer.xq20.s1                    6.00422e-07
+x_mixer.xq20.t                               0
+x_mixer.brfn                          0.813848
+x_mixer.xq21.s1                    6.00422e-07
+x_mixer.xq21.t                               0
+x_mixer.rfbias                        0.813161
+x_mixer.xq27.s1                     5.6466e-09
+x_mixer.xq27.t                               0
+x_mixer.lobias                         1.00074
+x_mixer.xq26.s1                    7.00657e-09
+x_mixer.xq26.t                               0
+x_mixer.tl21m                          1.00058
+x_mixer.tl21m2                         1.00058
+x_mixer.tl23m                          1.00058
+x_mixer.tl23m2                         1.00058
+x_mixer.tl22m                          1.00021
+x_mixer.tl22m2                         1.00021
+x_mixer.tl24m                          1.00021
+x_mixer.tl24m2                         1.00021
+x_mixer.tl25m                         0.813505
+x_mixer.tl25m2                        0.813505
+x_mixer.tl27m                         0.813505
+x_mixer.tl27m2                        0.813505
+x_mixer.tl26m                         0.814195
+x_mixer.tl26m2                        0.814195
+x_mixer.tl28m                         0.814195
+x_mixer.tl28m2                        0.814195
+x_mixer.xr21.dt                              0
+x_mixer.xr22.dt                              0
+x_mixer.xr23.dt                              0
+x_mixer.xc42.1                        0.813161
+x_mixer.xc37.1                               1
+x_mixer.xc38.1                               1
+x_mixer.xc39.1                        0.814542
+x_mixer.xc40.1                        0.814542
+x_mixer.xc41.1                             2.4
+x_mixer.xc43.1                             2.4
+ifa_inp                                1.34553
+ifa_inn                                1.34553
+x_ifa.out1p                            2.79357
+x_ifa.tail1                           0.531891
+x_ifa.xq1.s1                       3.06524e-08
+x_ifa.xq1.t                                  0
+x_ifa.out1n                            2.79357
+x_ifa.xq2.s1                       3.06524e-08
+x_ifa.xq2.t                                  0
+ifa_op                                 2.80065
+x_ifa.tail2                            1.97956
+x_ifa.xq3.s1                       3.07313e-08
+x_ifa.xq3.t                                  0
+ifa_on                                 2.80065
+x_ifa.xq4.s1                       3.07313e-08
+x_ifa.xq4.t                                  0
+vga_inp                                1.27809
+vga_inn                                1.27809
+vga_op                                 1.35912
+x_vga.net1                            0.408085
+x_vga.xq1.s1                       1.46437e-08
+x_vga.xq1.t                                  0
+vga_on                                 1.35912
+x_vga.xq2.s1                       1.46437e-08
+x_vga.xq2.t                                  0
+x_vga.net2                           0.0778582
+x_vga.xqtail.s1                     1.3875e-07
+x_vga.xqtail.t                               0
+adc_inp                                    0.6
+adc_inn                                    0.6
+x_adc.net2                             1.04281
+x_adc.net1                            0.566319
+x_adc.net3                              1.0428
+adc_op                                     1.2
+adc_on                                     1.2
+l.x_mixer.ltl28#branch            -0.000249701
+l.x_mixer.ltl26#branch            -0.000249701
+l.x_mixer.ltl27#branch             0.000247123
+l.x_mixer.ltl25#branch             0.000247123
+l.x_mixer.ltl24#branch             0.000289545
+l.x_mixer.ltl22#branch             0.000289545
+l.x_mixer.ltl23#branch            -0.000292065
+l.x_mixer.ltl21#branch            -0.000292065
+l.x_lna.ltl40#branch                0.00675714
+l.x_lna.ltl39#branch                0.00675714
+l.x_lna.ltl38#branch               -1.3717e-05
+l.x_lna.ltl37#branch               -1.3717e-05
+l.x_lna.ltl36#branch               4.18649e-06
+l.x_lna.ltl35#branch               4.18649e-06
+vclk#branch                        1.75665e-10
+vlo_n#branch                       0.000289545
+vlo_p#branch                       0.000289545
+vrf_n#branch                       4.18647e-06
+vrf_p#branch                       4.18647e-06
+vctrl#branch                      -1.11905e-05
+vsub#branch                        9.65853e-10
+vdd#branch                        -6.00015e-05
+v2v4#branch                         -0.0223463
+vcc#branch                          -0.0125819
+
+
+No. of Data Rows : 10017
+lna_swing           =  9.56194e-03 from=  1.00000e-09 to=  5.00000e-09
+if_swing            =  3.02336e-02 from=  1.00000e-09 to=  5.00000e-09
+ifa_swing           =  2.96668e-02 from=  1.00000e-09 to=  5.00000e-09
+vga_swing           =  1.86946e+00 from=  1.00000e-09 to=  5.00000e-09
+ngspice-46 done

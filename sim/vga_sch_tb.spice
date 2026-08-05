@@ -1,0 +1,31 @@
+* VGA Testbench - Using actual xschem-extracted netlist
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.options method=gear reltol=1e-2 abstol=1e-8 vntol=1e-4 itl4=500 gmin=1e-11 trtol=7
+
+** VGA subcircuit from xschem netlist (VGA_77G.sch)
+.subckt VGA_77G VCC INP INN VCTRL GND sub OUTP OUTN
+XQ1 OUTP INP net1 sub npn13G2l Nx=2 selft=0
+XQ2 OUTN INN net1 sub npn13G2l Nx=2 selft=0
+XQtail net1 VCTRL net2 sub npn13G2l Nx=4 selft=0
+RL1 VCC OUTP 500
+RL2 VCC OUTN 500
+RE net2 GND 10
+.ends VGA_77G
+
+** Testbench
+Vcc vcc 0 3.3
+Vinp inp 0 DC 1.3 SIN(1.3 10m 10Meg)
+Vinn inn 0 DC 1.3 SIN(1.3 -10m 10Meg)
+Vctrl vctrl 0 0.95
+
+XDUT vcc inp inn vctrl 0 0 outp outn VGA_77G
+
+.tran 100p 200n
+
+.control
+run
+meas tran vga_swing pp v(outp) from=20n to=200n
+quit
+.endc
+
+.end

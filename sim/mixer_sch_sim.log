@@ -1,0 +1,95 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * mixer testbench - using actual xschem-extracted netlist
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+2v4                                        2.4
+sub!                                         0
+rfp                                          1
+rfn                                          1
+lop                                          1
+lon                                          1
+ifp                                   0.056508
+blop                                  0.996882
+elol                                 0.0449172
+xq22.s1                              0.0763609
+xq22.t                                       0
+ifn                                   0.056508
+blon                                  0.996882
+xq23.s1                              0.0763609
+xq23.t                                       0
+elor                                 0.0449172
+xq24.s1                              0.0763609
+xq24.t                                       0
+xq25.s1                              0.0763609
+xq25.t                                       0
+brfp                                  0.984141
+xq20.s1                               0.102176
+xq20.t                                       0
+brfn                                  0.984141
+xq21.s1                               0.102176
+xq21.t                                       0
+rfbias                                0.973742
+xq27.s1                            6.10782e-09
+xq27.t                                       0
+lobias                                0.997199
+xq26.s1                             6.9818e-09
+xq26.t                                       0
+tl21m                                 0.997041
+tl21m2                                0.997041
+tl23m                                 0.997041
+tl23m2                                0.997041
+tl22m                                 0.998441
+tl22m2                                0.998441
+tl24m                                 0.998441
+tl24m2                                0.998441
+tl25m                                 0.978941
+tl25m2                                0.978941
+tl27m                                 0.978941
+tl27m2                                0.978941
+tl26m                                 0.992071
+tl26m2                                0.992071
+tl28m                                 0.992071
+tl28m2                                0.992071
+xr21.dt                                      0
+xr22.dt                                      0
+xr23.dt                                      0
+xc42.1                                0.973742
+xc37.1                                       1
+xc38.1                                       1
+xc39.1                                       1
+xc40.1                                       1
+xc41.1                                     2.4
+xc43.1                                     2.4
+ltl28#branch                       -0.00570466
+ltl26#branch                       -0.00570466
+ltl27#branch                        0.00374075
+ltl25#branch                        0.00374075
+ltl24#branch                       -0.00213529
+ltl22#branch                       -0.00213529
+ltl23#branch                      -0.000292804
+ltl21#branch                      -0.000292804
+vlo_n#branch                       -0.00213529
+vlo_p#branch                       -0.00213529
+vrf_n#branch                       -0.00570466
+vrf_p#branch                       -0.00570466
+vsub#branch                        0.000268314
+vcc#branch                         -0.00645531
+
+
+No. of Data Rows : 4008
+if_swing            =  2.26670e-04 from=  5.00000e-10 to=  2.00000e-09
+ifn_swing           =  2.26658e-04 from=  5.00000e-10 to=  2.00000e-09
+ngspice-46 done

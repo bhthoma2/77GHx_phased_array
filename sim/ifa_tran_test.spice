@@ -1,0 +1,59 @@
+* IFA + VGA cascaded transient test
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+
+.options method=gear reltol=1e-2 abstol=1e-8 vntol=1e-4 itl4=500 gmin=1e-11 trtol=7
+
+Vcc vcc 0 3.3
+Vinp inp 0 DC 1.3 SIN(1.3 1m 10Meg)
+Vinn inn 0 DC 1.3 SIN(1.3 -1m 10Meg)
+Vctrl vctrl 0 1.2
+
+* IFA Stage 1
+XQ1 outp1 inp tail1 0 npn13G2l Nx=2 selft=0
+XQ2 outn1 inn tail1 0 npn13G2l Nx=2 selft=0
+RL1 vcc outp1 500
+RL2 vcc outn1 500
+Itail1 tail1 0 DC 2m
+
+* AC couple to IFA Stage 2 (bias at 1.05V: 3.3*2.2/(4.7+2.2)=1.05V)
+Cc1 outp1 b2p 1p
+Cc2 outn1 b2n 1p
+Rb1 vcc b2p 4.7k
+Rb2 b2p 0 2.2k
+Rb3 vcc b2n 4.7k
+Rb4 b2n 0 2.2k
+
+* IFA Stage 2
+XQ3 outp2 b2p tail2 0 npn13G2l Nx=2 selft=0
+XQ4 outn2 b2n tail2 0 npn13G2l Nx=2 selft=0
+RL3 vcc outp2 500
+RL4 vcc outn2 500
+Itail2 tail2 0 DC 2m
+
+* AC couple to VGA (bias at 1.3V)
+Cc3 outp2 vga_inp 1p
+Cc4 outn2 vga_inn 1p
+Rb5 vcc vga_inp 10k
+Rb6 vga_inp 0 6.5k
+Rb7 vcc vga_inn 10k
+Rb8 vga_inn 0 6.5k
+
+* VGA
+XQ5 vga_op vga_inp vtail 0 npn13G2l Nx=2 selft=0
+XQ6 vga_on vga_inn vtail 0 npn13G2l Nx=2 selft=0
+XQtail vtail vctrl etail 0 npn13G2l Nx=4 selft=0
+RL5 vcc vga_op 500
+RL6 vcc vga_on 500
+RE etail 0 10
+
+.tran 100p 200n
+
+.control
+run
+meas tran ifa1_swing pp v(outp1) from=50n to=200n
+meas tran ifa2_swing pp v(outp2) from=50n to=200n
+meas tran vga_swing pp v(vga_op) from=50n to=200n
+quit
+.endc
+
+.end

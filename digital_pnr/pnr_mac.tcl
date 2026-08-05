@@ -9,8 +9,8 @@ link_design radar_mac_accel
 
 read_sdc constraints.sdc
 
-initialize_floorplan -die_area "0 0 1800 1800" \
-    -core_area "10 10 1790 1790" \
+initialize_floorplan -die_area "0 0 2200 2200" \
+    -core_area "10 10 2190 2190" \
     -site CoreSite
 
 make_tracks
@@ -24,7 +24,7 @@ add_pdn_stripe -grid core_grid -layer Metal4 -width 2.0 -pitch 40.0 -offset 10.0
 add_pdn_connect -grid core_grid -layers {Metal3 Metal4}
 
 place_pins -hor_layers Metal3 -ver_layers Metal2
-global_placement -density 0.60
+global_placement -density 0.45
 clock_tree_synthesis -root_buf sg13g2_buf_8 \
     -buf_list {sg13g2_buf_2 sg13g2_buf_4 sg13g2_buf_8}
 repair_timing -hold

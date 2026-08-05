@@ -1,0 +1,59 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/MIXER_77G.sch
+**.subckt MIXER_77G VCC RF_P RF_N LO_P LO_N GND sub! IF_P IF_N
+*.iopin 2V4
+*.iopin LOP
+*.iopin LON
+*.iopin RFP
+*.iopin RFN
+*.iopin GND
+*.iopin IFP
+*.iopin IFN
+XQ22 IFP BLOP ELOL sub! npn13G2l Nx=4 El=2.5
+XQ23 IFN BLON ELOL sub! npn13G2l Nx=4 El=2.5
+XQ24 IFP BLON ELOR sub! npn13G2l Nx=4 El=2.5
+XQ25 IFN BLOP ELOR sub! npn13G2l Nx=4 El=2.5
+XQ20 ELOL BRFP GND sub! npn13G2l Nx=4 El=2.5
+XQ21 ELOR BRFN GND sub! npn13G2l Nx=4 El=2.5
+XQ27 RFBIAS RFBIAS GND sub! npn13G2l Nx=1 El=2.5
+XQ26 LOBIAS LOBIAS RFBIAS sub! npn13G2l Nx=1 El=2.5
+ytransline TL23 BLON LOBIAS ytransline_TL23 len=49u lumps=50
+.model ytransline_TL23 transline r=22.16k l=445.9n C=61.5p
+ytransline TL21 BLOP LOBIAS ytransline_TL21 len=49u lumps=50
+.model ytransline_TL21 transline r=22.16k l=445.9n C=61.5p
+ytransline TL22 BLOP LOP ytransline_TL22 len=66u lumps=50
+.model ytransline_TL22 transline r=22.16k l=445.9n C=61.5p
+ytransline TL24 BLON LON ytransline_TL24 len=66u lumps=50
+.model ytransline_TL24 transline r=22.16k l=445.9n C=61.5p
+ytransline TL25 BRFP RFBIAS ytransline_TL25 len=125u lumps=50
+.model ytransline_TL25 transline r=22.16k l=445.9n C=61.5p
+ytransline TL27 BRFN RFBIAS ytransline_TL27 len=125u lumps=50
+.model ytransline_TL27 transline r=22.16k l=445.9n C=61.5p
+ytransline TL26 BRFP RFP ytransline_TL26 len=125u lumps=50
+.model ytransline_TL26 transline r=22.16k l=445.9n C=61.5p
+ytransline TL28 BRFN RFN ytransline_TL28 len=125u lumps=50
+.model ytransline_TL28 transline r=22.16k l=445.9n C=61.5p
+XR21 2V4 IFP sub! rppd w=3e-6 l=18.23e-6 m=2 b=0
+XR22 2V4 IFN sub! rppd w=3e-6 l=18.23e-6 m=2 b=0
+XC42 RFBIAS GND cap_cmim w=30e-6 l=30e-6
+XC37 LOP GND cap_cmim w=5e-6 l=5e-6
+XC38 LON GND cap_cmim w=5e-6 l=5e-6
+XC39 RFP GND cap_cmim w=4e-6 l=4e-6
+XC40 RFN GND cap_cmim w=4e-6 l=4e-6
+XR23 2V4 LOBIAS sub! rppd w=3e-6 l=27.48e-6 m=1 b=0
+XC41 2V4 LOBIAS cap_cmim w=30e-6 l=30e-6
+XC43 2V4 GND cap_cmim w=30e-6 l=30e-6
+**** begin user architecture code
+
+
+
+
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+
+
+**** end user architecture code
+**.ends
+.GLOBAL sub!
+.end

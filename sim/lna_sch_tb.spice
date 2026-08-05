@@ -1,0 +1,92 @@
+* LNA Testbench - Using actual xschem-extracted netlist
+* Includes ytransline XSPICE models + PDK passives (rppd, rsil, cap_cmim)
+
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+
+.options method=gear reltol=1e-2 abstol=1e-8 vntol=1e-4 itl4=500 gmin=1e-11 trtol=7
+
+.GLOBAL sub!
+
+** LNA from xschem netlist (LNA_77G.sch) - flattened as top-level
+Vcc 2V4 0 2.4
+Vinp INP 0 DC 1.0 SIN(1.0 0.5m 77G)
+Vinn INN 0 DC 1.0 SIN(1.0 -0.5m 77G)
+Vsub sub! 0 0
+
+* Transistors
+XQ33 net8 net7 net4 sub! npn13G2l Nx=4 selft=0
+XQ34 net5 net1 net4 sub! npn13G2l Nx=4 selft=0
+XQ37 BIAS6 BIAS6 net2 sub! npn13G2l Nx=1 selft=0
+XQ35 net6 B3536 net8 sub! npn13G2l Nx=4 selft=0
+XQ36 net3 B3536 net5 sub! npn13G2l Nx=4 selft=0
+
+* Transmission lines as lumped Pi-sections
+* R=22.16k/m, L=445.9nH/m, C=61.5pF/m
+* TL37/38: 58um -> R=1.29, L=25.9pH, C=3.57fF
+RTL37a net7 tl37m 0.64
+LTL37 tl37m tl37m2 25.9p
+RTL37b tl37m2 BIAS6 0.64
+CTL37a net7 0 1.78f
+CTL37b BIAS6 0 1.78f
+RTL38a net1 tl38m 0.64
+LTL38 tl38m tl38m2 25.9p
+RTL38b tl38m2 BIAS6 0.64
+CTL38a net1 0 1.78f
+CTL38b BIAS6 0 1.78f
+* TL35/36: 97um -> R=2.15, L=43.3pH, C=5.97fF
+RTL35a net7 tl35m 1.07
+LTL35 tl35m tl35m2 43.3p
+RTL35b tl35m2 INP 1.07
+CTL35a net7 0 2.98f
+CTL35b INP 0 2.98f
+RTL36a net1 tl36m 1.07
+LTL36 tl36m tl36m2 43.3p
+RTL36b tl36m2 INN 1.07
+CTL36a net1 0 2.98f
+CTL36b INN 0 2.98f
+* TL39/40: 151um -> R=3.35, L=67.3pH, C=9.29fF
+RTL39a 2V4 tl39m 1.67
+LTL39 tl39m tl39m2 67.3p
+RTL39b tl39m2 net6 1.67
+CTL39a 2V4 0 4.64f
+CTL39b net6 0 4.64f
+RTL40a 2V4 tl40m 1.67
+LTL40 tl40m tl40m2 67.3p
+RTL40b tl40m2 net3 1.67
+CTL40a 2V4 0 4.64f
+CTL40b net3 0 4.64f
+
+* PDK Resistors
+XR32 2V4 BIAS6 sub! rppd w=3e-6 l=18.23e-6 m=2 b=0
+XR33 net2 0 sub! rppd w=2.5e-6 l=10.53e-6 m=14 b=0
+XR30 2V4 B3536 sub! rppd w=3e-6 l=18.23e-6 m=2 b=0
+XR31 B3536 0 sub! rppd w=3e-6 l=18.23e-6 m=1 b=0
+XR29 net4 0 sub! rsil w=7e-6 l=38.8e-6 m=4 b=0
+
+* PDK Capacitors
+XC53 INP 0 cap_cmim w=6e-6 l=6e-6
+XC54 INN 0 cap_cmim w=6e-6 l=6e-6
+XC55 OUTN net6 cap_cmim w=4e-6 l=4e-6
+XC56 OUTP net3 cap_cmim w=4e-6 l=4e-6
+XC58 2V4 BIAS6 cap_cmim w=100e-6 l=20e-6
+XC57 2V4 B3536 cap_cmim w=100e-6 l=15e-6
+XC59 2V4 BIAS6 cap_cmim w=100e-6 l=20e-6
+XC60 2V4 0 cap_cmim w=100e-6 l=15e-6
+XC61 2V4 0 cap_cmim w=100e-6 l=15e-6
+
+* Output load
+Rload_p OUTP 0 50
+Rload_n OUTN 0 50
+
+.tran 0.5p 2n
+
+.control
+run
+meas tran lna_outp_swing pp v(OUTP) from=0.5n to=2n
+meas tran lna_outn_swing pp v(OUTN) from=0.5n to=2n
+quit
+.endc
+
+.end

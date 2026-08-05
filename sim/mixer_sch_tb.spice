@@ -1,0 +1,102 @@
+* MIXER Testbench - Using actual xschem-extracted netlist
+* Gilbert cell with TL matching + PDK passives
+
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+
+.options method=gear reltol=1e-2 abstol=1e-8 vntol=1e-4 itl4=500 gmin=1e-11 trtol=7
+.GLOBAL sub!
+
+Vcc 2V4 0 2.4
+Vsub sub! 0 0
+
+* RF input at 77GHz (1mVpp differential)
+Vrf_p RFP 0 DC 1.0 SIN(1.0 0.5m 77G)
+Vrf_n RFN 0 DC 1.0 SIN(1.0 -0.5m 77G)
+
+* LO at 76.99GHz (100mV amplitude -> 10MHz IF)
+Vlo_p LOP 0 DC 1.0 SIN(1.0 100m 76.99G)
+Vlo_n LON 0 DC 1.0 SIN(1.0 -100m 76.99G)
+
+** Mixer from xschem netlist (MIXER_77G.sch)
+* Switching quad
+XQ22 IFP BLOP ELOL sub! npn13G2l Nx=4 selft=0
+XQ23 IFN BLON ELOL sub! npn13G2l Nx=4 selft=0
+XQ24 IFP BLON ELOR sub! npn13G2l Nx=4 selft=0
+XQ25 IFN BLOP ELOR sub! npn13G2l Nx=4 selft=0
+* RF transconductance pair
+XQ20 ELOL BRFP 0 sub! npn13G2l Nx=4 selft=0
+XQ21 ELOR BRFN 0 sub! npn13G2l Nx=4 selft=0
+* Bias mirrors
+XQ27 RFBIAS RFBIAS 0 sub! npn13G2l Nx=1 selft=0
+XQ26 LOBIAS LOBIAS RFBIAS sub! npn13G2l Nx=1 selft=0
+
+* Transmission lines as lumped Pi-sections
+* TL21/23: 49um (LO bias stub) -> L=21.8pH, C=3.01fF, R=1.09
+RTL21a BLOP tl21m 0.54
+LTL21 tl21m tl21m2 21.8p
+RTL21b tl21m2 LOBIAS 0.54
+CTL21a BLOP 0 1.50f
+CTL21b LOBIAS 0 1.50f
+RTL23a BLON tl23m 0.54
+LTL23 tl23m tl23m2 21.8p
+RTL23b tl23m2 LOBIAS 0.54
+CTL23a BLON 0 1.50f
+CTL23b LOBIAS 0 1.50f
+* TL22/24: 66um (LO input) -> L=29.4pH, C=4.06fF, R=1.46
+RTL22a BLOP tl22m 0.73
+LTL22 tl22m tl22m2 29.4p
+RTL22b tl22m2 LOP 0.73
+CTL22a BLOP 0 2.03f
+CTL22b LOP 0 2.03f
+RTL24a BLON tl24m 0.73
+LTL24 tl24m tl24m2 29.4p
+RTL24b tl24m2 LON 0.73
+CTL24a BLON 0 2.03f
+CTL24b LON 0 2.03f
+* TL25/27: 125um (RF bias stub) -> L=55.7pH, C=7.69fF, R=2.77
+RTL25a BRFP tl25m 1.39
+LTL25 tl25m tl25m2 55.7p
+RTL25b tl25m2 RFBIAS 1.39
+CTL25a BRFP 0 3.84f
+CTL25b RFBIAS 0 3.84f
+RTL27a BRFN tl27m 1.39
+LTL27 tl27m tl27m2 55.7p
+RTL27b tl27m2 RFBIAS 1.39
+CTL27a BRFN 0 3.84f
+CTL27b RFBIAS 0 3.84f
+* TL26/28: 125um (RF input) -> same as above
+RTL26a BRFP tl26m 1.39
+LTL26 tl26m tl26m2 55.7p
+RTL26b tl26m2 RFP 1.39
+CTL26a BRFP 0 3.84f
+CTL26b RFP 0 3.84f
+RTL28a BRFN tl28m 1.39
+LTL28 tl28m tl28m2 55.7p
+RTL28b tl28m2 RFN 1.39
+CTL28a BRFN 0 3.84f
+CTL28b RFN 0 3.84f
+
+* PDK passives
+XR21 2V4 IFP sub! rppd w=3e-6 l=18.23e-6 m=2 b=0
+XR22 2V4 IFN sub! rppd w=3e-6 l=18.23e-6 m=2 b=0
+XR23 2V4 LOBIAS sub! rppd w=3e-6 l=27.48e-6 m=1 b=0
+XC42 RFBIAS 0 cap_cmim w=30e-6 l=30e-6
+XC37 LOP 0 cap_cmim w=5e-6 l=5e-6
+XC38 LON 0 cap_cmim w=5e-6 l=5e-6
+XC39 RFP 0 cap_cmim w=4e-6 l=4e-6
+XC40 RFN 0 cap_cmim w=4e-6 l=4e-6
+XC41 2V4 LOBIAS cap_cmim w=30e-6 l=30e-6
+XC43 2V4 0 cap_cmim w=30e-6 l=30e-6
+
+.tran 0.5p 2n
+
+.control
+run
+meas tran if_swing pp v(IFP) from=0.5n to=2n
+meas tran ifn_swing pp v(IFN) from=0.5n to=2n
+quit
+.endc
+
+.end

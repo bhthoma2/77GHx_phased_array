@@ -1,0 +1,20 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/ADC_SAR_12B.sch
+**.subckt ADC_SAR_12B VDD AINP AINN CLK VSS sub! DOUTP DOUTN
+*.iopin ainp
+*.iopin ainn
+*.iopin clk
+*.iopin doutp
+*.iopin doutn
+*.iopin vdd
+*.iopin vss
+XM1 net2 ainp net1 vss sg13_lv_nmos w=8u l=200n ng=4 m=4
+XM2 net3 ainn net1 vss sg13_lv_nmos w=8u l=200n ng=4 m=4
+XM9 net1 clk vss vss sg13_lv_nmos w=8u l=200n ng=4 m=2
+XM5 doutp doutn net2 vss sg13_lv_nmos w=4u l=200n ng=2 m=2
+XM6 doutn doutp net3 vss sg13_lv_nmos w=4u l=200n ng=2 m=2
+XM3 doutp doutn vdd vdd sg13_lv_pmos w=4u l=200n ng=2 m=2
+XM4 doutn doutp vdd vdd sg13_lv_pmos w=4u l=200n ng=2 m=2
+XM7 doutp clk vdd vdd sg13_lv_pmos w=2u l=200n ng=1 m=2
+XM8 doutn clk vdd vdd sg13_lv_pmos w=2u l=200n ng=1 m=2
+**.ends
+.end

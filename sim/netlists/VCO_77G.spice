@@ -1,0 +1,17 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/VCO_77G.sch
+**.subckt VCO_77G VCC VTUNE GND sub! OUTP OUTN
+*.iopin VCC
+*.iopin GND
+*.iopin OUTP
+*.iopin OUTN
+*.iopin VTUNE
+*.iopin sub|
+XQ1 net4 OUTN net3 sub| npn13G2l Nx=1 El=2.5
+XQ2 net5 OUTP net3 sub| npn13G2l Nx=1 El=2.5
+L1 VCC OUTP 27p
+L2 VCC OUTN 27p
+CVAR1 OUTP OUTN 15f
+CVAR2 net1 net2 12f
+ITAIL net3 GND DC 5m
+**.ends
+.end

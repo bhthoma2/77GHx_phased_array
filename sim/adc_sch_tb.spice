@@ -1,0 +1,36 @@
+* ADC Testbench - Using actual xschem-extracted netlist (ADC_SAR_12B.sch)
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+
+.options method=gear reltol=1e-3 abstol=1e-9 vntol=1e-6 itl4=200 gmin=1e-12
+
+** ADC subcircuit from xschem netlist
+.subckt ADC_SAR_12B VDD AINP AINN CLK VSS sub DOUTP DOUTN
+XM1 net2 AINP net1 VSS sg13_lv_nmos w=8u l=200n ng=4 m=4 rfmode=1
+XM2 net3 AINN net1 VSS sg13_lv_nmos w=8u l=200n ng=4 m=4 rfmode=1
+XM9 net1 CLK VSS VSS sg13_lv_nmos w=8u l=200n ng=4 m=2 rfmode=1
+XM5 DOUTP DOUTN net2 VSS sg13_lv_nmos w=4u l=200n ng=2 m=2 rfmode=1
+XM6 DOUTN DOUTP net3 VSS sg13_lv_nmos w=4u l=200n ng=2 m=2 rfmode=1
+XM3 DOUTP DOUTN VDD VDD sg13_lv_pmos w=4u l=200n ng=2 m=2 rfmode=1
+XM4 DOUTN DOUTP VDD VDD sg13_lv_pmos w=4u l=200n ng=2 m=2 rfmode=1
+XM7 DOUTP CLK VDD VDD sg13_lv_pmos w=2u l=200n ng=1 m=2 rfmode=1
+XM8 DOUTN CLK VDD VDD sg13_lv_pmos w=2u l=200n ng=1 m=2 rfmode=1
+.ends ADC_SAR_12B
+
+** Testbench
+Vdd vdd 0 1.2
+Vclk clk 0 PULSE(0 1.2 0 50p 50p 450p 1000p)
+Vinp ainp 0 0.605
+Vinn ainn 0 0.595
+
+XDUT vdd ainp ainn clk 0 0 doutp doutn ADC_SAR_12B
+
+.tran 10p 10n
+
+.control
+run
+meas tran doutp_swing pp v(doutp) from=1n to=10n
+meas tran doutn_swing pp v(doutn) from=1n to=10n
+quit
+.endc
+
+.end

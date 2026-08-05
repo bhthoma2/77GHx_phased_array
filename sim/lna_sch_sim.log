@@ -1,0 +1,83 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * lna testbench - using actual xschem-extracted netlist
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+2v4                                        2.4
+inp                                          1
+inn                                          1
+sub!                                         0
+net8                                  0.728848
+net7                                   1.00001
+net4                                  0.135376
+xq33.s1                            1.33651e-08
+xq33.t                                       0
+net5                                  0.728848
+net1                                   1.00001
+xq34.s1                            1.33651e-08
+xq34.t                                       0
+bias6                                  1.00003
+net2                                  0.137806
+xq37.s1                            6.83776e-09
+xq37.t                                       0
+net6                                   2.37743
+b3536                                  1.59328
+xq35.s1                            4.46838e-08
+xq35.t                                       0
+net3                                   2.37743
+xq36.s1                            4.46838e-08
+xq36.t                                       0
+tl37m                                  1.00002
+tl37m2                                 1.00002
+tl38m                                  1.00002
+tl38m2                                 1.00002
+tl35m                                        1
+tl35m2                                       1
+tl36m                                        1
+tl36m2                                       1
+tl39m                                  2.38872
+tl39m2                                 2.38872
+tl40m                                  2.38872
+tl40m2                                 2.38872
+xr32.dt                                      0
+xr33.dt                                      0
+xr30.dt                                      0
+xr31.dt                                      0
+xr29.dt                                      0
+xc53.1                                       1
+xc54.1                                       1
+outn                                         0
+xc55.1                                       0
+outp                                         0
+xc56.1                                       0
+xc58.1                                     2.4
+xc57.1                                     2.4
+xc59.1                                     2.4
+xc60.1                                     2.4
+xc61.1                                     2.4
+ltl40#branch                        0.00675714
+ltl39#branch                        0.00675714
+ltl36#branch                       4.18658e-06
+ltl35#branch                       4.18658e-06
+ltl38#branch                       -1.3717e-05
+ltl37#branch                       -1.3717e-05
+vsub#branch                        7.08723e-11
+vinn#branch                        4.18658e-06
+vinp#branch                        4.18658e-06
+vcc#branch                          -0.0162778
+
+
+No. of Data Rows : 4008
+lna_outp_swing      =  2.86254e-03 from=  5.00000e-10 to=  2.00000e-09
+lna_outn_swing      =  2.86254e-03 from=  5.00000e-10 to=  2.00000e-09
+ngspice-46 done

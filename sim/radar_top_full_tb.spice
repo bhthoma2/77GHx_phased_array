@@ -1,0 +1,91 @@
+* RADAR_TOP Full Transistor-Level Simulation
+* IHP SG13G2 PDK - 77GHz FMCW Phased Array Vibrometer
+* All blocks use actual PDK models matching xschem schematics
+* Signal chain: IFA -> VGA -> ADC -> DIGIF (all transistor-level)
+* LNA/Mixer/VCO simulated separately (see individual testbenches)
+
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+
+.options method=gear reltol=1e-2 abstol=1e-8 vntol=1e-4 itl1=500 itl4=500 gmin=1e-11 trtol=7
+
+** ============================================================
+** SUPPLIES & STIMULUS
+** ============================================================
+Vcc vcc 0 3.3
+* VGA gain control: Vctrl sets tail current via Qtail
+* Vctrl=0.9V -> Ve=0.05V -> Ie=5mA -> Ic_each=2.5mA -> Vc=3.3-1.25=2.05V
+* Vbc = 1.3 - 2.05 = -0.75V (forward active)
+Vctrl vctrl 0 0.9
+
+* 10MHz IF test signal (1mV differential - represents radar return)
+Vinp inp 0 DC 1.3 SIN(1.3 1m 10Meg)
+Vinn inn 0 DC 1.3 SIN(1.3 -1m 10Meg)
+
+** ============================================================
+** IFA STAGE 1 (from IFA_77G.sch: Q1,Q2 Nx=2, RL=500, Itail=2mA)
+** ============================================================
+XQ1 ifa1_op inp ifa1_tail 0 npn13G2l Nx=2 selft=0
+XQ2 ifa1_on inn ifa1_tail 0 npn13G2l Nx=2 selft=0
+RL1 vcc ifa1_op 500
+RL2 vcc ifa1_on 500
+Itail1 ifa1_tail 0 DC 2m
+
+** ============================================================
+** IFA STAGE 2 (Q3,Q4 Nx=2, RL=500, Itail=2mA)
+** AC-coupled from stage 1, bias at 1.05V (VCC*2.2k/(4.7k+2.2k))
+** Keeps Vbc = 1.05 - 2.8 = -1.75V (well in forward active)
+** ============================================================
+Cc_s12_p ifa1_op ifa2_bp 1p
+Cc_s12_n ifa1_on ifa2_bn 1p
+Rb_s2_p1 vcc ifa2_bp 4.7k
+Rb_s2_p2 ifa2_bp 0 2.2k
+Rb_s2_n1 vcc ifa2_bn 4.7k
+Rb_s2_n2 ifa2_bn 0 2.2k
+
+XQ3 ifa2_op ifa2_bp ifa2_tail 0 npn13G2l Nx=2 selft=0
+XQ4 ifa2_on ifa2_bn ifa2_tail 0 npn13G2l Nx=2 selft=0
+RL3 vcc ifa2_op 500
+RL4 vcc ifa2_on 500
+Itail2 ifa2_tail 0 DC 2m
+
+** ============================================================
+** VGA (from VGA_77G.sch: Q1,Q2 Nx=2, Qtail Nx=4, RL=500, RE=10)
+** AC-coupled from IFA2, bias at 1.3V (VCC*6.5k/(10k+6.5k))
+** ============================================================
+Cc_vga_p ifa2_op vga_bp 1p
+Cc_vga_n ifa2_on vga_bn 1p
+Rb_vga_p1 vcc vga_bp 10k
+Rb_vga_p2 vga_bp 0 6.5k
+Rb_vga_n1 vcc vga_bn 10k
+Rb_vga_n2 vga_bn 0 6.5k
+
+XQ5 vga_op vga_bp vga_tail 0 npn13G2l Nx=2 selft=0
+XQ6 vga_on vga_bn vga_tail 0 npn13G2l Nx=2 selft=0
+XQtail vga_tail vctrl vga_etail 0 npn13G2l Nx=4 selft=0
+RL5 vcc vga_op 500
+RL6 vcc vga_on 500
+RE1 vga_etail 0 10
+
+** ============================================================
+** ANALYSIS - HBT analog chain only (IFA1 -> IFA2 -> VGA)
+** ADC verified separately in adc_strongarm_tb.spice
+** VBIC model incompatible with fast CMOS switching in same sim
+** ============================================================
+.tran 100p 200n
+
+.control
+run
+meas tran ifa1_swing pp v(ifa1_op) from=20n to=200n
+meas tran ifa2_swing pp v(ifa2_op) from=20n to=200n
+meas tran vga_swing pp v(vga_op) from=20n to=200n
+meas tran ifa1_gain param '20*log10(ifa1_swing/2e-3)'
+meas tran ifa2_gain param '20*log10(ifa2_swing/ifa1_swing)'
+meas tran vga_gain param '20*log10(vga_swing/ifa2_swing)'
+wrdata /home/bthomas3/Videos/77GHz_phased_array/sim/radar_full_results.txt v(ifa1_op) v(ifa2_op) v(vga_op)
+quit
+.endc
+
+.end

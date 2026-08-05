@@ -1,0 +1,73 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * radar_top full transistor-level simulation
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vcc                                        3.3
+vctrl                                      0.9
+inp                                        1.3
+inn                                        1.3
+ifa1_op                                2.79327
+ifa1_tail                             0.486247
+xq1.s1                             3.06489e-08
+xq1.t                                        0
+ifa1_on                                2.79327
+xq2.s1                             3.06489e-08
+xq2.t                                        0
+ifa2_bp                                 1.0892
+ifa2_bn                                 1.0892
+ifa2_op                                2.78765
+ifa2_tail                             0.275656
+xq3.s1                             3.05862e-08
+xq3.t                                        0
+ifa2_on                                2.78765
+xq4.s1                             3.05862e-08
+xq4.t                                        0
+vga_bp                                 1.29122
+vga_bn                                 1.29122
+vga_op                                 2.05281
+vga_tail                              0.442699
+xq5.s1                             2.23854e-08
+xq5.t                                        0
+vga_on                                 2.05281
+xq6.s1                             2.23854e-08
+xq6.t                                        0
+vga_etail                            0.0500002
+xqtail.s1                          1.18397e-08
+xqtail.t                                     0
+vinn#branch                        1.34661e-05
+vinp#branch                        1.34661e-05
+vctrl#branch                      -6.82294e-06
+vcc#branch                          -0.0104076
+
+
+No. of Data Rows : 2008
+ifa1_swing          =  2.94013e-02 from=  2.00000e-08 to=  2.00000e-07
+ifa2_swing          =  2.67713e-02 from=  2.00000e-08 to=  2.00000e-07
+vga_swing           =  8.43221e-02 from=  2.00000e-08 to=  2.00000e-07
+	measure 'ifa1_gain'  failed
+Error: measure  ifa1_gain  :
+	no such function as 'param'
+ meas tran ifa1_gain param 20*log10(ifa1_swing/2e-3) failed!
+
+	measure 'ifa2_gain'  failed
+Error: measure  ifa2_gain  :
+	no such function as 'param'
+ meas tran ifa2_gain param 20*log10(ifa2_swing/ifa1_swing) failed!
+
+	measure 'vga_gain'  failed
+Error: measure  vga_gain  :
+	no such function as 'param'
+ meas tran vga_gain param 20*log10(vga_swing/ifa2_swing) failed!
+
+ngspice-46 done

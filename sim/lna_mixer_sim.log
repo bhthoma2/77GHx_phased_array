@@ -1,0 +1,126 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * lna + mixer transistor-level transient simulation
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Warning: singular matrix:  check node lna_on
+
+Note: Starting dynamic gmin stepping
+Warning: singular matrix:  check node lna_op
+
+Warning: Dynamic gmin stepping failed
+Note: Starting true gmin stepping
+Warning: singular matrix:  check node lna_op
+
+Warning: singular matrix:  check node lna_op
+
+Warning: singular matrix:  check node lna_op
+
+Warning: singular matrix:  check node lna_op
+
+Warning: True gmin stepping failed
+Note: Starting source stepping
+Warning: source stepping failed
+Note: Transient op started
+Note: Transient op finished successfully
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vcc                                        2.4
+rf_p                                         1
+rf_n                                         1
+lo_p                                       1.6
+lo_n                                       1.6
+x_lna.xtl_inp.m1                      0.999585
+x_lna.xtl_inp.m2                      0.999585
+x_lna.inp_m                            0.99917
+x_lna.xtl_inn.m1                      0.999585
+x_lna.xtl_inn.m2                      0.999585
+x_lna.inn_m                            0.99917
+x_lna.col1_p                          0.094854
+x_lna.em1                            0.0835252
+x_lna.xq33.s1                        0.0293651
+x_lna.xq33.t                                 0
+x_lna.col1_n                          0.094854
+x_lna.xq34.s1                        0.0293651
+x_lna.xq34.t                                 0
+x_lna.xtl_s1p.m1                     0.0958307
+x_lna.xtl_s1p.m2                     0.0958307
+x_lna.col1_pm                        0.0968075
+x_lna.xtl_s1n.m1                     0.0958307
+x_lna.xtl_s1n.m2                     0.0958307
+x_lna.col1_nm                        0.0968075
+x_lna.col2_p                           2.08846
+x_lna.bias_cb                         0.902242
+x_lna.xq35.s1                      3.96194e-08
+x_lna.xq35.t                                 0
+x_lna.col2_n                           2.08846
+x_lna.xq36.s1                      3.96194e-08
+x_lna.xq36.t                                 0
+x_lna.xtl_outp.m1                      2.09102
+x_lna.xtl_outp.m2                      2.09102
+x_lna.outp_m                           2.09358
+x_lna.xtl_outn.m1                      2.09102
+x_lna.xtl_outn.m2                      2.09102
+x_lna.outn_m                           2.09358
+lna_op                                 1.53196
+lna_on                                 1.53196
+mix_rfp                               0.970655
+mix_rfn                               0.970655
+x_mixer.xtl_rfp.m1                    0.970651
+x_mixer.xtl_rfp.m2                    0.970651
+x_mixer.rfp_m                         0.970648
+x_mixer.xtl_rfn.m1                    0.970651
+x_mixer.xtl_rfn.m2                    0.970651
+x_mixer.rfn_m                         0.970648
+x_mixer.elol                           0.80753
+x_mixer.mtail                          0.15611
+x_mixer.xq20.s1                    1.52084e-08
+x_mixer.xq20.t                               0
+x_mixer.elor                           0.80753
+x_mixer.xq21.s1                    1.52084e-08
+x_mixer.xq21.t                               0
+x_mixer.xtl_lop.m1                         1.6
+x_mixer.xtl_lop.m2                         1.6
+x_mixer.lop_m                              1.6
+x_mixer.xtl_lon.m1                         1.6
+x_mixer.xtl_lon.m2                         1.6
+x_mixer.lon_m                              1.6
+if_p                                   2.00102
+x_mixer.xq22.s1                    3.79588e-08
+x_mixer.xq22.t                               0
+if_n                                   2.00102
+x_mixer.xq23.s1                    3.79588e-08
+x_mixer.xq23.t                               0
+x_mixer.xq24.s1                    3.79588e-08
+x_mixer.xq24.t                               0
+x_mixer.xq25.s1                    3.79588e-08
+x_mixer.xq25.t                               0
+l.x_mixer.xtl_lon.ls1#branch       2.51638e-06
+l.x_mixer.xtl_lop.ls1#branch       2.51638e-06
+l.x_mixer.xtl_rfn.ls1#branch       2.59918e-06
+l.x_mixer.xtl_rfp.ls1#branch       2.59918e-06
+l.x_lna.xtl_outn.ls1#branch        -0.00153211
+l.x_lna.xtl_outp.ls1#branch        -0.00153211
+l.x_lna.xtl_s1n.ls1#branch         -0.00152613
+l.x_lna.xtl_s1p.ls1#branch         -0.00152613
+l.x_lna.xtl_inn.ls1#branch         0.000387622
+l.x_lna.xtl_inp.ls1#branch         0.000387622
+vlo_n#branch                       -2.5164e-06
+vlo_p#branch                       -2.5164e-06
+vrf_n#branch                      -0.000387622
+vrf_p#branch                      -0.000387622
+vcc#branch                          -0.0113489
+
+
+No. of Data Rows : 4008
+lna_swing           =  8.45307e-02 from=  5.00000e-10 to=  2.00000e-09
+if_swing            =  1.32627e-01 from=  5.00000e-10 to=  2.00000e-09
+ngspice-46 done

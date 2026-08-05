@@ -1,0 +1,330 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/RADAR_TOP.sch
+**.subckt RADAR_TOP ANT_RXP ANT_RXN DOUT_P DOUT_N VTUNE ANT_TXP ANT_TXN VCTRL CLK_ADC VCC_33 VDD_12 GND
+*.iopin ANT_RXP
+*.iopin ANT_RXN
+*.iopin DOUT_P
+*.iopin DOUT_N
+*.iopin VTUNE
+*.iopin ANT_TXP
+*.iopin ANT_TXN
+*.iopin VCTRL
+*.iopin CLK_ADC
+*.iopin VCC_33
+*.iopin VDD_12
+*.iopin GND
+x_lna VCC_33 ANT_RXP ANT_RXN GND sub! net1 net2 LNA_77G
+x_mixer VCC_33 net1 net2 net11 net13 GND sub! net3 net4 MIXER_77G
+x_ifa VCC_33 net3 net4 GND sub! net5 net6 IFA_77G
+x_vga VCC_33 net5 net6 VCTRL GND sub! net7 net8 VGA_77G
+x_adc VDD_12 net7 net8 CLK_ADC GND sub! net9 net10 ADC_SAR_12B
+x_digif VCC_33 net9 net10 GND sub! DOUT_P DOUT_N DIGIF_CML
+x_vco VCC_33 VTUNE GND sub! net11 net12 VCO_77G
+x_txpa VCC_33 net11 net12 VREF GND sub! ANT_TXP ANT_TXN TXPA_77G
+x_ilfd VCC_33 net11 GND sub! ILFD_OP ILFD_ON ILFD_77G
+x_bias VDD_12 GND sub! VREF IBIAS_OUT BIAS_BGR
+**.ends
+
+* expanding   symbol:  LNA_77G.sym # of pins=7
+** sym_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/LNA_77G.sym
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/LNA_77G.sch
+.subckt LNA_77G 2V4 INP INN GND sub! OUTP OUTN
+*.iopin 2V4
+*.iopin GND
+*.iopin OUTN
+*.iopin OUTP
+*.iopin INP
+*.iopin INN
+XQ33 net8 net7 net4 sub! npn13G2l Nx=4 El=2.5
+XQ34 net5 net1 net4 sub! npn13G2l Nx=4 El=2.5
+XQ37 BIAS6 BIAS6 net2 sub! npn13G2l Nx=1 El=2.5
+XQ35 net6 B35&36 net8 sub! npn13G2l Nx=4 El=2.5
+XQ36 net3 B35&36 net5 sub! npn13G2l Nx=4 El=2.5
+ytransline TL37 net7 BIAS6 ytransline_TL37 len=58u lumps=50
+.model ytransline_TL37 transline r=22.16k l=445.9n C=61.5p
+ytransline TL38 net1 BIAS6 ytransline_TL38 len=58u lumps=50
+.model ytransline_TL38 transline r=22.16k l=445.9n C=61.5p
+ytransline TL35 net7 INP ytransline_TL35 len=97u lumps=50
+.model ytransline_TL35 transline r=22.16k l=445.9n C=61.5p
+ytransline TL36 net1 INN ytransline_TL36 len=97u lumps=50
+.model ytransline_TL36 transline r=22.16k l=445.9n C=61.5p
+ytransline TL39 2V4 net6 ytransline_TL39 len=151u lumps=50
+.model ytransline_TL39 transline r=22.16k l=445.9n C=61.5p
+ytransline TL40 2V4 net3 ytransline_TL40 len=151u lumps=50
+.model ytransline_TL40 transline r=22.16k l=445.9n C=61.5p
+XR32 2V4 BIAS6 sub! rppd w=3e-6 l=18.23e-6 m=2 b=0
+**** begin user architecture code
+
+
+**** end user architecture code
+**** begin user architecture code
+
+
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+
+
+**** end user architecture code
+XC53 INP GND cap_cmim w=6e-6 l=6e-6
+XC54 INN GND cap_cmim w=6e-6 l=6e-6
+XC55 OUTN net6 cap_cmim w=4e-6 l=4e-6
+XC56 OUTP net3 cap_cmim w=4e-6 l=4e-6
+XR33 net2 GND sub! rppd w=2.5e-6 l=10.53e-6 m=14 b=0
+XR30 2V4 B35&36 sub! rppd w=3e-6 l=18.23e-6 m=2 b=0
+XR31 B35&36 GND sub! rppd w=3e-6 l=18.23e-6 m=1 b=0
+XC58 2V4 BIAS6 cap_cmim w=100e-6 l=20e-6
+XC57 2V4 B35&36 cap_cmim w=100e-6 l=15e-6
+XC59 2V4 BIAS6 cap_cmim w=100e-6 l=20e-6
+XC60 2V4 GND cap_cmim w=100e-6 l=15e-6
+XC61 2V4 GND cap_cmim w=100e-6 l=15e-6
+XR29 net4 GND sub! rsil w=7e-6 l=38.8e-6 m=4 b=0
+.ends
+
+
+* expanding   symbol:  MIXER_77G.sym # of pins=9
+** sym_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/MIXER_77G.sym
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/MIXER_77G.sch
+.subckt MIXER_77G VCC RF_P RF_N LO_P LO_N GND sub! IF_P IF_N
+*.iopin 2V4
+*.iopin LOP
+*.iopin LON
+*.iopin RFP
+*.iopin RFN
+*.iopin GND
+*.iopin IFP
+*.iopin IFN
+XQ22 IFP BLOP ELOL sub! npn13G2l Nx=4 El=2.5
+XQ23 IFN BLON ELOL sub! npn13G2l Nx=4 El=2.5
+XQ24 IFP BLON ELOR sub! npn13G2l Nx=4 El=2.5
+XQ25 IFN BLOP ELOR sub! npn13G2l Nx=4 El=2.5
+XQ20 ELOL BRFP GND sub! npn13G2l Nx=4 El=2.5
+XQ21 ELOR BRFN GND sub! npn13G2l Nx=4 El=2.5
+XQ27 RFBIAS RFBIAS GND sub! npn13G2l Nx=1 El=2.5
+XQ26 LOBIAS LOBIAS RFBIAS sub! npn13G2l Nx=1 El=2.5
+ytransline TL23 BLON LOBIAS ytransline_TL23 len=49u lumps=50
+.model ytransline_TL23 transline r=22.16k l=445.9n C=61.5p
+ytransline TL21 BLOP LOBIAS ytransline_TL21 len=49u lumps=50
+.model ytransline_TL21 transline r=22.16k l=445.9n C=61.5p
+ytransline TL22 BLOP LOP ytransline_TL22 len=66u lumps=50
+.model ytransline_TL22 transline r=22.16k l=445.9n C=61.5p
+ytransline TL24 BLON LON ytransline_TL24 len=66u lumps=50
+.model ytransline_TL24 transline r=22.16k l=445.9n C=61.5p
+ytransline TL25 BRFP RFBIAS ytransline_TL25 len=125u lumps=50
+.model ytransline_TL25 transline r=22.16k l=445.9n C=61.5p
+ytransline TL27 BRFN RFBIAS ytransline_TL27 len=125u lumps=50
+.model ytransline_TL27 transline r=22.16k l=445.9n C=61.5p
+ytransline TL26 BRFP RFP ytransline_TL26 len=125u lumps=50
+.model ytransline_TL26 transline r=22.16k l=445.9n C=61.5p
+ytransline TL28 BRFN RFN ytransline_TL28 len=125u lumps=50
+.model ytransline_TL28 transline r=22.16k l=445.9n C=61.5p
+**** begin user architecture code
+
+
+**** end user architecture code
+**** begin user architecture code
+
+
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+
+
+**** end user architecture code
+XR21 2V4 IFP sub! rppd w=3e-6 l=18.23e-6 m=2 b=0
+XR22 2V4 IFN sub! rppd w=3e-6 l=18.23e-6 m=2 b=0
+XC42 RFBIAS GND cap_cmim w=30e-6 l=30e-6
+XC37 LOP GND cap_cmim w=5e-6 l=5e-6
+XC38 LON GND cap_cmim w=5e-6 l=5e-6
+XC39 RFP GND cap_cmim w=4e-6 l=4e-6
+XC40 RFN GND cap_cmim w=4e-6 l=4e-6
+XR23 2V4 LOBIAS sub! rppd w=3e-6 l=27.48e-6 m=1 b=0
+XC41 2V4 LOBIAS cap_cmim w=30e-6 l=30e-6
+XC43 2V4 GND cap_cmim w=30e-6 l=30e-6
+.ends
+
+
+* expanding   symbol:  IFA_77G.sym # of pins=7
+** sym_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/IFA_77G.sym
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/IFA_77G.sch
+.subckt IFA_77G VCC INP INN GND sub! OUTP OUTN
+*.iopin INP
+*.iopin INN
+*.iopin OUTP
+*.iopin OUTN
+*.iopin VCC
+*.iopin GND
+*.iopin sub!
+XQ1 out1p INP tail1 sub! npn13G2l Nx=2 El=2.5
+XQ2 out1n INN tail1 sub! npn13G2l Nx=2 El=2.5
+XQ3 OUTP out1p tail2 sub! npn13G2l Nx=2 El=2.5
+XQ4 OUTN out1n tail2 sub! npn13G2l Nx=2 El=2.5
+RL1 VCC out1p 500
+RL2 VCC out1n 500
+RL3 VCC OUTP 500
+RL4 VCC OUTN 500
+ITAIL1 tail1 GND DC 2m
+ITAIL2 tail2 GND DC 2m
+.ends
+
+
+* expanding   symbol:  VGA_77G.sym # of pins=8
+** sym_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/VGA_77G.sym
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/VGA_77G.sch
+.subckt VGA_77G VCC INP INN VCTRL GND sub! OUTP OUTN
+*.iopin INP
+*.iopin INN
+*.iopin OUTP
+*.iopin OUTN
+*.iopin VCTRL
+*.iopin VCC
+*.iopin GND
+*.iopin sub!
+XQ1 OUTP INP net1 sub! npn13G2l Nx=2 El=2.5
+XQ2 OUTN INN net1 sub! npn13G2l Nx=2 El=2.5
+XQtail net1 VCTRL net2 sub! npn13G2l Nx=4 El=2.5
+RL1 VCC OUTP 500
+RL2 VCC OUTN 500
+RE net2 GND 10
+.ends
+
+
+* expanding   symbol:  ADC_SAR_12B.sym # of pins=8
+** sym_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/ADC_SAR_12B.sym
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/ADC_SAR_12B.sch
+.subckt ADC_SAR_12B VDD AINP AINN CLK VSS sub! DOUTP DOUTN
+*.iopin ainp
+*.iopin ainn
+*.iopin clk
+*.iopin doutp
+*.iopin doutn
+*.iopin vdd
+*.iopin vss
+XM1 net2 ainp net1 vss sg13_lv_nmos w=8u l=200n ng=4 m=4
+XM2 net3 ainn net1 vss sg13_lv_nmos w=8u l=200n ng=4 m=4
+XM9 net1 clk vss vss sg13_lv_nmos w=8u l=200n ng=4 m=2
+XM5 doutp doutn net2 vss sg13_lv_nmos w=4u l=200n ng=2 m=2
+XM6 doutn doutp net3 vss sg13_lv_nmos w=4u l=200n ng=2 m=2
+XM3 doutp doutn vdd vdd sg13_lv_pmos w=4u l=200n ng=2 m=2
+XM4 doutn doutp vdd vdd sg13_lv_pmos w=4u l=200n ng=2 m=2
+XM7 doutp clk vdd vdd sg13_lv_pmos w=2u l=200n ng=1 m=2
+XM8 doutn clk vdd vdd sg13_lv_pmos w=2u l=200n ng=1 m=2
+.ends
+
+
+* expanding   symbol:  DIGIF_CML.sym # of pins=7
+** sym_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/DIGIF_CML.sym
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/DIGIF_CML.sch
+.subckt DIGIF_CML VCC DIN_P DIN_N GND sub! DOUT_P DOUT_N
+*.iopin DIN_P
+*.iopin DIN_N
+*.iopin DOUT_P
+*.iopin DOUT_N
+*.iopin VCC
+*.iopin GND
+*.iopin sub!
+XQ1 DOUT_P DIN_P tail sub! npn13G2l Nx=2 El=2.5
+XQ2 DOUT_N DIN_N tail sub! npn13G2l Nx=2 El=2.5
+RT1 VCC DOUT_P 50
+RT2 VCC DOUT_N 50
+ITAIL tail GND DC 4m
+.ends
+
+
+* expanding   symbol:  VCO_77G.sym # of pins=6
+** sym_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/VCO_77G.sym
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/VCO_77G.sch
+.subckt VCO_77G VCC VTUNE GND sub! OUTP OUTN
+*.iopin VCC
+*.iopin GND
+*.iopin OUTP
+*.iopin OUTN
+*.iopin VTUNE
+*.iopin sub|
+XQ1 net4 OUTN net3 sub| npn13G2l Nx=1 El=2.5
+XQ2 net5 OUTP net3 sub| npn13G2l Nx=1 El=2.5
+L1 VCC OUTP 27p
+L2 VCC OUTN 27p
+CVAR1 OUTP OUTN 15f
+CVAR2 net1 net2 12f
+ITAIL net3 GND DC 5m
+.ends
+
+
+* expanding   symbol:  TXPA_77G.sym # of pins=8
+** sym_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/TXPA_77G.sym
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/TXPA_77G.sch
+.subckt TXPA_77G VCC INP INN VBIAS_CB GND sub! OUTP OUTN
+*.iopin VCC
+*.iopin GND
+*.iopin INP
+*.iopin INN
+*.iopin OUTP
+*.iopin OUTN
+*.iopin VBIAS_CB
+*.iopin sub|
+XQ1_CE net1 net5 net3 sub| npn13G2l Nx=8 El=2.5
+XQ2_CE net2 net6 net4 sub| npn13G2l Nx=8 El=2.5
+XQ3_CB sub| VBIAS_CB net1 sub| npn13G2l Nx=8 El=2.5
+XQ4_CB sub| VBIAS_CB net2 sub| npn13G2l Nx=8 El=2.5
+ytransline TL_INP net7 INP ytransline_TL_INP len=97u lumps=50
+.model ytransline_TL_INP transline r=22.16k l=445.9n C=61.5p
+ytransline TL_INN INN net8 ytransline_TL_INN len=97u lumps=50
+.model ytransline_TL_INN transline r=22.16k l=445.9n C=61.5p
+ytransline TL_OUTP sub| sub| ytransline_TL_OUTP len=210u lumps=50
+.model ytransline_TL_OUTP transline r=22.16k l=445.9n C=61.5p
+ytransline TL_OUTN sub| sub| ytransline_TL_OUTN len=210u lumps=50
+.model ytransline_TL_OUTN transline r=22.16k l=445.9n C=61.5p
+ytransline TL_DEG_P net3 GND ytransline_TL_DEG_P len=58u lumps=50
+.model ytransline_TL_DEG_P transline r=22.16k l=445.9n C=61.5p
+ytransline TL_DEG_N net4 GND ytransline_TL_DEG_N len=58u lumps=50
+.model ytransline_TL_DEG_N transline r=22.16k l=445.9n C=61.5p
+XRB_CB VBIAS_CB net9 sub! rppd w=3e-6 l=18.23e-6 m=1 b=0
+CDC_P VCC net10 500f
+CDC_N VCC net11 500f
+.ends
+
+
+* expanding   symbol:  ILFD_77G.sym # of pins=6
+** sym_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/ILFD_77G.sym
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/ILFD_77G.sch
+.subckt ILFD_77G VCC INJ_P GND sub! OUTP OUTN
+*.iopin VCC
+*.iopin GND
+*.iopin OUTP
+*.iopin OUTN
+*.iopin INJ_P
+*.iopin sub|
+XQ1_XC OUTP OUTN net1 sub| npn13G2l Nx=2 El=2.5
+XQ2_XC OUTN OUTP net1 sub| npn13G2l Nx=2 El=2.5
+XQ_INJ net1 net3 net2 sub| npn13G2l Nx=2 El=2.5
+ytransline TL_STUB_P VCC OUTP ytransline_TL_STUB_P len=280u lumps=50
+.model ytransline_TL_STUB_P transline r=22.16k l=445.9n C=61.5p
+ytransline TL_STUB_N VCC OUTN ytransline_TL_STUB_N len=280u lumps=50
+.model ytransline_TL_STUB_N transline r=22.16k l=445.9n C=61.5p
+ITAIL net2 GND DC 3m
+C_INJ INJ_P net3 100f
+.ends
+
+
+* expanding   symbol:  BIAS_BGR.sym # of pins=5
+** sym_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/BIAS_BGR.sym
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/BIAS_BGR.sch
+.subckt BIAS_BGR VDD VSS sub! VREF IBIAS_OUT
+*.iopin VREF
+*.iopin VCC
+*.iopin GND
+*.iopin sub!
+XQ1 c1 c1 e1 sub! npn13G2l Nx=1 El=2.5
+XQ2 c2 c2 GND sub! npn13G2l Nx=8 El=2.5
+R1 e1 GND 5.4k
+R2 VREF GND 18k
+Rfb c1 c2 50
+Rout c2 VREF 100
+I1 VCC c1 DC 200u
+I2 VCC c2 DC 200u
+.ends
+
+.GLOBAL sub!
+.end

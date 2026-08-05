@@ -1,0 +1,58 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * ifa + vga cascaded transient test
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vcc                                        3.3
+inp                                        1.3
+inn                                        1.3
+vctrl                                      1.2
+outp1                                  2.79327
+tail1                                 0.486394
+xq1.s1                             3.06489e-08
+xq1.t                                        0
+outn1                                  2.79327
+xq2.s1                             3.06489e-08
+xq2.t                                        0
+b2p                                    1.08919
+b2n                                    1.08919
+outp2                                  2.78765
+tail2                                 0.275793
+xq3.s1                             3.05862e-08
+xq3.t                                        0
+outn2                                  2.78765
+xq4.s1                             3.05862e-08
+xq4.t                                        0
+vga_inp                                1.17484
+vga_inn                                1.17484
+vga_op                                0.413715
+vtail                                 0.258213
+xq5.s1                              0.00020073
+xq5.t                                        0
+vga_on                                0.413715
+xq6.s1                              0.00020073
+xq6.t                                        0
+etail                                 0.158255
+xqtail.s1                             0.163532
+xqtail.t                                     0
+vctrl#branch                        -0.0043032
+vinn#branch                        1.34654e-05
+vinp#branch                        1.34654e-05
+vcc#branch                          -0.0169873
+
+
+No. of Data Rows : 2008
+ifa1_swing          =  2.94014e-02 from=  5.00000e-08 to=  2.00000e-07
+ifa2_swing          =  2.67743e-02 from=  5.00000e-08 to=  2.00000e-07
+vga_swing           =  1.87965e-03 from=  5.00000e-08 to=  2.00000e-07
+ngspice-46 done

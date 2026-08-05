@@ -1,0 +1,54 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/LNA_77G.sch
+**.subckt LNA_77G 2V4 INP INN GND sub! OUTP OUTN
+*.iopin 2V4
+*.iopin GND
+*.iopin OUTN
+*.iopin OUTP
+*.iopin INP
+*.iopin INN
+XQ33 net8 net7 net4 sub! npn13G2l Nx=4 El=2.5
+XQ34 net5 net1 net4 sub! npn13G2l Nx=4 El=2.5
+XQ37 BIAS6 BIAS6 net2 sub! npn13G2l Nx=1 El=2.5
+XQ35 net6 B35&36 net8 sub! npn13G2l Nx=4 El=2.5
+XQ36 net3 B35&36 net5 sub! npn13G2l Nx=4 El=2.5
+ytransline TL37 net7 BIAS6 ytransline_TL37 len=58u lumps=50
+.model ytransline_TL37 transline r=22.16k l=445.9n C=61.5p
+ytransline TL38 net1 BIAS6 ytransline_TL38 len=58u lumps=50
+.model ytransline_TL38 transline r=22.16k l=445.9n C=61.5p
+ytransline TL35 net7 INP ytransline_TL35 len=97u lumps=50
+.model ytransline_TL35 transline r=22.16k l=445.9n C=61.5p
+ytransline TL36 net1 INN ytransline_TL36 len=97u lumps=50
+.model ytransline_TL36 transline r=22.16k l=445.9n C=61.5p
+ytransline TL39 2V4 net6 ytransline_TL39 len=151u lumps=50
+.model ytransline_TL39 transline r=22.16k l=445.9n C=61.5p
+ytransline TL40 2V4 net3 ytransline_TL40 len=151u lumps=50
+.model ytransline_TL40 transline r=22.16k l=445.9n C=61.5p
+XR32 2V4 BIAS6 sub! rppd w=3e-6 l=18.23e-6 m=2 b=0
+XC53 INP GND cap_cmim w=6e-6 l=6e-6
+XC54 INN GND cap_cmim w=6e-6 l=6e-6
+XC55 OUTN net6 cap_cmim w=4e-6 l=4e-6
+XC56 OUTP net3 cap_cmim w=4e-6 l=4e-6
+XR33 net2 GND sub! rppd w=2.5e-6 l=10.53e-6 m=14 b=0
+XR30 2V4 B35&36 sub! rppd w=3e-6 l=18.23e-6 m=2 b=0
+XR31 B35&36 GND sub! rppd w=3e-6 l=18.23e-6 m=1 b=0
+XC58 2V4 BIAS6 cap_cmim w=100e-6 l=20e-6
+XC57 2V4 B35&36 cap_cmim w=100e-6 l=15e-6
+XC59 2V4 BIAS6 cap_cmim w=100e-6 l=20e-6
+XC60 2V4 GND cap_cmim w=100e-6 l=15e-6
+XC61 2V4 GND cap_cmim w=100e-6 l=15e-6
+XR29 net4 GND sub! rsil w=7e-6 l=38.8e-6 m=4 b=0
+**** begin user architecture code
+
+
+
+
+
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+.lib /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+
+
+**** end user architecture code
+**.ends
+.GLOBAL sub!
+.end

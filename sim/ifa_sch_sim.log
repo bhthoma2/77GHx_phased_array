@@ -1,0 +1,44 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * ifa testbench - using actual xschem-extracted netlist
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vcc                                        3.3
+inp                                        1.3
+inn                                        1.3
+xdut.out1p                             2.79263
+xdut.tail1                            0.486247
+xdut.xq1.s1                        3.06419e-08
+xdut.xq1.t                                   0
+xdut.out1n                             2.79263
+xdut.xq2.s1                        3.06419e-08
+xdut.xq2.t                                   0
+outp                                   2.80065
+xdut.tail2                             1.97848
+xdut.xq3.s1                        3.07313e-08
+xdut.xq3.t                                   0
+outn                                   2.80065
+xdut.xq4.s1                        3.07313e-08
+xdut.xq4.t                                   0
+vinn#branch                        1.34381e-05
+vinp#branch                        1.34381e-05
+vcc#branch                         -0.00402688
+
+
+No. of Data Rows : 2008
+ifa_swing           =  4.12393e-01 from=  2.00000e-08 to=  2.00000e-07
+
+Error: measure  ifa_diff_swing  pp(TRIG) : no such vector as 'v(outp,outn)'
+ meas tran ifa_diff_swing pp v(outp,outn) from=20n to=200n failed!
+
+ngspice-46 done

@@ -1,0 +1,38 @@
+* IFA Testbench - Using actual xschem-extracted netlist
+* Verifies IFA_77G.sch matches expected behavior
+
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+
+.options method=gear reltol=1e-2 abstol=1e-8 vntol=1e-4 itl4=500 gmin=1e-11 trtol=7
+
+** IFA subcircuit from xschem netlist (IFA_77G.sch)
+.subckt IFA_77G VCC INP INN GND sub OUTP OUTN
+XQ1 out1p INP tail1 sub npn13G2l Nx=2 selft=0
+XQ2 out1n INN tail1 sub npn13G2l Nx=2 selft=0
+XQ3 OUTP out1p tail2 sub npn13G2l Nx=2 selft=0
+XQ4 OUTN out1n tail2 sub npn13G2l Nx=2 selft=0
+RL1 VCC out1p 500
+RL2 VCC out1n 500
+RL3 VCC OUTP 500
+RL4 VCC OUTN 500
+ITAIL1 tail1 GND DC 2m
+ITAIL2 tail2 GND DC 2m
+.ends IFA_77G
+
+** Testbench
+Vcc vcc 0 3.3
+Vinp inp 0 DC 1.3 SIN(1.3 1m 10Meg)
+Vinn inn 0 DC 1.3 SIN(1.3 -1m 10Meg)
+
+XDUT vcc inp inn 0 0 outp outn IFA_77G
+
+.tran 100p 200n
+
+.control
+run
+meas tran ifa_swing pp v(outp) from=20n to=200n
+meas tran ifa_diff_swing pp v(outp,outn) from=20n to=200n
+quit
+.endc
+
+.end

@@ -1,0 +1,142 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * adc testbench - using actual xschem-extracted netlist (adc_sar_12b.sch)
+
+Warning: Model issue on line 232 :
+  .model xdut.xm1:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 254 :
+  .model xdut.xm1:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 256 :
+  .model xdut.xm1:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 sw ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 232 :
+  .model xdut.xm2:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 254 :
+  .model xdut.xm2:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 256 :
+  .model xdut.xm2:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 sw ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 232 :
+  .model xdut.xm9:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 254 :
+  .model xdut.xm9:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 256 :
+  .model xdut.xm9:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 sw ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 232 :
+  .model xdut.xm5:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 254 :
+  .model xdut.xm5:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 256 :
+  .model xdut.xm5:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 sw ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 232 :
+  .model xdut.xm6:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 254 :
+  .model xdut.xm6:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 256 :
+  .model xdut.xm6:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 sw ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 343 :
+  .model xdut.xm3:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 365 :
+  .model xdut.xm3:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 367 :
+  .model xdut.xm3:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 sw ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 343 :
+  .model xdut.xm4:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 365 :
+  .model xdut.xm4:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 367 :
+  .model xdut.xm4:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 sw ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 343 :
+  .model xdut.xm7:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 365 :
+  .model xdut.xm7:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 367 :
+  .model xdut.xm7:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 sw ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 343 :
+  .model xdut.xm8:sg13g2_lv_nmos_psp psp103va type=+1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 365 :
+  .model xdut.xm8:sg13g2_lv_pmos_psp psp103va type=-1 level=103.60 tr=27.0 ...
+Unknown model type psp103va - ignored
+
+Warning: Model issue on line 367 :
+  .model xdut.xm8:nmoscl_psp psp103va type=+1 tr=27.0 dta=0.0 swgeo=1.0 sw ...
+Unknown model type psp103va - ignored
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vdd                                        1.2
+clk                                          0
+ainp                                     0.605
+ainn                                     0.595
+xdut.net2                              1.04153
+xdut.net1                             0.567376
+xdut.net3                              1.04926
+doutp                                      1.2
+doutn                                      1.2
+vinn#branch                        1.29916e-12
+vinp#branch                         1.1668e-12
+vclk#branch                         1.7556e-10
+vdd#branch                        -1.08507e-09
+
+
+No. of Data Rows : 2236
+doutp_swing         =  1.38979e+00 from=  1.00000e-09 to=  1.00000e-08
+doutn_swing         =  7.58782e-01 from=  1.00000e-09 to=  1.00000e-08
+ngspice-46 done
