@@ -314,9 +314,11 @@ v2v4#branch                         -0.0223463
 vcc#branch                          -0.0125819
 
 
-No. of Data Rows : 10017
-lna_swing           =  9.56194e-03 from=  1.00000e-09 to=  5.00000e-09
-if_swing            =  3.02336e-02 from=  1.00000e-09 to=  5.00000e-09
-ifa_swing           =  2.96668e-02 from=  1.00000e-09 to=  5.00000e-09
-vga_swing           =  1.86946e+00 from=  1.00000e-09 to=  5.00000e-09
+No. of Data Rows : 150078
+lna_swing           =  6.01206e-03 from=  1.00000e-09 to=  1.00000e-07
+if_swing            =  7.34297e-02 from=  1.00000e-09 to=  1.00000e-07
+ifa_swing           =  8.83081e-01 from=  1.00000e-09 to=  1.00000e-07
+vga_swing           =  2.60474e+00 from=  1.00000e-09 to=  1.00000e-07
+adc_op_swing        =  1.30177e+00 from=  1.00000e-07 to=  1.50000e-07
+adc_on_swing        =  1.31076e+00 from=  1.00000e-07 to=  1.50000e-07
 ngspice-46 done

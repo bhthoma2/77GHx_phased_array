@@ -251,14 +251,17 @@ X_adc vdd adc_inp adc_inn clk 0 sub! adc_op adc_on ADC_SAR_12B
 ** ============================================================
 ** ANALYSIS
 ** ============================================================
-.tran 0.5p 5n
+.tran 1p 150n
 
 .control
 run
-meas tran lna_swing pp v(lna_op) from=1n to=5n
-meas tran if_swing pp v(if_p) from=1n to=5n
-meas tran ifa_swing pp v(ifa_op) from=1n to=5n
-meas tran vga_swing pp v(vga_op) from=1n to=5n
+meas tran lna_swing pp v(lna_op) from=1n to=100n
+meas tran if_swing pp v(if_p) from=1n to=100n
+meas tran ifa_swing pp v(ifa_op) from=1n to=100n
+meas tran vga_swing pp v(vga_op) from=1n to=100n
+meas tran adc_op_swing pp v(adc_op) from=100n to=150n
+meas tran adc_on_swing pp v(adc_on) from=100n to=150n
+wrdata /home/bthomas3/Videos/77GHz_phased_array/sim/radar_top_sch_results.txt v(lna_op) v(if_p) v(ifa_op) v(vga_op) v(adc_op) v(adc_on)
 quit
 .endc
 
