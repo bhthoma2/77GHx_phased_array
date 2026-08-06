@@ -100,6 +100,58 @@ A 77 GHz FMCW phased array vibrometer for autonomous drone-based landmine detect
 └── docs/                       # Documentation
 ```
 
+## Mixed-Signal Simulation
+
+The full analog receive chain has been verified at the transistor level using IHP SG13G2 PDK models in ngspice, then integrated with the digital RTL backend.
+
+### Signal Chain Performance (SPICE-verified)
+
+| Block | Topology | Gain | Output Swing |
+|-------|----------|------|-------------|
+| LNA | npn13G2l cascode + TL matching | 15.4 dB | 5.86 mV |
+| Mixer | Gilbert cell (npn13G2l) | 15.8 dB CG | 36.4 mV |
+| IFA | 2-stage differential (npn13G2l) | 44 dB | 195 mV |
+| VGA | Variable-gm (npn13G2l) | 11 dB | 695 mV |
+| ADC | 12-bit StrongARM (sg13_lv_nmos/pmos) | — | 1.27 V (rail) |
+| DIGIF | CML buffer, 50Ω | — | 200 mV |
+| BGR | Brokaw bandgap (npn13G2l) | — | 1.170 V |
+
+### Waveform Plots
+
+Interactive Plotly HTML plots from the 500ns transistor-level simulation:
+
+- **[Analog Chain](sim/plot_analog_chain.html)** — LNA → Mixer → IFA → VGA output waveforms showing signal amplification through the chain
+- **[ADC & DIGIF](sim/plot_adc_digif.html)** — StrongARM comparator digital output and CML buffer waveforms
+
+### Testbenches
+
+| Testbench | Type | Description |
+|-----------|------|-------------|
+| `sim/radar_mixed_signal_tb.spice` | SPICE | Full transistor-level analog chain (LNA+Mixer+IFA+VGA+ADC+DIGIF) with IHP PDK models, 500ns FMCW stimulus |
+| `tb/tb_landmine_detect.v` | Verilog | Integrated mixed-signal: SPICE-calibrated behavioral analog + `vibrometer_top` RTL digital backend (Range FFT + Slow-Time FFT + SPI) |
+| `tb/tb_mixed_signal_top.v` | Verilog | Simplified behavioral analog + RTL digital |
+| `tb/tb_vibrometer_top.v` | Verilog | Pure digital RTL testbench |
+
+### Running the Mixed-Signal Simulation
+
+```bash
+# Phase 1: Transistor-level analog verification (ngspice, ~9 min)
+cd sim
+ngspice -b -o mixed_sig.log radar_mixed_signal_tb.spice
+
+# Phase 2: Full system with digital RTL (iverilog)
+cd tb
+bash run_landmine_detect
+```
+
+### Landmine Detection Scenario
+
+The integrated testbench models end-to-end detection of a buried AP mine:
+- **Target:** 5m range, 1μm vibration at 200Hz (acoustic-seismic excitation)
+- **Beat frequency:** 2.33 MHz (from 70 THz/s chirp slope × 33.3ns round-trip)
+- **Phase modulation:** 3.23 mrad peak (4πf_c·A/c)
+- **Signal path:** 77GHz TX → Target → RX antenna → LNA → Mixer → IFA → VGA → ADC → DIGIF → Range FFT → Slow-Time FFT → SPI output
+
 ## RF Front-End
 
 Modified from mWATTBAT (150 GHz radar) with transmission lines scaled by 150/77 ≈ 1.95×.
