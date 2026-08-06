@@ -118,10 +118,11 @@ The full analog receive chain has been verified at the transistor level using IH
 
 ### Waveform Plots
 
-Interactive Plotly HTML plots from the 500ns transistor-level simulation:
+From the 500ns transistor-level simulation (IHP SG13G2 PDK):
 
-- **[Analog Chain](sim/plot_analog_chain.html)** — LNA → Mixer → IFA → VGA output waveforms showing signal amplification through the chain
-- **[ADC & DIGIF](sim/plot_adc_digif.html)** — StrongARM comparator digital output and CML buffer waveforms
+![Analog Chain Waveforms](docs/analog_chain_waveforms.png)
+
+![ADC & DIGIF Output](docs/adc_digif_waveforms.png)
 
 ### Testbenches
 
