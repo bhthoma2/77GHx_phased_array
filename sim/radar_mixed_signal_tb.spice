@@ -292,7 +292,7 @@ X_digif vcc digif_inp digif_inn 0 sub! dout_p dout_n DIGIF_CML
 ** ANALYSIS: 150ns (100ns settling + 50ns = 5 ADC samples)
 ** Save only key nodes to reduce memory
 ** ============================================================
-.tran 1p 150n
+.tran 2p 500n
 .save v(lna_op) v(lna_on) v(if_p) v(if_n) v(ifa_op) v(ifa_on)
 + v(vga_op) v(vga_on) v(adc_inp) v(adc_inn) v(adc_op) v(adc_on)
 + v(dout_p) v(dout_n) v(vref) v(clk_adc)
