@@ -1,8 +1,8 @@
+`timescale 1ns/1ps
 module slowtime_fft #(
     parameter DW       = 16,
     parameter AW       = 2*DW,
     parameter N_CHIRPS = 128,
-    parameter N_BINS   = 64,
     parameter N_BEAMS  = 4,
     parameter LOG2_NC  = 7,
     parameter SRAM_AW  = 10,
@@ -48,6 +48,7 @@ reg [3:0] fft_stage;
 reg [1:0] sub_state;
 
 reg signed [DW-1:0] p_re, p_im, q_re, q_im;
+reg [13:0]          tmp_addr_14;
 
 
 reg signed [AW-1:0] best_mag;
@@ -68,11 +69,15 @@ wire [7:0] st_p = st_group * st_stride + st_offset;
 wire [7:0] st_q = st_p + st_half_stride;
 wire [7:0] st_tw_idx = st_offset * (nc_half >> fft_stage[3:0]);
 
-// SRAM address helpers
-wire [SRAM_AW-1:0] addr_p_re = {1'b0, cur_beam, st_p, 1'b0};
-wire [SRAM_AW-1:0] addr_p_im = {1'b0, cur_beam, st_p, 1'b1};
-wire [SRAM_AW-1:0] addr_q_re = {1'b0, cur_beam, st_q, 1'b0};
-wire [SRAM_AW-1:0] addr_q_im = {1'b0, cur_beam, st_q, 1'b1};
+// SRAM address helpers — full-width intermediates then explicit truncation
+wire [13:0] addr_p_re_w = {1'b0, cur_beam, st_p, 1'b0};
+wire [13:0] addr_p_im_w = {1'b0, cur_beam, st_p, 1'b1};
+wire [13:0] addr_q_re_w = {1'b0, cur_beam, st_q, 1'b0};
+wire [13:0] addr_q_im_w = {1'b0, cur_beam, st_q, 1'b1};
+wire [SRAM_AW-1:0] addr_p_re = addr_p_re_w[SRAM_AW-1:0];
+wire [SRAM_AW-1:0] addr_p_im = addr_p_im_w[SRAM_AW-1:0];
+wire [SRAM_AW-1:0] addr_q_re = addr_q_re_w[SRAM_AW-1:0];
+wire [SRAM_AW-1:0] addr_q_im = addr_q_im_w[SRAM_AW-1:0];
 
 // 256-pt twiddle factor (simplified: 8 hardcoded quadrant entries, interpolated)
 // Full ROM would have 128 entries; for brevity use first-quadrant LUT with symmetry
@@ -82,9 +87,11 @@ reg signed [DW-1:0] tw256_sin;
 always @(*) begin : twiddle_256
     reg [DW-1:0] idx_sq;
     reg signed [DW-1:0] c, s;
+    reg signed [AW:0]   s_wide;
     idx_sq = {9'd0, st_tw_idx[6:0]} * {9'd0, st_tw_idx[6:0]};
     c = 16'sd16384 - $signed({1'b0, idx_sq[DW-1:1]});
-    s = $signed({1'b0, 9'd0, st_tw_idx[6:0]}) * 16'sd101;
+    s_wide = $signed({1'b0, 9'd0, st_tw_idx[6:0]}) * 16'sd101;
+    s = $signed(s_wide[DW-1:0]);
     if (st_tw_idx < 8'd64) begin
         tw256_cos = c;
         tw256_sin = -s;
@@ -153,11 +160,13 @@ always @(posedge clk or negedge rst_n) begin
             sram_ce <= 1'b1;
             sram_we <= 1'b1;
             if (sub_state == 2'd0) begin
-                sram_addr <= {1'b0, beam_idx, chirp_cnt, 1'b0};
+                tmp_addr_14 = {1'b0, beam_idx, chirp_cnt, 1'b0};
+                sram_addr <= tmp_addr_14[SRAM_AW-1:0];
                 sram_wdata <= {{SRAM_DW-DW{range_re[DW-1]}}, range_re};
                 sub_state <= 2'd1;
             end else begin
-                sram_addr <= {1'b0, beam_idx, chirp_cnt, 1'b1};
+                tmp_addr_14 = {1'b0, beam_idx, chirp_cnt, 1'b1};
+                sram_addr <= tmp_addr_14[SRAM_AW-1:0];
                 sram_wdata <= {{SRAM_DW-DW{range_im[DW-1]}}, range_im};
                 sub_state <= 2'd0;
                 if (beam_idx == N_BEAMS[3:0] - 4'd1) begin
@@ -176,6 +185,7 @@ always @(posedge clk or negedge rst_n) begin
             2'd1: begin p_re <= $signed(sram_rdata[DW-1:0]); sram_addr <= addr_p_im; sub_state <= 2'd2; end
             2'd2: begin p_im <= $signed(sram_rdata[DW-1:0]); sram_addr <= addr_q_re; sub_state <= 2'd3; end
             2'd3: begin q_re <= $signed(sram_rdata[DW-1:0]); sram_addr <= addr_q_im; state <= S_FFT_MAC; sub_state <= 2'd0; end
+            default: ;
             endcase
         end
 
@@ -217,6 +227,7 @@ always @(posedge clk or negedge rst_n) begin
                     state <= S_FFT_RD;
                 end
             end
+            default: ;
             endcase
         end
 
@@ -225,8 +236,8 @@ always @(posedge clk or negedge rst_n) begin
             sram_ce <= 1'b1;
             sram_we <= 1'b0;
             case (sub_state)
-            2'd0: begin sram_addr <= {1'b0, cur_beam, excite_bin, 1'b0}; sub_state <= 2'd1; end
-            2'd1: begin p_re <= $signed(sram_rdata[DW-1:0]); sram_addr <= {1'b0, cur_beam, excite_bin, 1'b1}; sub_state <= 2'd2; end
+            2'd0: begin tmp_addr_14 = {1'b0, cur_beam, excite_bin, 1'b0}; sram_addr <= tmp_addr_14[SRAM_AW-1:0]; sub_state <= 2'd1; end
+            2'd1: begin p_re <= $signed(sram_rdata[DW-1:0]); tmp_addr_14 = {1'b0, cur_beam, excite_bin, 1'b1}; sram_addr <= tmp_addr_14[SRAM_AW-1:0]; sub_state <= 2'd2; end
             2'd2: begin
                 p_im <= $signed(sram_rdata[DW-1:0]);
                 sub_state <= 2'd3;
@@ -247,6 +258,7 @@ always @(posedge clk or negedge rst_n) begin
                 else
                     cur_beam <= cur_beam + 4'd1;
             end
+            default: ;
             endcase
         end
 

@@ -1,0 +1,20 @@
+#!/bin/bash
+# Mixed-signal simulation: behavioral analog + RTL digital
+cd "$(dirname "$0")/.."
+RTL=rtl
+TB=tb/tb_mixed_signal_top.v
+
+iverilog -g2012 -o tb/sim_mixed_signal.vvp \
+    $TB \
+    $RTL/vibrometer_top.v \
+    $RTL/radar_mac_accel.v \
+    $RTL/slowtime_fft.v \
+    $RTL/spi_serializer.v \
+    $RTL/sram_if.v \
+    $RTL/cordic_rect_to_polar.v \
+    $RTL/cordic_polar_to_rect.v \
+    $RTL/fixed_pt_div.v \
+    $RTL/deserializer.v \
+    $RTL/serializer.v \
+    && echo "Compile OK" \
+    && vvp tb/sim_mixed_signal.vvp | tail -30

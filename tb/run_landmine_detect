@@ -1,0 +1,68 @@
+#!/bin/bash
+#============================================================================
+# Integrated Mixed-Signal Landmine Detection Simulation
+# Two-phase flow:
+#   Phase 1: SPICE (ngspice) - transistor-level analog chain verification
+#   Phase 2: Verilog (iverilog) - full system with SPICE-calibrated analog model
+#============================================================================
+
+set -e
+cd "$(dirname "$0")/.."
+
+NGSPICE=/home/bthomas3/Videos/ngspice_pdk/install/bin/ngspice
+RTL=rtl
+TB=tb/tb_landmine_detect.v
+
+echo "╔══════════════════════════════════════════════════════════════╗"
+echo "║  LANDMINE DETECTION: Integrated Mixed-Signal Simulation     ║"
+echo "╚══════════════════════════════════════════════════════════════╝"
+echo ""
+
+#--- Phase 1: SPICE analog chain verification ---
+echo "=== Phase 1: Transistor-level analog verification (ngspice) ==="
+echo "    Running: sim/radar_mixed_signal_tb.spice"
+echo "    Blocks: LNA + Mixer + IFA + VGA + ADC + DIGIF (IHP SG13G2)"
+echo ""
+
+if [ -x "$NGSPICE" ]; then
+    cd sim
+    $NGSPICE -b -o mixed_sig.log radar_mixed_signal_tb.spice
+    echo "--- SPICE Results ---"
+    grep -E "swing|vref_dc" mixed_sig.log 2>/dev/null || echo "  (check mixed_sig.log)"
+    cd ..
+    echo ""
+else
+    echo "  [SKIP] ngspice not found at $NGSPICE"
+    echo ""
+fi
+
+#--- Phase 2: Verilog digital + behavioral analog ---
+echo "=== Phase 2: Full system RTL simulation (iverilog) ==="
+echo "    Analog: SPICE-calibrated behavioral model"
+echo "    Digital: vibrometer_top RTL (Range FFT + Slow-Time FFT + SPI)"
+echo ""
+
+if command -v iverilog &>/dev/null; then
+    iverilog -g2012 -o tb/landmine_detect.vvp \
+        $TB \
+        $RTL/vibrometer_top.v \
+        $RTL/radar_mac_accel.v \
+        $RTL/slowtime_fft.v \
+        $RTL/spi_serializer.v \
+        $RTL/sram_if.v \
+        $RTL/cordic_rect_to_polar.v \
+        $RTL/cordic_polar_to_rect.v \
+        $RTL/fixed_pt_div.v \
+        $RTL/deserializer.v \
+        $RTL/serializer.v \
+    && echo "Compile OK" \
+    && vvp tb/landmine_detect.vvp
+else
+    echo "  [SKIP] iverilog not found - install with: yum install iverilog"
+    echo "  To run manually when available:"
+    echo "    iverilog -g2012 -o tb/landmine_detect.vvp $TB $RTL/*.v"
+    echo "    vvp tb/landmine_detect.vvp"
+fi
+
+echo ""
+echo "Done."

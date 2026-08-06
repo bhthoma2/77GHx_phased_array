@@ -284,3 +284,4 @@ Iteration |   Area    | Resized | Buffers | Nets repaired | Remaining
 [INFO RSZ-0035] Found 3215 fanout violations.
 [INFO RSZ-0038] Inserted 23647 buffers in 3215 nets.
 [INFO RSZ-0504] Runtime: 21.91s
+[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clknet_2_0_0_clk

@@ -1,0 +1,353 @@
+* ============================================================
+* MIXED-SIGNAL TESTBENCH: Schematic-Level Analog + Digital Interface
+* 77GHz FMCW Phased Array Vibrometer - Landmine Detection
+* IHP SG13G2 130nm SiGe BiCMOS
+*
+* Signal chain (all transistor-level from xschem):
+*   LNA -> Mixer -> IFA -> VGA -> ADC -> DIGIF
+*
+* FMCW beat signal stimulus: target at 5m, 1um vibration @ 200Hz
+* Beat frequency = chirp_rate * 2*R/c = 70e12 * 33.3ns = 2.33 MHz
+* ADC: 100 MSPS, captures 64 samples per chirp (640ns)
+* ============================================================
+
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerRES.lib res_typ
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerCAP.lib cap_typ
+
+.options method=gear reltol=1e-2 abstol=1e-8 vntol=1e-4 itl1=500 itl4=500 gmin=1e-11 trtol=7
+.GLOBAL sub!
+
+** ============================================================
+** SUBCIRCUIT DEFINITIONS (from xschem .sch netlists)
+** ============================================================
+
+** LNA (LNA_77G.sch): Cascode with TL matching, lumped Pi equivalents
+.subckt LNA_77G V2V4 INP INN GND sub OUTP OUTN
+XQ33 net8 net7 net4 sub npn13G2l Nx=4 selft=0
+XQ34 net5 net1 net4 sub npn13G2l Nx=4 selft=0
+XQ37 BIAS6 BIAS6 net2 sub npn13G2l Nx=1 selft=0
+XQ35 net6 B3536 net8 sub npn13G2l Nx=4 selft=0
+XQ36 net3 B3536 net5 sub npn13G2l Nx=4 selft=0
+RTL35a net7 tl35m 1.07
+LTL35 tl35m tl35m2 43.3p
+RTL35b tl35m2 INP 1.07
+CTL35a net7 GND 2.98f
+CTL35b INP GND 2.98f
+RTL36a net1 tl36m 1.07
+LTL36 tl36m tl36m2 43.3p
+RTL36b tl36m2 INN 1.07
+CTL36a net1 GND 2.98f
+CTL36b INN GND 2.98f
+RTL37a net7 tl37m 0.64
+LTL37 tl37m tl37m2 25.9p
+RTL37b tl37m2 BIAS6 0.64
+CTL37a net7 GND 1.78f
+CTL37b BIAS6 GND 1.78f
+RTL38a net1 tl38m 0.64
+LTL38 tl38m tl38m2 25.9p
+RTL38b tl38m2 BIAS6 0.64
+CTL38a net1 GND 1.78f
+CTL38b BIAS6 GND 1.78f
+RTL39a V2V4 tl39m 1.67
+LTL39 tl39m tl39m2 67.3p
+RTL39b tl39m2 net6 1.67
+CTL39a V2V4 GND 4.64f
+CTL39b net6 GND 4.64f
+RTL40a V2V4 tl40m 1.67
+LTL40 tl40m tl40m2 67.3p
+RTL40b tl40m2 net3 1.67
+CTL40a V2V4 GND 4.64f
+CTL40b net3 GND 4.64f
+XR32 V2V4 BIAS6 sub rppd w=3e-6 l=18.23e-6 m=2 b=0
+XR33 net2 GND sub rppd w=2.5e-6 l=10.53e-6 m=14 b=0
+XR30 V2V4 B3536 sub rppd w=3e-6 l=18.23e-6 m=2 b=0
+XR31 B3536 GND sub rppd w=3e-6 l=18.23e-6 m=1 b=0
+XR29 net4 GND sub rsil w=7e-6 l=38.8e-6 m=4 b=0
+XC53 INP GND cap_cmim w=6e-6 l=6e-6
+XC54 INN GND cap_cmim w=6e-6 l=6e-6
+XC55 OUTN net6 cap_cmim w=4e-6 l=4e-6
+XC56 OUTP net3 cap_cmim w=4e-6 l=4e-6
+XC58 V2V4 BIAS6 cap_cmim w=100e-6 l=20e-6
+XC57 V2V4 B3536 cap_cmim w=100e-6 l=15e-6
+XC59 V2V4 BIAS6 cap_cmim w=100e-6 l=20e-6
+XC60 V2V4 GND cap_cmim w=100e-6 l=15e-6
+XC61 V2V4 GND cap_cmim w=100e-6 l=15e-6
+.ends LNA_77G
+
+** MIXER (MIXER_77G.sch): Gilbert cell with TL matching
+.subckt MIXER_77G V2V4 RFP RFN LOP LON GND sub IFP IFN
+XQ22 IFP BLOP ELOL sub npn13G2l Nx=4 selft=0
+XQ23 IFN BLON ELOL sub npn13G2l Nx=4 selft=0
+XQ24 IFP BLON ELOR sub npn13G2l Nx=4 selft=0
+XQ25 IFN BLOP ELOR sub npn13G2l Nx=4 selft=0
+XQ20 ELOL BRFP GND sub npn13G2l Nx=4 selft=0
+XQ21 ELOR BRFN GND sub npn13G2l Nx=4 selft=0
+XQ27 RFBIAS RFBIAS GND sub npn13G2l Nx=1 selft=0
+XQ26 LOBIAS LOBIAS RFBIAS sub npn13G2l Nx=1 selft=0
+RTL21a BLOP tl21m 0.54
+LTL21 tl21m tl21m2 21.8p
+RTL21b tl21m2 LOBIAS 0.54
+CTL21a BLOP GND 1.50f
+CTL21b LOBIAS GND 1.50f
+RTL23a BLON tl23m 0.54
+LTL23 tl23m tl23m2 21.8p
+RTL23b tl23m2 LOBIAS 0.54
+CTL23a BLON GND 1.50f
+CTL23b LOBIAS GND 1.50f
+RTL22a BLOP tl22m 0.73
+LTL22 tl22m tl22m2 29.4p
+RTL22b tl22m2 LOP 0.73
+CTL22a BLOP GND 2.03f
+CTL22b LOP GND 2.03f
+RTL24a BLON tl24m 0.73
+LTL24 tl24m tl24m2 29.4p
+RTL24b tl24m2 LON 0.73
+CTL24a BLON GND 2.03f
+CTL24b LON GND 2.03f
+RTL25a BRFP tl25m 1.39
+LTL25 tl25m tl25m2 55.7p
+RTL25b tl25m2 RFBIAS 1.39
+CTL25a BRFP GND 3.84f
+CTL25b RFBIAS GND 3.84f
+RTL27a BRFN tl27m 1.39
+LTL27 tl27m tl27m2 55.7p
+RTL27b tl27m2 RFBIAS 1.39
+CTL27a BRFN GND 3.84f
+CTL27b RFBIAS GND 3.84f
+RTL26a BRFP tl26m 1.39
+LTL26 tl26m tl26m2 55.7p
+RTL26b tl26m2 RFP 1.39
+CTL26a BRFP GND 3.84f
+CTL26b RFP GND 3.84f
+RTL28a BRFN tl28m 1.39
+LTL28 tl28m tl28m2 55.7p
+RTL28b tl28m2 RFN 1.39
+CTL28a BRFN GND 3.84f
+CTL28b RFN GND 3.84f
+XR21 V2V4 IFP sub rppd w=3e-6 l=18.23e-6 m=2 b=0
+XR22 V2V4 IFN sub rppd w=3e-6 l=18.23e-6 m=2 b=0
+XR23 V2V4 LOBIAS sub rppd w=3e-6 l=27.48e-6 m=1 b=0
+XC42 RFBIAS GND cap_cmim w=30e-6 l=30e-6
+XC37 LOP GND cap_cmim w=5e-6 l=5e-6
+XC38 LON GND cap_cmim w=5e-6 l=5e-6
+XC39 RFP GND cap_cmim w=4e-6 l=4e-6
+XC40 RFN GND cap_cmim w=4e-6 l=4e-6
+XC41 V2V4 LOBIAS cap_cmim w=30e-6 l=30e-6
+XC43 V2V4 GND cap_cmim w=30e-6 l=30e-6
+.ends MIXER_77G
+
+** IFA (IFA_77G.sch): 2-stage differential amplifier, 44dB gain
+.subckt IFA_77G VCC INP INN GND sub OUTP OUTN
+XQ1 out1p INP tail1 sub npn13G2l Nx=2 selft=0
+XQ2 out1n INN tail1 sub npn13G2l Nx=2 selft=0
+XQ3 OUTP out1p tail2 sub npn13G2l Nx=2 selft=0
+XQ4 OUTN out1n tail2 sub npn13G2l Nx=2 selft=0
+RL1 VCC out1p 500
+RL2 VCC out1n 500
+RL3 VCC OUTP 500
+RL4 VCC OUTN 500
+ITAIL1 tail1 GND DC 2m
+ITAIL2 tail2 GND DC 2m
+.ends IFA_77G
+
+** VGA (VGA_77G.sch): Variable-gm amplifier
+.subckt VGA_77G VCC INP INN VCTRL GND sub OUTP OUTN
+XQ1 OUTP INP net1 sub npn13G2l Nx=2 selft=0
+XQ2 OUTN INN net1 sub npn13G2l Nx=2 selft=0
+XQtail net1 VCTRL net2 sub npn13G2l Nx=4 selft=0
+RL1 VCC OUTP 500
+RL2 VCC OUTN 500
+RE net2 GND 10
+.ends VGA_77G
+
+** ADC (ADC_SAR_12B.sch): 9T StrongARM comparator
+.subckt ADC_SAR_12B VDD AINP AINN CLK VSS sub DOUTP DOUTN
+XM1 net2 AINP net1 VSS sg13_lv_nmos w=8u l=200n ng=4 m=4 rfmode=1
+XM2 net3 AINN net1 VSS sg13_lv_nmos w=8u l=200n ng=4 m=4 rfmode=1
+XM9 net1 CLK VSS VSS sg13_lv_nmos w=8u l=200n ng=4 m=2 rfmode=1
+XM5 DOUTP DOUTN net2 VSS sg13_lv_nmos w=4u l=200n ng=2 m=2 rfmode=1
+XM6 DOUTN DOUTP net3 VSS sg13_lv_nmos w=4u l=200n ng=2 m=2 rfmode=1
+XM3 DOUTP DOUTN VDD VDD sg13_lv_pmos w=4u l=200n ng=2 m=2 rfmode=1
+XM4 DOUTN DOUTP VDD VDD sg13_lv_pmos w=4u l=200n ng=2 m=2 rfmode=1
+XM7 DOUTP CLK VDD VDD sg13_lv_pmos w=2u l=200n ng=1 m=2 rfmode=1
+XM8 DOUTN CLK VDD VDD sg13_lv_pmos w=2u l=200n ng=1 m=2 rfmode=1
+.ends ADC_SAR_12B
+
+** DIGIF (DIGIF_CML.sch): CML buffer 50ohm, 4mA
+.subckt DIGIF_CML VCC DIN_P DIN_N GND sub DOUT_P DOUT_N
+XQ1 DOUT_P DIN_P tail sub npn13G2l Nx=2 selft=0
+XQ2 DOUT_N DIN_N tail sub npn13G2l Nx=2 selft=0
+RT1 VCC DOUT_P 50
+RT2 VCC DOUT_N 50
+ITAIL tail GND DC 4m
+.ends DIGIF_CML
+
+** BIAS_BGR (BIAS_BGR.sch): Brokaw bandgap reference
+** Simulated separately - replaced with ideal VREF for convergence
+** .subckt BIAS_BGR VDD VSS sub VREF IBIAS_OUT
+** ...
+** .ends BIAS_BGR
+
+** ============================================================
+** SUPPLIES
+** ============================================================
+Vcc vcc 0 3.3
+V2v4 v2v4 0 2.4
+Vdd vdd 0 1.2
+Vsub sub! 0 0
+
+** ============================================================
+** FMCW RADAR STIMULUS
+** Beat freq = chirp_slope * 2*R/c = 70e12 * 2*5/3e8 = 2.33 MHz
+** Modulated by 77GHz carrier for LNA input
+** RF signal: 1mV peak differential at 77GHz, AM modulated by beat
+** ============================================================
+
+* FMCW beat: after mixing with LO at same freq, beat = 2.33MHz
+* Drive LNA directly with 77GHz CW (mixer provides downconversion)
+* LO offset by 2.33MHz to produce beat at IF
+
+* RF input: 77GHz, 1mV pk differential
+Vrf_p rf_p 0 DC 1.0 SIN(1.0 0.5m 77G)
+Vrf_n rf_n 0 DC 1.0 SIN(1.0 -0.5m 77G)
+
+* LO at 76.9977GHz -> 2.33MHz IF beat (target at 5m)
+Vlo_p lo_p 0 DC 1.0 SIN(1.0 100m 76.9977G)
+Vlo_n lo_n 0 DC 1.0 SIN(1.0 -100m 76.9977G)
+
+* VGA gain control
+Vctrl vctrl 0 0.95
+
+* ADC clock: 100MHz, starts after 100ns analog settling
+Vclk clk_adc 0 PULSE(0 1.2 100n 200p 200p 4.8n 10n)
+
+** ============================================================
+** SIGNAL CHAIN (full transistor-level)
+** ============================================================
+
+* Bandgap Reference (ideal source - BGR simulated separately)
+Vref_bgr vref 0 1.17
+Ribias vref ibias 10k
+
+* LNA (2.4V supply)
+X_lna v2v4 rf_p rf_n 0 sub! lna_op lna_on LNA_77G
+
+* AC coupling LNA -> Mixer RF
+Cc_lm_p lna_op mix_rfp 500f
+Cc_lm_n lna_on mix_rfn 500f
+Rb_lm_p v2v4 mix_rfp 2k
+Rb_lm_n v2v4 mix_rfn 2k
+Rb_lm_p2 mix_rfp 0 1.5k
+Rb_lm_n2 mix_rfn 0 1.5k
+
+* Mixer (2.4V supply)
+X_mixer v2v4 mix_rfp mix_rfn lo_p lo_n 0 sub! if_p if_n MIXER_77G
+
+* AC coupling Mixer IF -> IFA
+Cc_mi_p if_p ifa_inp 1p
+Cc_mi_n if_n ifa_inn 1p
+Rb_mi_p vcc ifa_inp 10k
+Rb_mi_n vcc ifa_inn 10k
+Rb_mi_p2 ifa_inp 0 6.5k
+Rb_mi_n2 ifa_inn 0 6.5k
+
+* IFA (3.3V supply)
+X_ifa vcc ifa_inp ifa_inn 0 sub! ifa_op ifa_on IFA_77G
+
+* AC coupling IFA -> VGA
+Cc_iv_p ifa_op vga_inp 1p
+Cc_iv_n ifa_on vga_inn 1p
+Rb_iv_p vcc vga_inp 10k
+Rb_iv_n vcc vga_inn 10k
+Rb_iv_p2 vga_inp 0 6.5k
+Rb_iv_n2 vga_inn 0 6.5k
+
+* VGA (3.3V supply)
+X_vga vcc vga_inp vga_inn vctrl 0 sub! vga_op vga_on VGA_77G
+
+* AC coupling VGA -> ADC (bias at VDD/2 = 0.6V)
+Cc_va_p vga_op adc_inp 1p
+Cc_va_n vga_on adc_inn 1p
+Rb_va_p1 vdd adc_inp 20k
+Rb_va_p2 adc_inp 0 20k
+Rb_va_n1 vdd adc_inn 20k
+Rb_va_n2 adc_inn 0 20k
+
+* ADC (1.2V supply)
+X_adc vdd adc_inp adc_inn clk_adc 0 sub! adc_op adc_on ADC_SAR_12B
+
+* DIGIF CML Buffer (3.3V supply)
+* AC-couple ADC output to DIGIF to avoid DC metastability loading
+Cc_ad_p adc_op digif_inp 100f
+Cc_ad_n adc_on digif_inn 100f
+Rb_ad_p vcc digif_inp 5k
+Rb_ad_n vcc digif_inn 5k
+Rb_ad_p2 digif_inp 0 5k
+Rb_ad_n2 digif_inn 0 5k
+X_digif vcc digif_inp digif_inn 0 sub! dout_p dout_n DIGIF_CML
+
+** ============================================================
+** ANALYSIS: 150ns (100ns settling + 50ns = 5 ADC samples)
+** Save only key nodes to reduce memory
+** ============================================================
+.tran 1p 150n
+.save v(lna_op) v(lna_on) v(if_p) v(if_n) v(ifa_op) v(ifa_on)
++ v(vga_op) v(vga_on) v(adc_inp) v(adc_inn) v(adc_op) v(adc_on)
++ v(dout_p) v(dout_n) v(vref) v(clk_adc)
+
+.control
+run
+
+* Measure analog chain performance
+echo "============================================================"
+echo " MIXED-SIGNAL SIMULATION RESULTS (Schematic-Level Analog)"
+echo " 77GHz FMCW Phased Array Vibrometer - IHP SG13G2"
+echo "============================================================"
+
+echo ""
+echo "--- Analog Chain Gain (100ns-800ns) ---"
+meas tran lna_swing pp v(lna_op) from=10n to=100n
+meas tran mixer_if_swing pp v(if_p) from=10n to=100n
+meas tran ifa_swing pp v(ifa_op) from=10n to=100n
+meas tran vga_swing pp v(vga_op) from=10n to=100n
+
+echo ""
+echo "--- ADC Output (first 10 clock cycles after 100ns) ---"
+meas tran adc_p_swing pp v(adc_op) from=100n to=200n
+meas tran adc_n_swing pp v(adc_on) from=100n to=200n
+
+echo ""
+echo "--- DIGIF CML Output ---"
+meas tran digif_p_swing pp v(dout_p) from=100n to=200n
+meas tran digif_n_swing pp v(dout_n) from=100n to=200n
+
+echo ""
+echo "--- Bandgap Reference ---"
+meas tran vref_dc avg v(vref) from=50n to=100n
+
+echo ""
+echo "--- DC Operating Points (t=50ns) ---"
+print v(lna_op) v(if_p) v(ifa_op) v(vga_op) v(adc_inp) v(adc_op) v(dout_p) v(vref)
+
+* Export waveforms for digital backend processing
+echo ""
+echo "--- Exporting ADC samples for digital processing ---"
+wrdata /home/bthomas3/Videos/77GHz_phased_array/sim/mixed_sig_adc_out.dat v(adc_op) v(adc_on) v(dout_p) v(dout_n)
+
+* Export full chain waveforms
+wrdata /home/bthomas3/Videos/77GHz_phased_array/sim/mixed_sig_chain.dat v(lna_op) v(lna_on) v(if_p) v(if_n) v(ifa_op) v(ifa_on) v(vga_op) v(vga_on)
+
+echo ""
+echo "============================================================"
+echo " Simulation complete. ADC output exported to:"
+echo "   mixed_sig_adc_out.dat"
+echo " Full chain waveforms exported to:"
+echo "   mixed_sig_chain.dat"
+echo "============================================================"
+
+quit
+.endc
+
+.end

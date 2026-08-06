@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module sram_if #(
     parameter ADDR_W = 10,
     parameter DATA_W = 32
@@ -9,6 +10,8 @@ module sram_if #(
     input  wire [DATA_W-1:0] wdata,
     output wire [DATA_W-1:0] rdata
 );
+
+`ifdef SYNTHESIS
 
 RM_IHPSG13_1P_1024x32_c2_bm_bist u_sram (
     .A_CLK(clk),
@@ -29,5 +32,23 @@ RM_IHPSG13_1P_1024x32_c2_bm_bist u_sram (
     .A_BIST_DIN(32'd0),
     .A_BIST_BM(32'd0)
 );
+
+`else
+
+reg [DATA_W-1:0] mem [0:(1<<ADDR_W)-1];
+reg [DATA_W-1:0] rdata_r;
+
+always @(posedge clk) begin
+    if (ce) begin
+        if (we)
+            mem[addr] <= wdata;
+        else
+            rdata_r <= mem[addr];
+    end
+end
+
+assign rdata = rdata_r;
+
+`endif
 
 endmodule

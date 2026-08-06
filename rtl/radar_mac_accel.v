@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module radar_mac_accel #(
     parameter DW    = 16,
     parameter N_FFT = 64,

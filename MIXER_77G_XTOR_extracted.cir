@@ -1,4 +1,4 @@
-* Extracted by KLayout with SG13G2 LVS runset on : 05/08/2026 11:17
+* Extracted by KLayout with SG13G2 LVS runset on : 05/08/2026 22:53
 
 .SUBCKT MIXER_77G_XTOR
 Q$1 \$2 \$2 \$6 \$1 npn13G2l we=70n le=1000n Nx=1 m=1

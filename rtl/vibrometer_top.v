@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module vibrometer_top #(
     parameter DW       = 16,
     parameter AW       = 2*DW,
@@ -68,14 +69,14 @@ wire [SRAM_DW-1:0]  sram_wdata;
 wire [SRAM_DW-1:0]  sram_rdata;
 
 slowtime_fft #(
-    .DW(DW), .N_CHIRPS(N_CHIRPS), .N_BINS(N_FFT),
+    .DW(DW), .N_CHIRPS(N_CHIRPS),
     .N_BEAMS(N_BEAMS), .SRAM_AW(SRAM_AW), .SRAM_DW(SRAM_DW)
 ) u_slowtime (
     .clk(clk),
     .rst_n(rst_n),
     .chirp_valid(range_result_valid),
-    .range_re(range_result_re[DW-1:0]),
-    .range_im(range_result_im[DW-1:0]),
+    .range_re($signed(range_result_re[DW-1:0])),
+    .range_im($signed(range_result_im[DW-1:0])),
     .range_bin(range_result_bin),
     .beam_idx(beam_idx),
     .process_start(process_start),
@@ -110,7 +111,7 @@ spi_serializer #(
 ) u_spi (
     .clk(clk),
     .rst_n(rst_n),
-    .data_re(vib_amplitude),
+    .data_re($unsigned(vib_amplitude)),
     .data_im({28'd0, vib_beam}),
     .data_bin(6'd0),
     .data_valid(vib_valid),

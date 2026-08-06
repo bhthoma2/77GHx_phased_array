@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module spi_serializer #(
     parameter DW = 32,
     parameter FRAME_BITS = 38
