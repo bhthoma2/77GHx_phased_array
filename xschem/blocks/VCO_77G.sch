@@ -12,8 +12,8 @@ N 220 -550 220 -480 {lab=VCC}
 N 380 -550 380 -480 {lab=VCC}
 N 220 -550 380 -550 {lab=VCC}
 N 100 -550 220 -550 {lab=VCC}
-N 220 -420 220 -380 {lab=OUTP}
-N 380 -420 380 -380 {lab=OUTN}
+N 220 -340 220 -330 {lab=OUTP}
+N 380 -340 380 -330 {lab=OUTN}
 N 220 -380 270 -380 {lab=OUTP}
 N 330 -380 380 -380 {lab=OUTN}
 N 220 -340 270 -340 {lab=OUTP}
@@ -26,6 +26,16 @@ N 300 -90 300 -60 {lab=GND}
 N 140 -380 220 -380 {lab=OUTP}
 N 380 -380 460 -380 {lab=OUTN}
 N 220 -220 300 -220 {lab=TAIL}
+N 160 -300 180 -300 {lab=OUTN}
+N 160 -430 160 -300 {lab=OUTN}
+N 160 -430 380 -430 {lab=OUTN}
+N 380 -430 380 -380 {lab=OUTN}
+N 420 -300 440 -300 {lab=OUTP}
+N 440 -440 440 -300 {lab=OUTP}
+N 220 -440 440 -440 {lab=OUTP}
+N 220 -440 220 -380 {lab=OUTP}
+N 220 -380 220 -340 {lab=OUTP}
+N 380 -380 380 -340 {lab=OUTN}
 C {sg13g2_pr/npn13G2l.sym} 200 -300 0 0 {name=Q1
 model=npn13G2l
 spiceprefix=X
@@ -56,7 +66,5 @@ C {iopin.sym} 140 -380 0 1 {name=p3 lab=OUTP}
 C {iopin.sym} 460 -380 0 0 {name=p4 lab=OUTN}
 C {iopin.sym} 300 -340 0 0 {name=p5 lab=VTUNE}
 C {iopin.sym} 100 -300 0 1 {name=p6 lab=sub|}
-C {lab_pin.sym} 180 -300 0 1 {name=p7 sig_type=std_logic lab=OUTN}
-C {lab_pin.sym} 420 -300 0 0 {name=p8 sig_type=std_logic lab=OUTP}
 C {lab_pin.sym} 220 -300 0 0 {name=p9 sig_type=std_logic lab=sub|}
 C {lab_pin.sym} 380 -300 0 0 {name=p10 sig_type=std_logic lab=sub|}

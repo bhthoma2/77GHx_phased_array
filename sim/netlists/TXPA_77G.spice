@@ -1,0 +1,31 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/TXPA_77G.sch
+**.subckt TXPA_77G VCC INP INN VBIAS_CB GND sub! OUTP OUTN
+*.iopin VCC
+*.iopin GND
+*.iopin INP
+*.iopin INN
+*.iopin OUTP
+*.iopin OUTN
+*.iopin VBIAS_CB
+*.iopin sub|
+XQ1_CE net5 net9 net7 sub| npn13G2l Nx=8 El=2.5
+XQ2_CE net6 net10 net8 sub| npn13G2l Nx=8 El=2.5
+XQ3_CB net1 VBIAS_CB net5 sub| npn13G2l Nx=8 El=2.5
+XQ4_CB net2 VBIAS_CB net6 sub| npn13G2l Nx=8 El=2.5
+ytransline TL_INP net9 INP ytransline_TL_INP len=97u lumps=50
+.model ytransline_TL_INP transline r=22.16k l=445.9n C=61.5p
+ytransline TL_INN INN net10 ytransline_TL_INN len=97u lumps=50
+.model ytransline_TL_INN transline r=22.16k l=445.9n C=61.5p
+ytransline TL_OUTP net1 net3 ytransline_TL_OUTP len=210u lumps=50
+.model ytransline_TL_OUTP transline r=22.16k l=445.9n C=61.5p
+ytransline TL_OUTN net2 net4 ytransline_TL_OUTN len=210u lumps=50
+.model ytransline_TL_OUTN transline r=22.16k l=445.9n C=61.5p
+ytransline TL_DEG_P net7 GND ytransline_TL_DEG_P len=58u lumps=50
+.model ytransline_TL_DEG_P transline r=22.16k l=445.9n C=61.5p
+ytransline TL_DEG_N net8 GND ytransline_TL_DEG_N len=58u lumps=50
+.model ytransline_TL_DEG_N transline r=22.16k l=445.9n C=61.5p
+XRB_CB VBIAS_CB GND sub! rppd w=3e-6 l=18.23e-6 m=1 b=0
+CDC_P VCC net3 500f
+CDC_N VCC net4 500f
+**.ends
+.end

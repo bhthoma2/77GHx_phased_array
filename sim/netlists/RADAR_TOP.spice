@@ -13,7 +13,7 @@
 *.iopin VDD_12
 *.iopin GND
 x_lna VCC_33 ANT_RXP ANT_RXN GND sub! net1 net2 LNA_77G
-x_mixer VCC_33 net1 net2 net11 net13 GND sub! net3 net4 MIXER_77G
+x_mixer VCC_33 net1 net2 net11 net12 GND sub! net3 net4 MIXER_77G
 x_ifa VCC_33 net3 net4 GND sub! net5 net6 IFA_77G
 x_vga VCC_33 net5 net6 VCTRL GND sub! net7 net8 VGA_77G
 x_adc VDD_12 net7 net8 CLK_ADC GND sub! net9 net10 ADC_SAR_12B
@@ -156,16 +156,16 @@ XC43 2V4 GND cap_cmim w=30e-6 l=30e-6
 *.iopin VCC
 *.iopin GND
 *.iopin sub!
-XQ1 out1p INP tail1 sub! npn13G2l Nx=2 El=2.5
-XQ2 out1n INN tail1 sub! npn13G2l Nx=2 El=2.5
-XQ3 OUTP out1p tail2 sub! npn13G2l Nx=2 El=2.5
-XQ4 OUTN out1n tail2 sub! npn13G2l Nx=2 El=2.5
-RL1 VCC out1p 500
-RL2 VCC out1n 500
+XQ1 net3 INP net1 sub! npn13G2l Nx=2 El=2.5
+XQ2 net4 INN net1 sub! npn13G2l Nx=2 El=2.5
+XQ3 OUTP net3 net2 sub! npn13G2l Nx=2 El=2.5
+XQ4 OUTN net4 net2 sub! npn13G2l Nx=2 El=2.5
+RL1 VCC net3 500
+RL2 VCC net4 500
 RL3 VCC OUTP 500
 RL4 VCC OUTN 500
-ITAIL1 tail1 GND DC 2m
-ITAIL2 tail2 GND DC 2m
+ITAIL1 net1 GND DC 2m
+ITAIL2 net2 GND DC 2m
 .ends
 
 
@@ -242,13 +242,13 @@ ITAIL tail GND DC 4m
 *.iopin OUTN
 *.iopin VTUNE
 *.iopin sub|
-XQ1 net4 OUTN net3 sub| npn13G2l Nx=1 El=2.5
-XQ2 net5 OUTP net3 sub| npn13G2l Nx=1 El=2.5
+XQ1 OUTP OUTN net1 sub| npn13G2l Nx=1 El=2.5
+XQ2 OUTN OUTP net1 sub| npn13G2l Nx=1 El=2.5
 L1 VCC OUTP 27p
 L2 VCC OUTN 27p
 CVAR1 OUTP OUTN 15f
-CVAR2 net1 net2 12f
-ITAIL net3 GND DC 5m
+CVAR2 OUTP OUTN 12f
+ITAIL net1 GND DC 5m
 .ends
 
 
@@ -264,25 +264,25 @@ ITAIL net3 GND DC 5m
 *.iopin OUTN
 *.iopin VBIAS_CB
 *.iopin sub|
-XQ1_CE net1 net5 net3 sub| npn13G2l Nx=8 El=2.5
-XQ2_CE net2 net6 net4 sub| npn13G2l Nx=8 El=2.5
-XQ3_CB sub| VBIAS_CB net1 sub| npn13G2l Nx=8 El=2.5
-XQ4_CB sub| VBIAS_CB net2 sub| npn13G2l Nx=8 El=2.5
-ytransline TL_INP net7 INP ytransline_TL_INP len=97u lumps=50
+XQ1_CE net5 net9 net7 sub| npn13G2l Nx=8 El=2.5
+XQ2_CE net6 net10 net8 sub| npn13G2l Nx=8 El=2.5
+XQ3_CB net1 VBIAS_CB net5 sub| npn13G2l Nx=8 El=2.5
+XQ4_CB net2 VBIAS_CB net6 sub| npn13G2l Nx=8 El=2.5
+ytransline TL_INP net9 INP ytransline_TL_INP len=97u lumps=50
 .model ytransline_TL_INP transline r=22.16k l=445.9n C=61.5p
-ytransline TL_INN INN net8 ytransline_TL_INN len=97u lumps=50
+ytransline TL_INN INN net10 ytransline_TL_INN len=97u lumps=50
 .model ytransline_TL_INN transline r=22.16k l=445.9n C=61.5p
-ytransline TL_OUTP sub| sub| ytransline_TL_OUTP len=210u lumps=50
+ytransline TL_OUTP net1 net3 ytransline_TL_OUTP len=210u lumps=50
 .model ytransline_TL_OUTP transline r=22.16k l=445.9n C=61.5p
-ytransline TL_OUTN sub| sub| ytransline_TL_OUTN len=210u lumps=50
+ytransline TL_OUTN net2 net4 ytransline_TL_OUTN len=210u lumps=50
 .model ytransline_TL_OUTN transline r=22.16k l=445.9n C=61.5p
-ytransline TL_DEG_P net3 GND ytransline_TL_DEG_P len=58u lumps=50
+ytransline TL_DEG_P net7 GND ytransline_TL_DEG_P len=58u lumps=50
 .model ytransline_TL_DEG_P transline r=22.16k l=445.9n C=61.5p
-ytransline TL_DEG_N net4 GND ytransline_TL_DEG_N len=58u lumps=50
+ytransline TL_DEG_N net8 GND ytransline_TL_DEG_N len=58u lumps=50
 .model ytransline_TL_DEG_N transline r=22.16k l=445.9n C=61.5p
-XRB_CB VBIAS_CB net9 sub! rppd w=3e-6 l=18.23e-6 m=1 b=0
-CDC_P VCC net10 500f
-CDC_N VCC net11 500f
+XRB_CB VBIAS_CB GND sub! rppd w=3e-6 l=18.23e-6 m=1 b=0
+CDC_P VCC net3 500f
+CDC_N VCC net4 500f
 .ends
 
 
@@ -316,14 +316,14 @@ C_INJ INJ_P net3 100f
 *.iopin VCC
 *.iopin GND
 *.iopin sub!
-XQ1 c1 c1 e1 sub! npn13G2l Nx=1 El=2.5
-XQ2 c2 c2 GND sub! npn13G2l Nx=8 El=2.5
-R1 e1 GND 5.4k
+XQ1 net2 net2 net1 sub! npn13G2l Nx=1 El=2.5
+XQ2 net3 net3 GND sub! npn13G2l Nx=8 El=2.5
+R1 net1 GND 5.4k
 R2 VREF GND 18k
-Rfb c1 c2 50
-Rout c2 VREF 100
-I1 VCC c1 DC 200u
-I2 VCC c2 DC 200u
+Rfb net2 net3 50
+Rout net3 VREF 100
+I1 VCC net2 DC 200u
+I2 VCC net3 DC 200u
 .ends
 
 .GLOBAL sub!

@@ -34,7 +34,7 @@ detailed_placement
 set_max_fanout 100 [current_design]
 repair_design
 
-global_route -guide_file build/route_mac.guide
+global_route -guide_file build/route_mac.guide -allow_congestion
 
 set block [ord::get_db_block]
 foreach net [$block getNets] {

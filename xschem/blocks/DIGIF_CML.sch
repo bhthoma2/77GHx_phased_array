@@ -30,17 +30,16 @@ C {iopin.sym} 520 -310 0 0 {name=p4 lab=DOUT_N}
 C {iopin.sym} 300 -430 0 0 {name=p5 lab=VCC}
 C {iopin.sym} 300 -70 0 0 {name=p6 lab=GND}
 C {iopin.sym} 350 -70 0 0 {name=p7 lab=sub!}
-C {lab_pin.sym} 220 -280 3 0 {name=l1 sig_type=std_logic lab=DOUT_P}
-C {lab_pin.sym} 180 -250 0 0 {name=l2 sig_type=std_logic lab=DIN_P}
-C {lab_pin.sym} 220 -220 1 0 {name=l3 sig_type=std_logic lab=tail}
 C {lab_pin.sym} 220 -250 0 0 {name=l4 sig_type=std_logic lab=sub!}
-C {lab_pin.sym} 380 -280 3 0 {name=l5 sig_type=std_logic lab=DOUT_N}
-C {lab_pin.sym} 420 -250 2 0 {name=l6 sig_type=std_logic lab=DIN_N}
-C {lab_pin.sym} 380 -220 1 0 {name=l7 sig_type=std_logic lab=tail}
 C {lab_pin.sym} 380 -250 2 0 {name=l8 sig_type=std_logic lab=sub!}
-C {lab_pin.sym} 220 -380 3 0 {name=l9 sig_type=std_logic lab=VCC}
-C {lab_pin.sym} 220 -320 1 0 {name=l10 sig_type=std_logic lab=DOUT_P}
-C {lab_pin.sym} 380 -380 3 0 {name=l11 sig_type=std_logic lab=VCC}
-C {lab_pin.sym} 380 -320 1 0 {name=l12 sig_type=std_logic lab=DOUT_N}
-C {lab_pin.sym} 300 -190 3 0 {name=l13 sig_type=std_logic lab=tail}
-C {lab_pin.sym} 300 -130 1 0 {name=l14 sig_type=std_logic lab=GND}
+N 80 -250 180 -250 {lab=DIN_P}
+N 520 -250 420 -250 {lab=DIN_N}
+N 220 -320 220 -280 {lab=DOUT_P}
+N 80 -310 220 -310 {lab=DOUT_P}
+N 380 -320 380 -280 {lab=DOUT_N}
+N 520 -310 380 -310 {lab=DOUT_N}
+N 220 -380 380 -380 {lab=VCC}
+N 300 -430 300 -380 {lab=VCC}
+N 300 -130 300 -70 {lab=GND}
+N 220 -220 380 -220 {lab=tail}
+N 300 -220 300 -190 {lab=tail}

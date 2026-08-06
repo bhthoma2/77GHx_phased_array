@@ -1,0 +1,16 @@
+** sch_path: /home/bthomas3/Videos/77GHz_phased_array/xschem/blocks/BIAS_BGR.sch
+**.subckt BIAS_BGR VDD VSS sub! VREF IBIAS_OUT
+*.iopin VREF
+*.iopin VCC
+*.iopin GND
+*.iopin sub!
+XQ1 net2 net2 net1 sub! npn13G2l Nx=1 El=2.5
+XQ2 net3 net3 GND sub! npn13G2l Nx=8 El=2.5
+R1 net1 GND 5.4k
+R2 VREF GND 18k
+Rfb net2 net3 50
+Rout net3 VREF 100
+I1 VCC net2 DC 200u
+I2 VCC net3 DC 200u
+**.ends
+.end

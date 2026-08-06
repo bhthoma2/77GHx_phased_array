@@ -7,15 +7,15 @@
 *.iopin VCC
 *.iopin GND
 *.iopin sub!
-XQ1 out1p INP tail1 sub! npn13G2l Nx=2 El=2.5
-XQ2 out1n INN tail1 sub! npn13G2l Nx=2 El=2.5
-XQ3 OUTP out1p tail2 sub! npn13G2l Nx=2 El=2.5
-XQ4 OUTN out1n tail2 sub! npn13G2l Nx=2 El=2.5
-RL1 VCC out1p 500
-RL2 VCC out1n 500
+XQ1 net3 INP net1 sub! npn13G2l Nx=2 El=2.5
+XQ2 net4 INN net1 sub! npn13G2l Nx=2 El=2.5
+XQ3 OUTP net3 net2 sub! npn13G2l Nx=2 El=2.5
+XQ4 OUTN net4 net2 sub! npn13G2l Nx=2 El=2.5
+RL1 VCC net3 500
+RL2 VCC net4 500
 RL3 VCC OUTP 500
 RL4 VCC OUTN 500
-ITAIL1 tail1 GND DC 2m
-ITAIL2 tail2 GND DC 2m
+ITAIL1 net1 GND DC 2m
+ITAIL2 net2 GND DC 2m
 **.ends
 .end

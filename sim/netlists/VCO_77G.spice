@@ -6,12 +6,12 @@
 *.iopin OUTN
 *.iopin VTUNE
 *.iopin sub|
-XQ1 net4 OUTN net3 sub| npn13G2l Nx=1 El=2.5
-XQ2 net5 OUTP net3 sub| npn13G2l Nx=1 El=2.5
+XQ1 OUTP OUTN net1 sub| npn13G2l Nx=1 El=2.5
+XQ2 OUTN OUTP net1 sub| npn13G2l Nx=1 El=2.5
 L1 VCC OUTP 27p
 L2 VCC OUTN 27p
 CVAR1 OUTP OUTN 15f
-CVAR2 net1 net2 12f
-ITAIL net3 GND DC 5m
+CVAR2 OUTP OUTN 12f
+ITAIL net1 GND DC 5m
 **.ends
 .end
