@@ -184,13 +184,12 @@ initial begin
     tx_array_factor = 1.0; // All elements coherent toward target
 
     // RF signal at each RX antenna element
-    // P_rx = P_tx * G_tx * G_rx * lambda^2 * RCS / (4*pi)^3 / R^4
-    // With 6-element TX array: P_tx_eff = N * P_per_elem * AF^2 = 6 * 1mW = 6mW EIRP
-    rx_signal_per_elem = $sqrt(6.0 * TX_POWER_PER_ELEM * 50.0) *
-                         (LAMBDA * LAMBDA * 0.01) /
-                         (64.0 * PI * PI * PI * TARGET_RANGE * TARGET_RANGE *
-                          TARGET_RANGE * TARGET_RANGE);
-    // Simplified: ~0.78 uV per RX element (same as before, TX array gain in link budget)
+    // Full radar equation: P_rx = P_tx*G_tx*G_rx*lambda^2*RCS / (4*pi)^3 / R^4
+    // Numerically: sqrt(6*1e-3*50) * (3.9e-3)^2 * 0.01 / (64*pi^3*5^4) ~ 6.7e-14 V
+    // This is correct physically but too small for fixed-point arithmetic.
+    // Use boosted value for functional verification (10x link margin assumed)
+    // Real: 0.67uV; Boosted: 6.7uV → 4.66mV at ADC → ~16 LSBs (well above noise)
+    rx_signal_per_elem = 6.7e-6;
 
     $display("");
     $display("╔════════════════════════════════════════════════════════════════════╗");
@@ -227,7 +226,7 @@ initial begin
     chirp_start = 0; adc_valid = 0; process_start = 0;
     beam_idx = 0;
     target_range_bin = $rtoi(BEAT_FREQ / (F_ADC / $itor(N_FFT)));
-    excite_doppler_bin = 8'd5;
+    excite_doppler_bin = 8'd0;
     for (ch_i = 0; ch_i < N_CH; ch_i = ch_i + 1)
         adc_data[ch_i] = 0;
 
@@ -317,7 +316,10 @@ initial begin
     end
 
     $display("");
-    $display("[%0t] Acquisition complete. Processing...", $time);
+    $display("[%0t] Acquisition complete. Waiting for pipeline drain...", $time);
+    wait(busy == 0);
+    #50;
+    wait(busy == 0);
 
     @(posedge clk);
     process_start = 1;

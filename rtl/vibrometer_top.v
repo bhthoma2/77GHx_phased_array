@@ -111,8 +111,8 @@ spi_serializer #(
 ) u_spi (
     .clk(clk),
     .rst_n(rst_n),
-    .data_re($unsigned(vib_amplitude)),
-    .data_im({28'd0, vib_beam}),
+    .data_re({{AW-DW{1'b0}}, vib_amplitude[DW-1:0]}),
+    .data_im({{AW-4{1'b0}}, vib_beam}),
     .data_bin(6'd0),
     .data_valid(vib_valid),
     .spi_clk(spi_clk_o),

@@ -40,7 +40,7 @@ always @(posedge clk or negedge rst_n) begin
             spi_cs_n <= 1'b1;
             spi_clk <= 1'b0;
             if (data_valid) begin
-                shift_reg <= {data_bin, data_re[DW-1:DW-16], data_im[DW-1:DW-16]};
+                shift_reg <= {data_bin, data_re[15:0], data_im[15:0]};
                 bit_cnt <= FRAME_BITS[5:0] - 6'd1;
                 state <= S_DATA;
                 spi_cs_n <= 1'b0;

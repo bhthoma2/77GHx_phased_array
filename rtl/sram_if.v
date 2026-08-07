@@ -36,18 +36,15 @@ RM_IHPSG13_1P_1024x32_c2_bm_bist u_sram (
 `else
 
 reg [DATA_W-1:0] mem [0:(1<<ADDR_W)-1];
-reg [DATA_W-1:0] rdata_r;
+integer mem_i;
+initial for (mem_i = 0; mem_i < (1<<ADDR_W); mem_i = mem_i + 1) mem[mem_i] = 0;
 
 always @(posedge clk) begin
-    if (ce) begin
-        if (we)
-            mem[addr] <= wdata;
-        else
-            rdata_r <= mem[addr];
-    end
+    if (ce && we)
+        mem[addr] <= wdata;
 end
 
-assign rdata = rdata_r;
+assign rdata = mem[addr];
 
 `endif
 
