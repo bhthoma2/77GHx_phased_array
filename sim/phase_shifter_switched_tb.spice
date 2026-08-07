@@ -1,0 +1,126 @@
+* Switched-Line Phase Shifter Verification
+* Demonstrates 45-degree phase bit using LC delay line
+* IHP SG13G2, 77 GHz
+*
+* Concept: SPDT switch selects between:
+*   Path A (reference): direct connection (short line)
+*   Path B (delayed): LC ladder giving 45 deg extra delay
+*
+* At 77GHz, 45 deg delay = 45/(360*77e9) = 1.62 ps
+* LC ladder: 4 sections, each 11.25 deg
+*   L_section = Z0 * Td / N = 50 * 1.62e-12 / 4 = 20.3 pH
+*   C_section = Td / (Z0 * N) = 1.62e-12 / (50 * 4) = 8.1 fF
+*
+* Switch model: HBT npn13G2l in shunt config
+*   RON  ~ 5 ohm  (Ib driven, Vbe=0.9V, Ic ~ 2mA, Vce_sat ~ 0.1V)
+*   ROFF ~ 500 ohm (open base, Vbe=0V)
+
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.GLOBAL sub!
+Vsub sub! 0 0
+
+* ============================================================
+* PATH A: Reference path
+*   inp -> [5-ohm series switch] -> outp_ref -> 50-ohm load
+*   Models SPDT-ON state: HBT series switch conducting
+* ============================================================
+Vp1   inp_src 0 DC 0 AC 1
+Rs1   inp_src inp 50
+
+Rsw_ref   inp outp_ref 5
+
+RL_ref    outp_ref 0 50
+
+* ============================================================
+* PATH B: Delayed path (+45 deg w.r.t. reference at 77 GHz)
+*   inp2 -> [5-ohm switch] -> 4-section LC ladder -> [5-ohm switch] -> outp_del
+*
+*   Each LC section: series L + shunt C (low-pass ladder)
+*     L = 20.3 pH,  C = 8.1 fF
+*   4 sections => total Td = 4*(L/Z0) = 4*(20.3e-12/50) = 1.624 ps
+*   Phase at 77 GHz = 2*pi*77e9*1.624e-12 * (180/pi) = 45.0 deg
+* ============================================================
+Vp2   inp2_src 0 DC 0 AC 1
+Rs2   inp2_src inp2 50
+
+Rsw_del_in  inp2 d1 5
+
+Ld1  d1  d2  20.3p
+Cd1  d2  0   8.1f
+Ld2  d2  d3  20.3p
+Cd2  d3  0   8.1f
+Ld3  d3  d4  20.3p
+Cd3  d4  0   8.1f
+Ld4  d4  d5  20.3p
+Cd4  d5  0   8.1f
+
+Rsw_del_out d5 outp_del 5
+
+RL_del  outp_del 0 50
+
+* ============================================================
+* PATH C: HBT switch path - npn13G2l series switch
+*   Validate Ron with actual device at self-consistent DC bias
+*   Nx=4 for lower Ron; base driven to 0.9 V through 500-ohm resistor
+* ============================================================
+Vp3   inp3_src 0 DC 0 AC 1
+Rs3   inp3_src inp3 50
+
+* HBT series switch: collector=inp3, emitter=sw_out3, base=biased
+XSW3  inp3 sw_out3 sw3_b sub! npn13G2l Nx=4 selft=0
+Vb3   sw3_b 0 DC 0.9
+Vc3_load sw_out3 0 DC 0
+
+RL_hbt sw_out3 0 50
+
+.control
+  * ---- single-frequency check at 77 GHz ----
+  ac lin 1 77e9 77e9
+
+  let phase_ref_deg = 180/PI * ph(v(outp_ref))
+  let phase_del_deg = 180/PI * ph(v(outp_del))
+  let delta_phase   = phase_del_deg - phase_ref_deg
+  let gain_ref_dB   = db(v(outp_ref))
+  let gain_del_dB   = db(v(outp_del))
+  let gain_imbal_dB = gain_del_dB - gain_ref_dB
+
+  echo ""
+  echo "============================================================"
+  echo " SWITCHED-LINE PHASE SHIFTER @ 77 GHz"
+  echo "============================================================"
+  echo " Reference path phase  : $&phase_ref_deg deg"
+  echo " Delayed path phase    : $&phase_del_deg deg"
+  echo " Phase difference      : $&delta_phase deg  (target: -45 deg)"
+  echo " Reference path gain   : $&gain_ref_dB dB"
+  echo " Delayed path gain     : $&gain_del_dB dB"
+  echo " Gain imbalance        : $&gain_imbal_dB dB"
+  echo "------------------------------------------------------------"
+  echo " 4-bit array context:"
+  echo "   Bits: 22.5 / 45 / 90 / 180 deg"
+  echo "   Coverage: 0..337.5 deg in 22.5-deg steps (16 states)"
+  echo "   Switch loss per bit ~1 dB; total 4-bit IL ~4-6 dB"
+  echo "   PA gain budget: +10..+15 dB compensates IL"
+  echo "============================================================"
+  echo ""
+
+  * ---- wideband sweep 60-100 GHz ----
+  ac lin 200 60e9 100e9
+
+  let phase_diff_vs_f = 180/PI * ph(v(outp_del)) - 180/PI * ph(v(outp_ref))
+  let gain_diff_vs_f  = db(v(outp_del)) - db(v(outp_ref))
+
+  wrdata /home/bthomas3/Videos/77GHz_phased_array/sim/phase_shifter_switched_results.txt phase_diff_vs_f gain_diff_vs_f
+
+  echo "Wideband sweep written to phase_shifter_switched_results.txt"
+  echo ""
+
+  * ---- HBT switch Ron check ----
+  ac lin 1 77e9 77e9
+  let gain_hbt_dB = db(v(sw_out3))
+  echo "HBT series switch (npn13G2l Nx=4, Vb=0.9V) gain: $&gain_hbt_dB dB"
+  echo "  (ref: ideal 5-ohm gives -0.39 dB into 50-ohm)"
+  echo ""
+
+.endc
+
+.end

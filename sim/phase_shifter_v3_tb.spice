@@ -1,0 +1,59 @@
+* Phase Shifter V3 - Fixed: Nx=2, reverse-bias operating point
+* IHP SG13G2 npn13G2l Cbc as tunable varactor
+
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.GLOBAL sub!
+Vsub sub! 0 0
+
+.param vctrl=1.5
+
+* Transmission line sections (lumped LC, lambda/8 at 77GHz, Z0=70ohm)
+L1p inp mid_p 145p
+L1n inn mid_n 145p
+L2p mid_p outp 145p
+L2n mid_n outn 145p
+
+* DC return for collector nodes (RF choke, high impedance at 77GHz)
+Lchoke_p mid_p dc_ret 2n
+Lchoke_n mid_n dc_ret 2n
+Vdc_ret dc_ret 0 1.65
+
+* Varactors: npn13G2l Nx=2, B-C junction
+* Collector=mid (signal), Base=vbias (control), Emitter=GND
+* DC: Vcb = Vdc_ret - Vbias. Keep Vcb > 0 (reverse bias)
+XQV1 mid_p vbias GND sub! npn13G2l Nx=2 selft=0
+XQV2 mid_n vbias GND sub! npn13G2l Nx=2 selft=0
+
+* Bias: VCTRL directly controls base through 10k (keeps RF off control line)
+Rbias vctrl_node vbias 10k
+Cbias vbias GND 10p
+Vctrl vctrl_node 0 {vctrl}
+
+* Source (50 ohm differential)
+Vp inp_src 0 DC 0 AC 1
+Vn inn_src 0 DC 0 AC -1
+Rs1 inp_src inp 50
+Rs2 inn_src inn 50
+
+* Load (50 ohm)
+RL1 outp 0 50
+RL2 outn 0 50
+
+.options method=gear reltol=1e-3 abstol=1e-9 vntol=1e-5 itl1=500
+
+.control
+  foreach vval 0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4 1.6 1.8 2.0 2.2 2.4 2.6 2.8 3.0
+    alterparam vctrl = $vval
+    reset
+    ac lin 1 77e9 77e9
+    
+    let vdiff_out = v(outp) - v(outn)
+    let vdiff_in = v(inp) - v(inn)
+    let phase_shift = 180/PI * (ph(vdiff_out) - ph(vdiff_in))
+    let gain_db = db(vdiff_out/vdiff_in)
+    
+    echo "VCTRL=$vval  Phase=$&phase_shift deg  Gain=$&gain_db dB"
+  end
+.endc
+
+.end

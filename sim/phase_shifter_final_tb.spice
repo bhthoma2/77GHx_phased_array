@@ -1,0 +1,92 @@
+* Phase Shifter Final - 4-stage varactor-loaded line
+* Target: >45 deg range, <10 dB insertion loss
+* IHP SG13G2
+
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+.GLOBAL sub!
+Vsub sub! 0 0
+
+.param vctrl=1.5
+
+* 4 LC stages, Z0=50 ohm, lambda/16 each
+* L = Z0/(2*pi*f*2) = 50/(2*pi*77e9*2) = 52pH per half-section
+* Using T-section: L/2 - shunt C(varactor) - L/2
+
+* Stage 1
+L1a inp n1 52p
+L1b n1 n2 52p
+* Stage 2
+L2a n2 n3 52p
+L2b n3 n4 52p
+* Stage 3
+L3a n4 n5 52p
+L3b n5 n6 52p
+* Stage 4
+L4a n6 n7 52p
+L4b n7 outp 52p
+
+* Negative side
+L1an inn m1 52p
+L1bn m1 m2 52p
+L2an m2 m3 52p
+L2bn m3 m4 52p
+L3an m4 m5 52p
+L3bn m5 m6 52p
+L4an m6 m7 52p
+L4bn m7 outn 52p
+
+* DC return for varactor collectors (midpoints n1,n3,n5,n7 and m1,m3,m5,m7)
+* Use large resistors as RF chokes (simpler than inductors, works for AC analysis)
+Rdc1 n1 dc_mid 5k
+Rdc2 n3 dc_mid 5k
+Rdc3 n5 dc_mid 5k
+Rdc4 n7 dc_mid 5k
+Rdc5 m1 dc_mid 5k
+Rdc6 m3 dc_mid 5k
+Rdc7 m5 dc_mid 5k
+Rdc8 m7 dc_mid 5k
+Vdc dc_mid 0 1.5
+
+* Varactors at each midpoint: npn13G2l Nx=3, collector=signal, base=ctrl, emitter=GND
+XQV1 n1 vbias GND sub! npn13G2l Nx=3 selft=0
+XQV2 n3 vbias GND sub! npn13G2l Nx=3 selft=0
+XQV3 n5 vbias GND sub! npn13G2l Nx=3 selft=0
+XQV4 n7 vbias GND sub! npn13G2l Nx=3 selft=0
+XQV5 m1 vbias GND sub! npn13G2l Nx=3 selft=0
+XQV6 m3 vbias GND sub! npn13G2l Nx=3 selft=0
+XQV7 m5 vbias GND sub! npn13G2l Nx=3 selft=0
+XQV8 m7 vbias GND sub! npn13G2l Nx=3 selft=0
+
+* Bias network
+Rbias vctrl_node vbias 10k
+Cbias vbias GND 10p
+Vctrl vctrl_node 0 {vctrl}
+
+* Source (50 ohm differential)
+Vp inp_src 0 DC 0 AC 1
+Vn inn_src 0 DC 0 AC -1
+Rs1 inp_src inp 50
+Rs2 inn_src inn 50
+
+* Load (50 ohm)
+RL1 outp 0 50
+RL2 outn 0 50
+
+.options method=gear reltol=1e-3 abstol=1e-9 vntol=1e-5 itl1=500
+
+.control
+  foreach vval 0.0 0.3 0.6 0.9 1.2 1.5 1.8 2.1 2.4 2.7 3.0 3.3
+    alterparam vctrl = $vval
+    reset
+    ac lin 1 77e9 77e9
+
+    let vdiff_out = v(outp) - v(outn)
+    let vdiff_in = v(inp) - v(inn)
+    let phase_shift = 180/PI * (ph(vdiff_out) - ph(vdiff_in))
+    let gain_db = db(vdiff_out/vdiff_in)
+
+    echo "VCTRL=$vval  Phase=$&phase_shift deg  Gain=$&gain_db dB"
+  end
+.endc
+
+.end

@@ -1,0 +1,117 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * phase shifter v2 - varactor-loaded transmission line
+
+Reset re-loads circuit * phase shifter v2 - varactor-loaded transmission line
+
+Circuit: * phase shifter v2 - varactor-loaded transmission line
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+VCTRL=0.0  Phase=-85.0976 deg  Gain=-5.27103 dB
+Reset re-loads circuit * phase shifter v2 - varactor-loaded transmission line
+
+Circuit: * phase shifter v2 - varactor-loaded transmission line
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+VCTRL=0.3  Phase=-86.5194 deg  Gain=-5.05014 dB
+Reset re-loads circuit * phase shifter v2 - varactor-loaded transmission line
+
+Circuit: * phase shifter v2 - varactor-loaded transmission line
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+VCTRL=0.6  Phase=-91.9001 deg  Gain=-4.37531 dB
+Reset re-loads circuit * phase shifter v2 - varactor-loaded transmission line
+
+Circuit: * phase shifter v2 - varactor-loaded transmission line
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+VCTRL=0.9  Phase=-131.944 deg  Gain=-11.8376 dB
+Reset re-loads circuit * phase shifter v2 - varactor-loaded transmission line
+
+Circuit: * phase shifter v2 - varactor-loaded transmission line
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+VCTRL=1.2  Phase=-139.311 deg  Gain=-17.0594 dB
+Reset re-loads circuit * phase shifter v2 - varactor-loaded transmission line
+
+Circuit: * phase shifter v2 - varactor-loaded transmission line
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+VCTRL=1.5  Phase=-140.204 deg  Gain=-19.028 dB
+Reset re-loads circuit * phase shifter v2 - varactor-loaded transmission line
+
+Circuit: * phase shifter v2 - varactor-loaded transmission line
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+VCTRL=1.8  Phase=-140.198 deg  Gain=-20.1366 dB
+Reset re-loads circuit * phase shifter v2 - varactor-loaded transmission line
+
+Circuit: * phase shifter v2 - varactor-loaded transmission line
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+VCTRL=2.1  Phase=-139.995 deg  Gain=-20.8716 dB
+Reset re-loads circuit * phase shifter v2 - varactor-loaded transmission line
+
+Circuit: * phase shifter v2 - varactor-loaded transmission line
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+VCTRL=2.4  Phase=-139.762 deg  Gain=-21.4049 dB
+Reset re-loads circuit * phase shifter v2 - varactor-loaded transmission line
+
+Circuit: * phase shifter v2 - varactor-loaded transmission line
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+VCTRL=2.7  Phase=-139.544 deg  Gain=-21.8154 dB
+Reset re-loads circuit * phase shifter v2 - varactor-loaded transmission line
+
+Circuit: * phase shifter v2 - varactor-loaded transmission line
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+VCTRL=3.0  Phase=-139.354 deg  Gain=-22.1446 dB
+Note: Simulation executed from .control section 

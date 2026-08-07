@@ -1,0 +1,56 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * switched-line phase shifter verification
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed
+
+No. of Data Rows : 1
+
+============================================================
+ SWITCHED-LINE PHASE SHIFTER @ 77 GHz
+============================================================
+ Reference path phase  : 0 deg
+ Delayed path phase    : -45.2993 deg
+ Phase difference      : -45.2993 deg  (target: -45 deg)
+ Reference path gain   : -6.44439 dB
+ Delayed path gain     : -6.88887 dB
+ Gain imbalance        : -0.444487 dB
+------------------------------------------------------------
+ 4-bit array context:
+   Bits: 22.5 / 45 / 90 / 180 deg
+   Coverage: 0..337.5 deg in 22.5-deg steps (16 states)
+   Switch loss per bit ~1 dB; total 4-bit IL ~4-6 dB
+   PA gain budget: +10..+15 dB compensates IL
+============================================================
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed
+
+No. of Data Rows : 200
+Wideband sweep written to phase_shifter_switched_results.txt
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed
+
+No. of Data Rows : 1
+Error: argument out of range for db
+  in term: db(v(sw_out3))
+
+Error: Can't evaluate "db(v(sw_out3))"
+Error: &gain_hbt_db: no such variable.
+HBT series switch (npn13G2l Nx=4, Vb=0.9V) gain:  dB
+  (ref: ideal 5-ohm gives -0.39 dB into 50-ohm)
+
+Note: Simulation executed from .control section 

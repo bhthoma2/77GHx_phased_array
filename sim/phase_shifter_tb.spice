@@ -1,0 +1,115 @@
+* ============================================================
+* Phase Shifter 77GHz Testbench — IHP SG13G2 PDK
+* Differential-pair phase shifter: VCTRL_PS sweeps tail bias
+* AC analysis at 77GHz, VCTRL_PS stepped 0.5V → 1.5V
+* ============================================================
+
+.GLOBAL sub!
+Vsub sub! 0 0
+
+* IHP SG13G2 HBT models
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+
+* Simulator options
+.options method=gear reltol=1e-3 abstol=1e-9 vntol=1e-5 itl1=500
+
+* ============================================================
+* Phase Shifter Subcircuit
+* Ports: INP INN OUTP OUTN VCTRL_PS GND VCC sub
+* ============================================================
+.subckt PHASE_SHIFTER_77G INP INN OUTP OUTN VCTRL_PS GND VCC sub
+XQ1 OUTP INP tail sub npn13G2l Nx=2 selft=0
+XQ2 OUTN INN tail sub npn13G2l Nx=2 selft=0
+Rbias VCTRL_PS tail 5k
+RL1 VCC OUTP 500
+RL2 VCC OUTN 500
+.ends PHASE_SHIFTER_77G
+
+* ============================================================
+* Testbench Top-Level
+* ============================================================
+
+* Supply: VCC = 3.3V
+Vcc vcc 0 DC 3.3
+
+* Control voltage for phase shift — swept in .control block
+Vctrl_ps ctrl_node 0 DC 1.0
+
+* Differential 77GHz RF input
+*   DC bias = 1.0V (sets Q1/Q2 base potential)
+*   AC amplitude = 100mV differential
+Vinp inp 0 DC 1.0 AC 0.1
+Vinn inn 0 DC 1.0 AC -0.1
+
+* DUT instantiation
+XDUT inp inn outp outn ctrl_node 0 vcc sub! PHASE_SHIFTER_77G
+
+* AC sweep: single point at 77GHz for phase characterisation
+* (also covers 70–85GHz band for gain/phase bandwidth view)
+.ac lin 100 70G 85G
+
+* ============================================================
+* Control Block
+* ============================================================
+.control
+
+* Load OSDI compact models for IHP HBT
+pre_osdi /home/bthomas3/Videos/ngspice_pdk/install/lib/ngspice/r3_cmc.osdi
+
+echo ""
+echo "=========================================================="
+echo "  PHASE SHIFTER 77GHz CHARACTERIZATION — IHP SG13G2"
+echo "  Differential pair (npn13G2l Nx=2, Rbias=5k)"
+echo "  Sweeping VCTRL_PS: 0.5V to 1.5V in 0.1V steps"
+echo "=========================================================="
+echo ""
+echo "VCTRL_PS(V)   PhaseIn(deg)   PhaseOut(deg)   PhaseShift(deg)   Gain(dB)"
+echo "--------------------------------------------------------------------------"
+
+* Sweep VCTRL_PS from 0.5 to 1.5V in 0.1V steps
+foreach vctrl 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5
+
+    * Set new control voltage
+    alter @Vctrl_ps[dc] = $vctrl
+
+    * Run AC analysis
+    run
+
+    * ── Differential output and input phasors ──
+    let vdiff_out = v(outp) - v(outn)
+    let vdiff_in  = v(inp)  - v(inn)
+
+    * Phase in degrees at 77GHz
+    * lin 100 pts from 70G to 85G → step = 150MHz
+    * index of 77GHz = (77G - 70G)/150M = 46.67 → index 47
+    let phase_out_deg = 180 * ph(vdiff_out)[47] / 3.14159265358979
+    let phase_in_deg  = 180 * ph(vdiff_in)[47]  / 3.14159265358979
+    let phase_shift   = phase_out_deg - phase_in_deg
+    let gain_db       = vdb(vdiff_out)[47] - vdb(vdiff_in)[47]
+
+    echo "--- VCTRL_PS = $vctrl V ---"
+    print phase_in_deg
+    print phase_out_deg
+    print phase_shift
+    print gain_db
+
+end
+
+echo ""
+echo "=========================================================="
+echo "  Simulation complete."
+echo "  Exporting last AC run data to results file..."
+echo "=========================================================="
+
+* Export waveform data from final run
+let vdiff_out_f = v(outp) - v(outn)
+let vdiff_in_f  = v(inp)  - v(inn)
+wrdata /home/bthomas3/Videos/77GHz_phased_array/sim/phase_shifter_results.txt frequency vdiff_out_f vdiff_in_f v(outp) v(outn) v(inp) v(inn)
+
+echo "Results written to: /home/bthomas3/Videos/77GHz_phased_array/sim/phase_shifter_results.txt"
+echo ""
+
+quit
+.endc
+
+.end

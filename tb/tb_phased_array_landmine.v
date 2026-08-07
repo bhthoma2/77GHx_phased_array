@@ -65,6 +65,11 @@ parameter real TX_POWER_PER_ELEM = 1.0e-3;      // 0 dBm per PA
 // Clutter
 parameter real CLUTTER_AMP = 10.0;
 
+// TX-RX isolation (on-chip leakage): 10^(-40/20) = 0.01
+parameter real TX_RX_COUPLING = 0.01;
+// Mutual coupling between adjacent RX elements: 10^(-20/20) = 0.1
+parameter real MUTUAL_COUPLING = 0.1;
+
 // Clock
 reg clk;
 reg rst_n;
@@ -284,6 +289,15 @@ initial begin
                                  $itor(ch_i)*0.5 + $itor(beam_i)*1.2);
                         total_voltage = noise_sample + clutter_sample;
                     end
+
+                    // TX-RX on-chip leakage (DC after self-mixing, filtered by HPF in IFA)
+                    // Residual after HPF: ~1% of leaked signal
+                    total_voltage = total_voltage + TX_RX_COUPLING * 0.01 * V_FS * 0.5;
+
+                    // Adjacent element mutual coupling (adds correlated noise)
+                    if (ch_i > 0)
+                        total_voltage = total_voltage + MUTUAL_COUPLING * V_NOISE_RMS *
+                            $cos(beat_phase + array_phase - 2.0*PI*D_ELEM*$sin(TARGET_ANGLE)/LAMBDA);
 
                     adc_data[ch_i] = adc_quantize(total_voltage);
                 end

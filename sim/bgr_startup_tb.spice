@@ -1,0 +1,72 @@
+* BGR Startup Testbench — BIAS_BGR convergence helper
+* Uses nodeset + ramp-up technique for diode-connected HBT BGR
+* npn13G2l is a subcircuit: ports = c b e bn (4-terminal)
+
+.title BIAS_BGR Startup Testbench
+
+* ─── PDK Models (must come before subcircuit instances) ──────────────
+.LIB /home/bthomas3/Videos/IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/models/cornerHBT.lib hbt_typ
+
+* ─── Convergence options ─────────────────────────────────────────────
+.options gmin=1e-10 rshunt=1e8 itl1=500 itl2=200 trtol=7 abstol=1e-12 vntol=1e-6
+
+* ─── Initial conditions / nodesets ──────────────────────────────────
+.nodeset v(vref)=1.0 v(q1_c)=0.8 v(q2_e)=0.2
+.ic v(vref)=0.5
+
+* ─── Supply: ramp from 0 → 1.2V over 10ns ───────────────────────────
+Vvdd vdd 0 PWL(0ns 0V  10ns 1.2V  20ns 1.2V)
+
+* ─── BGR Core (BIAS_BGR) ─────────────────────────────────────────────
+* npn13G2l subcircuit: X<name> c b e bn npn13G2l
+*
+* Q1: Nx=1, diode-connected (base tied to collector)
+*   ports: c=q1_c, b=q1_c, e=0, bn=0
+XQ1 q1_c q1_c 0 0 npn13G2l
+
+* Q2: Nx=8, diode-connected, emitter has degeneration R2
+*   ports: c=q2_c, b=q2_c, e=q2_e, bn=0
+XQ2a q2_c q2_c q2_e 0 npn13G2l
+XQ2b q2_c q2_c q2_e 0 npn13G2l
+XQ2c q2_c q2_c q2_e 0 npn13G2l
+XQ2d q2_c q2_c q2_e 0 npn13G2l
+XQ2e q2_c q2_c q2_e 0 npn13G2l
+XQ2f q2_c q2_c q2_e 0 npn13G2l
+XQ2g q2_c q2_c q2_e 0 npn13G2l
+XQ2h q2_c q2_c q2_e 0 npn13G2l
+
+* Q3: Nx=1, amplifier — base=vref_div, collector=q3_c, emitter=q3_e
+*   Base is driven from VREF via R3 feedback; here simplified: b=q2_c
+XQ3 q3_c q2_c q3_e 0 npn13G2l
+
+* ─── Resistors ───────────────────────────────────────────────────────
+* R1: collector load for Q1 (50k from VDD to Q1 collector)
+R1 vdd q1_c 50k
+
+* R2: Q2 emitter degeneration (500 ohm, PTAT generator)
+R2 q2_e 0 500
+
+* R3: feedback resistor forming VREF (10k, Q2 collector to VREF)
+R3 q2_c vref 10k
+
+* Q3 emitter resistor (sets Q3 bias current, connects to 0)
+Rq3e q3_e 0 5k
+
+* VREF load (high-impedance output)
+Rvref vref 0 1Meg
+
+* Q3 collector tied to VDD through load
+Rq3c vdd q3_c 50k
+
+* ─── Analysis ────────────────────────────────────────────────────────
+* Transient: run 50ns to let BGR settle after VDD ramp
+.tran 0.1ns 50ns uic
+
+* ─── Measurements ────────────────────────────────────────────────────
+.meas tran vref_settled avg v(vref) from=40ns to=50ns
+.meas tran vref_final   find v(vref) at=50ns
+
+* ─── Output ──────────────────────────────────────────────────────────
+.save v(vref) v(q1_c) v(q2_e) v(q2_c) v(vdd)
+
+.end
