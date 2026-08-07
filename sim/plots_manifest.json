@@ -1,0 +1,14 @@
+[
+  {
+    "file": "plot_analog_chain.html",
+    "title": "77GHz Phased Array: Analog Chain (500ns, IHP SG13G2)",
+    "status": "ok",
+    "warnings": []
+  },
+  {
+    "file": "plot_adc_digif.html",
+    "title": "77GHz Phased Array: ADC & DIGIF Output (500ns, IHP SG13G2)",
+    "status": "ok",
+    "warnings": []
+  }
+]

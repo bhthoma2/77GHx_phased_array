@@ -19,12 +19,12 @@ add_global_connection -net VDD -pin_pattern {^VDD$} -power
 add_global_connection -net VSS -pin_pattern {^VSS$} -ground
 set_voltage_domain -name Core -power VDD -ground VSS
 define_pdn_grid -name core_grid -voltage_domains {Core}
-add_pdn_stripe -grid core_grid -layer Metal3 -width 1.0 -pitch 20.0 -offset 5.0 -followpins
-add_pdn_stripe -grid core_grid -layer Metal4 -width 2.0 -pitch 40.0 -offset 10.0
-add_pdn_connect -grid core_grid -layers {Metal3 Metal4}
+add_pdn_stripe -grid core_grid -layer Metal5 -width 2.0 -pitch 50.0 -offset 10.0 -followpins
+add_pdn_stripe -grid core_grid -layer TopMetal1 -width 4.0 -pitch 100.0 -offset 20.0
+add_pdn_connect -grid core_grid -layers {Metal5 TopMetal1}
 
 place_pins -hor_layers Metal3 -ver_layers Metal2
-global_placement -density 0.45
+global_placement -density 0.40
 clock_tree_synthesis -root_buf sg13g2_buf_8 \
     -buf_list {sg13g2_buf_2 sg13g2_buf_4 sg13g2_buf_8}
 repair_timing -hold

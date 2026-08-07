@@ -1,0 +1,28 @@
+v {xschem version=3.4.7 file_version=1.2}
+K {type=subcircuit
+format="@name @pinlist @symname"
+template="name=x1"
+}
+G {}
+V {}
+S {}
+E {}
+L 4 -130 -40 130 -40 {}
+L 4 -130 40 130 40 {}
+L 4 -130 -40 -130 40 {}
+L 4 130 -40 130 40 {}
+B 5 -150 -30 -130 -30 {name=INP dir=in}
+B 5 -150 10 -130 10 {name=INN dir=in}
+B 5 -70 -60 -70 -40 {name=VCTRL_PS dir=in}
+B 5 0 -60 0 -40 {name=VCC dir=in}
+B 5 30 -60 30 -40 {name=VREF dir=in}
+B 5 0 40 0 60 {name=GND dir=in}
+B 5 30 40 30 60 {name=sub! dir=in}
+B 5 130 -30 150 -30 {name=ANT_TXP dir=out}
+B 5 130 10 150 10 {name=ANT_TXN dir=out}
+T {@name} -120 -55 0 0 0.2 0.2 {}
+T {TX_CHANNEL_77G} -60 -10 0 0 0.3 0.3 {}
+T {INP} -125 -38 0 0 0.2 0.2 {}
+T {INN} -125 2 0 0 0.2 0.2 {}
+T {TXP} 85 -38 0 0 0.2 0.2 {}
+T {TXN} 85 2 0 0 0.2 0.2 {}
